@@ -42,4 +42,4 @@ jobs:
         run: dotnet test DevHabit.slnx -c Release --no-restore --no-build --nologo
 
       - name: Publish
-        run: dotnet publish DevHabit.slnx -c Release --no-restore --no-build --nologo -p:PublishDir=publish
+        run: dotnet publish DevHabit.slnx -c Release --no-restore --no-build --nologo -p:PublishDir=publish -p:DebugType=None -p:DebugSymbols=false
