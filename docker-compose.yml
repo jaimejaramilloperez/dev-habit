@@ -1,0 +1,24 @@
+services:
+  devhabit.seq:
+    container_name: devhabit.seq
+    image: datalust/seq:2024.3
+    restart: unless-stopped
+    ports:
+      - 8080:80
+      - 5341:5341
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq-data:/data
+
+  devhabit.aspire-dashboard:
+    container_name: devhabit.aspire-dashboard
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+    ports:
+      - 18888:18888
+      - 18889:18889
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+
+volumes:
+  seq-data:

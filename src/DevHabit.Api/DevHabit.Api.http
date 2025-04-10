@@ -1,0 +1,7 @@
+@DevHabitApiHostAddress = https://localhost:5001
+
+###
+GET {{DevHabitApiHostAddress}}/weather/
+Accept: application/json
+
+###

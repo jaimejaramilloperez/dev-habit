@@ -1,0 +1,15 @@
+services:
+  devhabit.api:
+    container_name: devhabit.api
+    image: devhabitapi
+    build:
+      context: .
+      dockerfile: src/DevHabit.Api/Dockerfile
+      args:
+        - configuration=Debug
+    ports:
+      - 5000:80
+      - 5001:443
+    env_file: ".env"
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw

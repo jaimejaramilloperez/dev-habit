@@ -1,0 +1,33 @@
+{
+  "dotnet.defaultSolution": "DevHabit.slnx",
+  "cSpell.words": [
+    "appsettings",
+    "aspnet",
+    "aspnetapp",
+    "ASPNETCORE",
+    "buildtransitive",
+    "buildx",
+    "classpath",
+    "contentfiles",
+    "datalust",
+    "dbmdl",
+    "dcproj",
+    "devhabit",
+    "devhabitapi",
+    "dotenv",
+    "dotnet",
+    "github",
+    "LINQ",
+    "linux",
+    "nologo",
+    "Otlp",
+    "protobuf",
+    "Qube",
+    "slnx",
+    "toolstarget",
+    "vsdbg"
+  ],
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "file:///home/spartan/dev/learning/dotnet/RestApis/PragmaticRestApiCourse/.github/workflows/pipeline.yml"
+  }
+}

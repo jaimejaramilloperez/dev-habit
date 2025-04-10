@@ -1,0 +1,45 @@
+name: Publish 🚀
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  DOTNET_VERSION: "9.x"
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            !~/.nuget/packages/unwanted
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}-${{ hashFiles('.github/workflows/pipeline.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore DevHabit.slnx
+
+      - name: Build
+        run: dotnet build DevHabit.slnx -c Release --no-restore --nologo
+
+      - name: Test
+        run: dotnet test DevHabit.slnx -c Release --no-restore --no-build --nologo
+
+      - name: Publish
+        run: dotnet publish DevHabit.slnx -c Release --no-restore --no-build --nologo -p:PublishDir=publish
