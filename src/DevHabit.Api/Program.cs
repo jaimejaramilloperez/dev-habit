@@ -1,3 +1,9 @@
+using DevHabit.Api.Database;
+using DevHabit.Api.Extensions;
+using HealthChecks.UI.Client;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -9,13 +15,20 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddDbContext<ApplicationDbContext>(options => options
+    .UseNpgsql(builder.Configuration.GetConnectionString("Database"), npgsqlOptions =>
+        npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Application))
+    .UseSnakeCaseNamingConvention());
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
     .WithTracing(tracing => tracing
         .AddHttpClientInstrumentation()
-        .AddAspNetCoreInstrumentation())
+        .AddAspNetCoreInstrumentation()
+        .AddNpgsql())
     .WithMetrics(metrics => metrics
         .AddHttpClientInstrumentation()
         .AddAspNetCoreInstrumentation()
@@ -33,11 +46,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.ApplyMigrations<ApplicationDbContext>();
 }
 
 app.UseHttpsRedirection();
 
-app.MapHealthChecks("health");
+app.MapHealthChecks("health", new()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.MapControllers();
 
