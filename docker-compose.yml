@@ -1,7 +1,7 @@
 services:
   devhabit.api:
-    image: ${DOCKER_REGISTRY-}devhabit.api
     container_name: devhabit.api
+    image: ${DOCKER_REGISTRY-}devhabit.api
     build:
       context: .
       dockerfile: src/DevHabit.Api/Dockerfile

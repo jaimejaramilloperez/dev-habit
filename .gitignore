@@ -65,7 +65,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
-
+**/*.pfx
 # Tye
 .tye/
 

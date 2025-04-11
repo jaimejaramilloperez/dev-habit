@@ -41,6 +41,6 @@ COPY --from=build /app/build .
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
 EXPOSE 5001
-COPY ["aspnetapp.pfx", "/https/aspnetapp.pfx"]
+COPY ["src/DevHabit.Api/aspnetapp.pfx", "/https/aspnetapp.pfx"]
 RUN chmod 644 /https/aspnetapp.pfx
 ENTRYPOINT ["dotnet", "DevHabit.Api.dll"]
