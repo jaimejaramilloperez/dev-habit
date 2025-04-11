@@ -1,8 +1,10 @@
 <Project>
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageVersionOverrideEnabled>true</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
     <!-- OpenTelemetry -->
@@ -14,4 +16,5 @@
     <!-- Code Analysis -->
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.8.0.113526" />
   </ItemGroup>
+
 </Project>
