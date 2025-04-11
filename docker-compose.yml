@@ -1,4 +1,15 @@
 services:
+  devhabit.api:
+    image: ${DOCKER_REGISTRY-}devhabit.api
+    container_name: devhabit.api
+    build:
+      context: .
+      dockerfile: src/DevHabit.Api/Dockerfile
+    ports:
+      - 5000:5000
+    env_file:
+      - .env
+
   devhabit.seq:
     container_name: devhabit.seq
     image: datalust/seq:2024.3
