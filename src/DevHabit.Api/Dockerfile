@@ -10,7 +10,6 @@ RUN dotnet restore "./src/DevHabit.Api/DevHabit.Api.csproj"
 
 FROM restore AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
 COPY . .
 RUN dotnet build "./src/DevHabit.Api/DevHabit.Api.csproj" \
   -c $BUILD_CONFIGURATION \
@@ -20,7 +19,6 @@ RUN dotnet build "./src/DevHabit.Api/DevHabit.Api.csproj" \
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
 RUN dotnet publish "./src/DevHabit.Api/DevHabit.Api.csproj" \
   -c $BUILD_CONFIGURATION \
   --no-restore \
@@ -35,4 +33,14 @@ COPY --from=publish /app/publish .
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
 USER app
+ENTRYPOINT ["dotnet", "DevHabit.Api.dll"]
+
+
+FROM base AS dev
+COPY --from=build /app/build .
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
+EXPOSE 5001
+COPY ["aspnetapp.pfx", "/https/aspnetapp.pfx"]
+RUN chmod 644 /https/aspnetapp.pfx
 ENTRYPOINT ["dotnet", "DevHabit.Api.dll"]
