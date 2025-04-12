@@ -27,6 +27,7 @@ RUN dotnet publish "./src/DevHabit.Api/DevHabit.Api.csproj" \
   -p:UseAppHost=false \
   -p:DebugType=None \
   -p:DebugSymbols=false
+RUN rm /app/publish/appsettings.Development.json
 
 FROM base AS final
 COPY --from=publish /app/publish .

@@ -17,6 +17,7 @@
     "dotenv",
     "dotnet",
     "dpage",
+    "Dtos",
     "github",
     "healthcheck",
     "isready",

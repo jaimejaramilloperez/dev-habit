@@ -9,16 +9,16 @@ services:
       args:
         - BUILD_CONFIGURATION=${DOCKER_ASPNETCORE_BUILD_CONFIGURATION}
     ports:
-      - 5000:${ASPNETCORE_HTTP_PORTS}
-      - 5001:${ASPNETCORE_HTTPS_PORTS}
+      - 5000:${HTTP_PORT}
+      - 5001:${HTTPS_PORT}
     environment:
-      DOTNET_USE_POLLING_FILE_WATCHER: ${DOTNET_USE_POLLING_FILE_WATCHER}
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ASPNETCORE_HTTP_PORTS: ${ASPNETCORE_HTTP_PORTS}
-      ASPNETCORE_HTTPS_PORTS: ${ASPNETCORE_HTTPS_PORTS}
-      ASPNETCORE_Kestrel__Certificates__Default__Path: ${ASPNETCORE_Kestrel__Certificates__Default__Path}
-      ASPNETCORE_Kestrel__Certificates__Default__Password: ${ASPNETCORE_Kestrel__Certificates__Default__Password}
-      ConnectionStrings__Database: "Server=devhabit.postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      ASPNETCORE_HTTP_PORTS: ${HTTP_PORT}
+      ASPNETCORE_HTTPS_PORTS: ${HTTPS_PORT}
+      ASPNETCORE_Kestrel__Certificates__Default__Path: ${CERTIFICATE_PATH}
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
+      ConnectionStrings__Database: "Server=${POSTGRES_SERVER};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
     depends_on:
       devhabit.postgres:
         condition: service_healthy
@@ -29,7 +29,7 @@ services:
     image: postgres:17.3-alpine3.21
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - 5432:${POSTGRES_PORT}
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
