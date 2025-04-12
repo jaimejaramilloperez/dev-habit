@@ -23,6 +23,7 @@ docker container inspect --format='{{json .State.Health}}' devhabit.api
 ```sh
 dotnet dev-certs https -ep ./src/DevHabit.Api/aspnetapp.pfx -p Test1234!
 ```
+
 ### Create a database migration
 
 ```sh

@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Habits;
