@@ -1,4 +1,29 @@
 services:
+  devhabit.api:
+    container_name: devhabit.api
+    image: ${DOCKER_REGISTRY-}devhabit.api:${DOCKER_IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: src/DevHabit.Api/Dockerfile
+      target: ${DOCKER_BUILD_TARGET}
+      args:
+        - BUILD_CONFIGURATION=${DOCKER_ASPNETCORE_BUILD_CONFIGURATION}
+    ports:
+      - 5000:${HTTP_PORT}
+      - 5001:${HTTPS_PORT}
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      ASPNETCORE_HTTP_PORTS: ${HTTP_PORT}
+      ASPNETCORE_HTTPS_PORTS: ${HTTPS_PORT}
+      ASPNETCORE_Kestrel__Certificates__Default__Path: ${CERTIFICATE_PATH}
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
+      ConnectionStrings__Database: "Server=${POSTGRES_SERVER};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
+    depends_on:
+      devhabit.postgres:
+        condition: service_healthy
+        restart: true
+
   devhabit.postgres:
     container_name: devhabit.postgres
     image: postgres:17.3-alpine3.21

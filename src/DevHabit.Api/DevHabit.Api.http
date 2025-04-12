@@ -5,7 +5,7 @@ GET {{DevHabitApiHostAddress}}/api/habits
 Accept: application/json
 
 ### Get Habit by Id
-GET {{DevHabitApiHostAddress}}/api/habits/id
+GET {{DevHabitApiHostAddress}}/api/habits/h_01962bbb-4678-7301-8344-39b050fd2f58
 Accept: application/json
 
 ### Create Habit
@@ -14,16 +14,39 @@ Accept: application/json
 Content-Type: application/json
 
 {
-
+  "name": null,
+  "description": null,
+  "type": 2,
+  "frequency": {
+    "type": 1,
+    "timesPerPeriod": 1
+  },
+  "target": {
+    "value": 30,
+    "unit": "minutes"
+  }
 }
 
 ### Update Habit
-PUT {{DevHabitApiHostAddress}}/api/habits/id
+PUT {{DevHabitApiHostAddress}}/api/habits/h_01962bbb-4678-7301-8344-39b050fd2f58
 Accept: application/json
 Content-Type: application/json
 
 {
-
+  "name": "Daily Coding",
+  "description": "The new description",
+  "type": 2,
+  "frequency": {
+    "type": 1,
+    "timesPerPeriod": 1
+  },
+  "target": {
+    "value": 30,
+    "unit": "minutes"
+  },
+  "milestone": {
+    "target": 100
+  }
 }
 
 ### Partially Update Habit
