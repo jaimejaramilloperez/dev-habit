@@ -1,6 +1,7 @@
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<HabitDto>> GetHabit(string id)
+    public async Task<IActionResult> GetHabit(string id)
     {
         HabitDto? habit = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
@@ -64,6 +65,50 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
 
         habit.UpdateFromDto(updateHabitDto);
 
+        await _dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchHabit(string id, JsonPatchDocument<HabitDto> patchDocument)
+    {
+        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (habit is null)
+        {
+            return NotFound();
+        }
+
+        HabitDto habitDto = habit.ToDto();
+
+        patchDocument.ApplyTo(habitDto, ModelState);
+
+        if (!TryValidateModel(habitDto))
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        habit.Name = habitDto.Name;
+        habit.Description = habitDto.Description;
+        habit.UpdatedAtUtc = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteHabit(string id)
+    {
+        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (habit is null)
+        {
+            return NotFound();
+        }
+
+        _dbContext.Habits.Remove(habit);
         await _dbContext.SaveChangesAsync();
 
         return NoContent();

@@ -50,13 +50,21 @@ Content-Type: application/json
 }
 
 ### Partially Update Habit
-PATCH {{DevHabitApiHostAddress}}/api/habits/id
+PATCH {{DevHabitApiHostAddress}}/api/habits/h_01962bbb-4678-7301-8344-39b050fd2f58
 Accept: application/json
 Content-Type: application/json
 
-{
-
-}
+[
+  {
+    "op": "replace",
+    "path": "/name",
+    "value": "Daily Coding (Update)"
+  },
+  {
+    "op": "remove",
+    "path": "/description"
+  }
+]
 
 ### Delete Habit
 DELETE  {{DevHabitApiHostAddress}}/api/habits/id
