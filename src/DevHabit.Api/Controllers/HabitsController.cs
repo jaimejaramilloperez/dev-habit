@@ -32,9 +32,9 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
     [HttpGet("{id}")]
     public async Task<IActionResult> GetHabit(string id)
     {
-        HabitDto? habit = await _dbContext.Habits.AsNoTracking()
+        HabitWithTagsDto? habit = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
-            .Select(x => x.ToDto())
+            .Select(HabitQueries.ProjectToDtoWithTags())
             .FirstOrDefaultAsync();
 
         return habit is null ? NotFound() : Ok(habit);

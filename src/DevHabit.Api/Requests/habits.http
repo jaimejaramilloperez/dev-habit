@@ -1,6 +1,6 @@
 @DevHabitApiHostAddress = https://localhost:5001
 @BasePath = api/habits
-@ResourceId = h_01962bbb-4678-7301-8344-39b050fd2f58
+@ResourceId = h_01962bc2-765b-7e35-846e-42568b36975b
 
 ### Get Habits
 GET {{DevHabitApiHostAddress}}/{{BasePath}}
