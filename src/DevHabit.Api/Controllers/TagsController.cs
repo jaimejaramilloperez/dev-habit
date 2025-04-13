@@ -1,4 +1,3 @@
-using System.Globalization;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Dtos.Tags;

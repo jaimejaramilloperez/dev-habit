@@ -1,6 +1,6 @@
 @DevHabitApiHostAddress = https://localhost:5001
 @BasePath = api/tags
-@ResourceId = t_01963066-a2e5-7b54-b5c6-427720662460
+@ResourceId = t_01962fec-fe05-749f-ae01-3d78000389ce
 
 ### Get Tags
 GET {{DevHabitApiHostAddress}}/{{BasePath}}
