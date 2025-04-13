@@ -1,0 +1,35 @@
+@DevHabitApiHostAddress = https://localhost:5001
+@BasePath = api/tags
+@ResourceId = t_01963066-a2e5-7b54-b5c6-427720662460
+
+### Get Tags
+GET {{DevHabitApiHostAddress}}/{{BasePath}}
+Accept: application/json
+
+### Get Tag by Id
+GET {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+Accept: application/json
+
+### Create Tag
+POST {{DevHabitApiHostAddress}}/{{BasePath}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "coding",
+  "description": null
+}
+
+### Update Tag
+PUT {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "coding",
+  "description": "The new description"
+}
+
+### Delete Tag
+DELETE  {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+Accept: application/json

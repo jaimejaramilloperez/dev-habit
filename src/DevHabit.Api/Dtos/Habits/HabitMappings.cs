@@ -34,35 +34,35 @@ public static class HabitMappings
         };
     }
 
-    public static HabitDto ToDto(this Habit x)
+    public static HabitDto ToDto(this Habit habit)
     {
         return new()
         {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Type = x.Type,
+            Id = habit.Id,
+            Name = habit.Name,
+            Description = habit.Description,
+            Type = habit.Type,
             Frequency = new()
             {
-                Type = x.Frequency.Type,
-                TimesPerPeriod = x.Frequency.TimesPerPeriod,
+                Type = habit.Frequency.Type,
+                TimesPerPeriod = habit.Frequency.TimesPerPeriod,
             },
             Target = new()
             {
-                Value = x.Target.Value,
-                Unit = x.Target.Unit,
+                Value = habit.Target.Value,
+                Unit = habit.Target.Unit,
             },
-            Status = x.Status,
-            IsArchived = x.IsArchived,
-            EndDate = x.EndDate,
-            Milestone = x.Milestone is null ? null : new()
+            Status = habit.Status,
+            IsArchived = habit.IsArchived,
+            EndDate = habit.EndDate,
+            Milestone = habit.Milestone is null ? null : new()
             {
-                Target = x.Milestone.Target,
-                Current = x.Milestone.Current,
+                Target = habit.Milestone.Target,
+                Current = habit.Milestone.Current,
             },
-            CreatedAtUtc = x.CreatedAtUtc,
-            UpdatedAtUtc = x.UpdatedAtUtc,
-            LastCompletedAtUtc = x.LastCompletedAtUtc,
+            CreatedAtUtc = habit.CreatedAtUtc,
+            UpdatedAtUtc = habit.UpdatedAtUtc,
+            LastCompletedAtUtc = habit.LastCompletedAtUtc,
         };
     }
 

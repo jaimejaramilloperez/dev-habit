@@ -64,7 +64,6 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
         }
 
         habit.UpdateFromDto(updateHabitDto);
-
         await _dbContext.SaveChangesAsync();
 
         return NoContent();

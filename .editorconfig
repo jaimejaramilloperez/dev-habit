@@ -418,11 +418,20 @@ dotnet_diagnostic.CA1849.severity = suggestion
 # CA1860: Avoid using 'Enumerable.Any()' extension method
 dotnet_diagnostic.CA1860.severity = suggestion
 
+# CA1304: Specify CultureInfo
+dotnet_diagnostic.CA1304.severity = suggestion
+
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity = suggestion
 
+# CA1311: Specify a culture or use an invariant version
+dotnet_diagnostic.CA1311.severity = suggestion
+
 # CA1515: Consider making public types internal
 dotnet_diagnostic.CA1515.severity = suggestion
+
+# CA1862: Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
+dotnet_diagnostic.CA1862.severity = suggestion
 
 # CA2007: Do not directly await a Task
 dotnet_diagnostic.CA2007.severity = none
