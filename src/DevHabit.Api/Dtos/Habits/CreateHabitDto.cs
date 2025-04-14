@@ -1,7 +1,9 @@
 using DevHabit.Api.Entities;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace DevHabit.Api.Dtos.Habits;
 
+[ValidateNever]
 public sealed record CreateHabitDto
 {
     public required string Name { get; init; }

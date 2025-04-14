@@ -1,6 +1,9 @@
+using DevHabit.Api;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
+using FluentValidation;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json.Serialization;
@@ -18,6 +21,11 @@ builder.Host.UseDefaultServiceProvider((context, options) =>
     options.ValidateOnBuild = true;
 });
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    // options.SuppressModelStateInvalidFilter = true;
+});
+
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
@@ -31,6 +39,16 @@ builder.Services.AddControllers(options =>
     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 })
 .AddXmlSerializerFormatters();
+
+builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+    };
+});
 
 builder.Services.AddOpenApi();
 

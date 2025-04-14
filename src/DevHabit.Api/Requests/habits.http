@@ -18,15 +18,19 @@ Content-Type: application/json
 {
   "name": null,
   "description": null,
-  "type": 2,
+  "type": 4,
   "frequency": {
-    "type": 1,
+    "type": 5,
     "timesPerPeriod": 1
   },
   "target": {
     "value": 30,
     "unit": "minutes"
-  }
+  },
+  "milestone": {
+    "target": -1
+  },
+  "endDate": "2024-12-01"
 }
 
 ### Update Habit
