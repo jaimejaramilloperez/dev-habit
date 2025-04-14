@@ -1,9 +1,9 @@
 using DevHabit.Api;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
+using DevHabit.Api.Middlewares;
 using FluentValidation;
 using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json.Serialization;
@@ -21,19 +21,10 @@ builder.Host.UseDefaultServiceProvider((context, options) =>
     options.ValidateOnBuild = true;
 });
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    // options.SuppressModelStateInvalidFilter = true;
-});
-
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
 })
-// .AddJsonOptions(options =>
-// {
-//     options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-// })
 .AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -42,13 +33,13 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
 
-builder.Services.AddProblemDetails(options =>
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
 {
-    options.CustomizeProblemDetails = context =>
-    {
-        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
-    };
+    context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
 });
+
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddOpenApi();
 
@@ -87,6 +78,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.MapHealthChecks("health", new()
 {

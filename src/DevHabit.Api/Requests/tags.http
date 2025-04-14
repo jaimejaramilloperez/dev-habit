@@ -16,7 +16,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "coding",
+  "name": "Coding",
   "description": null
 }
 
@@ -26,7 +26,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "coding",
+  "name": "Coding",
   "description": "The new description"
 }
 
