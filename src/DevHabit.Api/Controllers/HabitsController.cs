@@ -16,9 +16,17 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<HabitsCollectionDto>> GetHabits()
+    public async Task<ActionResult<HabitsCollectionDto>> GetHabits(HabitsQueryParameters queryParams)
     {
+        string? searchTerm = queryParams.Search?.Trim().ToLower();
+
         List<HabitDto> habits = await _dbContext.Habits.AsNoTracking()
+            .Where(x =>
+                searchTerm == null ||
+                x.Name.ToLower().Contains(searchTerm) ||
+                x.Description != null && x.Description.ToLower().Contains(searchTerm))
+            .Where(x => queryParams.Type == null || x.Type == queryParams.Type)
+            .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
             .Select(x => x.ToDto())
             .ToListAsync();
 
