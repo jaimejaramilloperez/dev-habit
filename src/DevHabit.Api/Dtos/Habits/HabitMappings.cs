@@ -89,10 +89,8 @@ public static class HabitMappings
 
         if (dto.Milestone is not null)
         {
-            habit.Milestone = new()
-            {
-                Target = dto.Milestone.Target,
-            };
+            habit.Milestone ??= new Milestone();
+            habit.Milestone.Target = dto.Milestone.Target;
         }
 
         habit.UpdatedAtUtc = DateTime.UtcNow;

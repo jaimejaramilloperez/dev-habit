@@ -39,7 +39,9 @@ public sealed class HabitTagsController(ApplicationDbContext dbContext)
 
         if (existingTagIds.Length != upsertHabitTagsDto.TagIds.Count)
         {
-            return BadRequest("One or more tag IDs are invalid");
+            return Problem(
+                detail: "One or more tag IDs are invalid",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         habit.HabitTags.RemoveAll(x => !upsertHabitTagsDto.TagIds.Contains(x.TagId));

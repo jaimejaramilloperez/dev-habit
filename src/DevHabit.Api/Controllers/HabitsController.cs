@@ -27,7 +27,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext)
                 x.Description != null && x.Description.ToLower().Contains(searchTerm))
             .Where(x => queryParams.Type == null || x.Type == queryParams.Type)
             .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
-            .Select(x => x.ToDto())
+            .Select(HabitQueries.ProjectToDto())
             .ToListAsync();
 
         HabitsCollectionDto habitsCollectionDto = new()

@@ -19,7 +19,7 @@ public sealed class TagsController(ApplicationDbContext dbContext)
     public async Task<ActionResult<TagsCollectionDto>> GetTags()
     {
         List<TagDto> tags = await _dbContext.Tags.AsNoTracking()
-            .Select(x => x.ToDto())
+            .Select(TagQueries.ProjectToDto())
             .ToListAsync();
 
         TagsCollectionDto tagsCollectionDto = new()
@@ -35,7 +35,7 @@ public sealed class TagsController(ApplicationDbContext dbContext)
     {
         TagDto? tag = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.Id == id)
-            .Select(x => x.ToDto())
+            .Select(TagQueries.ProjectToDto())
             .FirstOrDefaultAsync();
 
         return tag is null ? NotFound() : Ok(tag);

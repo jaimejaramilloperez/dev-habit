@@ -17,5 +17,5 @@ public sealed record HabitWithTagsDto
     public required DateTime CreatedAtUtc { get; init; }
     public DateTime? UpdatedAtUtc { get; init; }
     public DateTime? LastCompletedAtUtc { get; init; }
-    public required ICollection<string> Tags { get; init; }
+    public required IReadOnlyCollection<string> Tags { get; init; }
 }
