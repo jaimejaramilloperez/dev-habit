@@ -10,8 +10,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/habits")]
-public sealed class HabitsController(ApplicationDbContext dbContext)
-    : ControllerBase
+public sealed class HabitsController(ApplicationDbContext dbContext) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
 

@@ -15,6 +15,8 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
+
 builder.Host.UseDefaultServiceProvider((context, options) =>
 {
     options.ValidateScopes = true;

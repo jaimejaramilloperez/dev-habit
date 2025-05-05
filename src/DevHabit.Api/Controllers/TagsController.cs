@@ -10,8 +10,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/tags")]
-public sealed class TagsController(ApplicationDbContext dbContext)
-    : ControllerBase
+public sealed class TagsController(ApplicationDbContext dbContext) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
 

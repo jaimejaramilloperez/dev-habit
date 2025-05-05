@@ -58,6 +58,6 @@ public sealed partial class ValidationExceptionHandler(IProblemDetailsService pr
             .Replace(result, m => "." + char.ToLowerInvariant(m.Groups[1].Value[0]));
     }
 
-    [GeneratedRegex(@"\.(\w)", RegexOptions.NonBacktracking, 20)]
+    [GeneratedRegex(@"\.(\w)", RegexOptions.None, 20, "en-US")]
     private static partial Regex PropertyDotSeparatorRegex();
 }

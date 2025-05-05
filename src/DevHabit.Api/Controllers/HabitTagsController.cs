@@ -8,8 +8,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("/api/habits/{habitId}/tags")]
-public sealed class HabitTagsController(ApplicationDbContext dbContext)
-    : ControllerBase
+public sealed class HabitTagsController(ApplicationDbContext dbContext) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
 
@@ -32,12 +31,12 @@ public sealed class HabitTagsController(ApplicationDbContext dbContext)
             return NoContent();
         }
 
-        string[] existingTagIds = await _dbContext.Tags
+        List<string> existingTagIds = await _dbContext.Tags
             .Where(x => upsertHabitTagsDto.TagIds.Contains(x.Id))
             .Select(x => x.Id)
-            .ToArrayAsync();
+            .ToListAsync();
 
-        if (existingTagIds.Length != upsertHabitTagsDto.TagIds.Count)
+        if (existingTagIds.Count != upsertHabitTagsDto.TagIds.Count)
         {
             return Problem(
                 detail: "One or more tag IDs are invalid",
