@@ -1,4 +1,5 @@
 using DevHabit.Api.Database;
+using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Dtos.Tags;
 using DevHabit.Api.Entities;
@@ -15,18 +16,18 @@ public sealed class TagsController(ApplicationDbContext dbContext) : ControllerB
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<TagsCollectionDto>> GetTags()
+    public async Task<ActionResult<PaginationResult<TagDto>>> GetTags()
     {
         List<TagDto> tags = await _dbContext.Tags.AsNoTracking()
             .Select(TagQueries.ProjectToDto())
             .ToListAsync();
 
-        TagsCollectionDto tagsCollectionDto = new()
+        PaginationResult<TagDto> paginationResult = new()
         {
             Data = tags,
         };
 
-        return Ok(tagsCollectionDto);
+        return Ok(paginationResult);
     }
 
     [HttpGet("{id}")]

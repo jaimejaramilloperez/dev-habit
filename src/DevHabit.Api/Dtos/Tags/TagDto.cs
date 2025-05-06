@@ -1,10 +1,5 @@
 namespace DevHabit.Api.Dtos.Tags;
 
-public sealed record TagsCollectionDto
-{
-    public required List<TagDto> Data { get; init; }
-}
-
 public sealed record TagDto
 {
     public required string Id { get; init; }

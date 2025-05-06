@@ -1,5 +1,7 @@
 using System.Linq.Dynamic.Core;
+using DevHabit.Api.Dtos.Common;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Extensions;
 
@@ -40,6 +42,27 @@ public static class QueryableExtensions
         return string.IsNullOrWhiteSpace(orderQuery)
             ? ApplyDefaultOrder(query, defaultOrderField)
             : query.OrderBy(orderQuery);
+    }
+
+    public static async Task<PaginationResult<T>> ToPaginationResult<T>(
+        this IQueryable<T> query,
+        int page,
+        int pageSize)
+    {
+        long totalCount = await query.LongCountAsync();
+
+        List<T> items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new()
+        {
+            Data = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+        };
     }
 
     private static IQueryable<T> ApplyDefaultOrder<T>(IQueryable<T> query, string? defaultOrderField)

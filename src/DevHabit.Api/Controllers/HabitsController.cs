@@ -1,4 +1,5 @@
 using DevHabit.Api.Database;
+using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
@@ -16,11 +17,11 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<HabitsCollectionDto>> GetHabits(HabitsQueryParameters queryParams)
+    public async Task<ActionResult<PaginationResult<HabitDto>>> GetHabits(HabitsQueryParameters queryParams)
     {
         string? searchTerm = queryParams.SearchTerm?.Trim().ToLower();
 
-        List<HabitDto> habits = await _dbContext.Habits.AsNoTracking()
+        PaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
@@ -29,14 +30,9 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
             .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
             .OrderByQueryString(queryParams.Sort, ["id", "name", "description"])
             .Select(HabitQueries.ProjectToDto())
-            .ToListAsync();
+            .ToPaginationResult(queryParams.Page, queryParams.PageSize);
 
-        HabitsCollectionDto habitsCollectionDto = new()
-        {
-            Data = habits,
-        };
-
-        return Ok(habitsCollectionDto);
+        return Ok(paginationResult);
     }
 
     [HttpGet("{id}")]
