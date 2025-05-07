@@ -30,13 +30,20 @@ public sealed partial class ValidationExceptionHandler(IProblemDetailsService pr
             },
         };
 
-        Dictionary<string, string[]> errors = validationException.Errors
-            .GroupBy(x => x.PropertyName)
-            .ToDictionary(
-                g => ToCamelCase(g.Key),
-                g => g.Select(x => x.ErrorMessage).ToArray());
+        if (validationException.Errors.Any())
+        {
+            Dictionary<string, string[]> errors = validationException.Errors
+                .GroupBy(x => x.PropertyName)
+                .ToDictionary(
+                    g => ToCamelCase(g.Key),
+                    g => g.Select(x => x.ErrorMessage).ToArray());
 
-        context.ProblemDetails.Extensions.Add("errors", errors);
+            context.ProblemDetails.Extensions.Add("errors", errors);
+        }
+        else
+        {
+            context.ProblemDetails.Detail = validationException.Message;
+        }
 
         return await problemDetailsService.TryWriteAsync(context);
     }

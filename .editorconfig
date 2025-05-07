@@ -461,6 +461,9 @@ dotnet_diagnostic.S2094.severity = suggestion
 # S2139: Exceptions should be either logged or rethrown but not both
 dotnet_diagnostic.S2139.severity = silent
 
+# S2326: Unused type parameters should be removed
+dotnet_diagnostic.S2326.severity = suggestion
+
 # S3267: Loops should be simplified with "LINQ" expressions
 dotnet_diagnostic.S3267.severity = suggestion
 

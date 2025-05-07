@@ -28,7 +28,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
                 x.Description != null && x.Description.ToLower().Contains(searchTerm))
             .Where(x => queryParams.Type == null || x.Type == queryParams.Type)
             .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
-            .OrderByQueryString(queryParams.Sort, ["id", "name", "description"])
+            .SortByQueryString(queryParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
             .ToPaginationResult(queryParams.Page, queryParams.PageSize);
 

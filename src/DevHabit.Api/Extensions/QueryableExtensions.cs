@@ -7,10 +7,10 @@ namespace DevHabit.Api.Extensions;
 
 public static class QueryableExtensions
 {
-    public static IQueryable<T> OrderByQueryString<T>(
+    public static IQueryable<T> SortByQueryString<T>(
         this IQueryable<T> query,
         string? sort,
-        IEnumerable<string> validFields,
+        ICollection<SortMapping> mappings,
         string? defaultOrderField = null)
     {
         if (string.IsNullOrWhiteSpace(sort))
@@ -19,22 +19,40 @@ public static class QueryableExtensions
         }
 
         string[] sortFields = sort
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Trim().ToLowerInvariant())
-            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(x => x.ToLowerInvariant())
             .ToArray();
+
+        if (!SortMapping.AreAllSortFieldsValid(mappings, sortFields))
+        {
+            throw new ValidationException($"The sort parameter '{sort}' is not valid");
+        }
 
         List<string> sortClauses = new(sortFields.Length);
 
-        foreach (var field in sortFields)
+        foreach (var sortField in sortFields)
         {
-            string sortDirection = field[0] == '-' ? "desc" : "asc";
-            string fieldName = sortDirection == "desc" ? field[1..] : field;
+            Sort.Direction direction = sortField[0] == '-'
+                ? Sort.Direction.Desc
+                : Sort.Direction.Asc;
 
-            if (validFields.Contains(fieldName, StringComparer.OrdinalIgnoreCase))
+            string field = direction == Sort.Direction.Desc
+                ? sortField[1..]
+                : sortField;
+
+            SortMapping mapping = mappings.First(x =>
+                string.Equals(x.SortField, field, StringComparison.OrdinalIgnoreCase));
+
+            string sortDirection = (direction, mapping.Reverse) switch
             {
-                sortClauses.Add($"{fieldName} {sortDirection}");
-            }
+                (Sort.Direction.Asc, false) => "ASC",
+                (Sort.Direction.Desc, false) => "DESC",
+                (Sort.Direction.Asc, true) => "DESC",
+                (Sort.Direction.Desc, true) => "ASC",
+                _ => "ASC",
+            };
+
+            sortClauses.Add($"{mapping.PropertyName} {sortDirection}");
         }
 
         string orderQuery = string.Join(',', sortClauses);
