@@ -17,8 +17,12 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<PaginationResult<HabitDto>>> GetHabits(HabitsQueryParameters queryParams)
+    public async Task<ActionResult<PaginationResult<HabitDto>>> GetHabits(
+        HabitsQueryParameters queryParams,
+        IValidator<HabitsQueryParameters> validator)
     {
+        await validator.ValidateAndThrowAsync(queryParams);
+
         string? searchTerm = queryParams.SearchTerm?.Trim().ToLower();
 
         PaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()

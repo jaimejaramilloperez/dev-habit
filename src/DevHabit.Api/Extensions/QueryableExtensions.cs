@@ -25,7 +25,7 @@ public static class QueryableExtensions
 
         if (!SortMapping.AreAllSortFieldsValid(mappings, sortFields))
         {
-            throw new ValidationException($"The sort parameter '{sort}' is not valid");
+            throw new ValidationException([new("sort", $"Sort value '{sort}' is not valid")]);
         }
 
         List<string> sortClauses = new(sortFields.Length);
