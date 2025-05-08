@@ -2,6 +2,7 @@ using DevHabit.Api;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Middlewares;
+using DevHabit.Api.Services;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,8 @@ builder.Logging.AddOpenTelemetry(options =>
     options.IncludeScopes = true;
     options.IncludeFormattedMessage = true;
 });
+
+builder.Services.AddTransient<IDataShapingService, DataShapingService>();
 
 var app = builder.Build();
 

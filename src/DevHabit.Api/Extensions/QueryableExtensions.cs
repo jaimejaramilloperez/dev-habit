@@ -1,5 +1,6 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Dtos.Common;
+using DevHabit.Api.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,6 +63,23 @@ public static class QueryableExtensions
             : query.OrderBy(orderQuery);
     }
 
+    public static async Task<ShapedResult?> FirstOrDefaultAsyncShapedResult<T>(
+        this IQueryable<T> query,
+        IDataShapingService dataShaping,
+        string? fields)
+    {
+        if (!dataShaping.AreAllFieldsValid<T>(fields))
+        {
+            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
+        }
+
+        T? item = await query.FirstOrDefaultAsync();
+
+        return item is null
+            ? null
+            : new(dataShaping.ShapeData(item, fields));
+    }
+
     public static async Task<PaginationResult<T>> ToPaginationResult<T>(
         this IQueryable<T> query,
         int page,
@@ -77,6 +95,33 @@ public static class QueryableExtensions
         return new()
         {
             Data = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+        };
+    }
+
+    public static async Task<ShapedPaginationResult> ToShapedPaginationResult<T>(
+        this IQueryable<T> query,
+        ShapedPaginationResultOptions options)
+    {
+        var (page, pageSize, fields, dataShaping) = options;
+
+        long totalCount = await query.LongCountAsync();
+
+        List<T> items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        if (!dataShaping.AreAllFieldsValid<T>(fields))
+        {
+            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
+        }
+
+        return new()
+        {
+            Data = dataShaping.ShapeCollectionData(items, fields!),
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,

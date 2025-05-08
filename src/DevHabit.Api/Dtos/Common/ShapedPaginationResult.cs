@@ -1,8 +1,8 @@
 namespace DevHabit.Api.Dtos.Common;
 
-public sealed record PaginationResult<T> : ICollectionResponse<T>
+public sealed record ShapedPaginationResult : IShapedCollectionResponse
 {
-    public required ICollection<T> Data { get; init; }
+    public required object Data { get; init; }
     public int Page { get; init; }
     public int PageSize { get; init; }
     public long TotalCount { get; init; }

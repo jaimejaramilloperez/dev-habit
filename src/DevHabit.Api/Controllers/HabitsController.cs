@@ -3,6 +3,7 @@ using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
+using DevHabit.Api.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -17,15 +18,16 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<PaginationResult<HabitDto>>> GetHabits(
+    public async Task<IActionResult> GetHabits(
         HabitsQueryParameters queryParams,
+        IDataShapingService dataShapingService,
         IValidator<HabitsQueryParameters> validator)
     {
         await validator.ValidateAndThrowAsync(queryParams);
 
-        string? searchTerm = queryParams.SearchTerm?.Trim().ToLower();
+        string? searchTerm = queryParams.SearchTerm?.Trim().ToLowerInvariant();
 
-        PaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()
+        ShapedPaginationResult shapedPaginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
@@ -34,20 +36,31 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
             .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
             .SortByQueryString(queryParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
-            .ToPaginationResult(queryParams.Page, queryParams.PageSize);
+            .ToShapedPaginationResult(new()
+            {
+                Page = queryParams.Page,
+                PageSize = queryParams.PageSize,
+                Fields = queryParams.Fields,
+                DataShaping = dataShapingService,
+            });
 
-        return Ok(paginationResult);
+        return Ok(shapedPaginationResult);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetHabit(string id)
+    public async Task<IActionResult> GetHabit(
+        string id,
+        string? fields,
+        IDataShapingService dataShapingService)
     {
-        HabitWithTagsDto? habit = await _dbContext.Habits.AsNoTracking()
+        ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsyncShapedResult(dataShapingService, fields);
 
-        return habit is null ? NotFound() : Ok(habit);
+        return result is null
+            ? NotFound()
+            : Ok(result.Item);
     }
 
     [HttpPost]
