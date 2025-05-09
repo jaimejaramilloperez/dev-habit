@@ -63,7 +63,7 @@ public static class QueryableExtensions
             : query.OrderBy(orderQuery);
     }
 
-    public static async Task<ShapedResult?> FirstOrDefaultAsyncShapedResult<T>(
+    public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
         IDataShapingService dataShaping,
         string? fields)
@@ -101,7 +101,7 @@ public static class QueryableExtensions
         };
     }
 
-    public static async Task<ShapedPaginationResult> ToShapedPaginationResult<T>(
+    public static async Task<ShapedPaginationResult> ToShapedPaginationAsync<T>(
         this IQueryable<T> query,
         ShapedPaginationResultOptions options)
     {

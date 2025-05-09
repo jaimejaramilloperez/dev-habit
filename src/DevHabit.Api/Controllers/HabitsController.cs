@@ -36,7 +36,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
             .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
             .SortByQueryString(queryParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
-            .ToShapedPaginationResult(new()
+            .ToShapedPaginationAsync(new()
             {
                 Page = queryParams.Page,
                 PageSize = queryParams.PageSize,
@@ -56,7 +56,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
-            .FirstOrDefaultAsyncShapedResult(dataShapingService, fields);
+            .ToShapedFirstOrDefaultAsync(dataShapingService, fields);
 
         return result is null
             ? NotFound()
