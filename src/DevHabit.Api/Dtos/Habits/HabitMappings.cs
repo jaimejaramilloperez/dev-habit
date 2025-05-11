@@ -3,7 +3,7 @@ using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Habits;
 
-public static class HabitMappings
+internal static class HabitMappings
 {
     public static readonly SortMappingDefinition<HabitDto, Habit> SortMapping = new()
     {

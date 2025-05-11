@@ -3,7 +3,7 @@ using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Tags;
 
-public static class TagQueries
+internal static class TagQueries
 {
     public static Expression<Func<Tag, TagDto>> ProjectToDto()
     {

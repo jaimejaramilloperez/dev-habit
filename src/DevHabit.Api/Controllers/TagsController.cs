@@ -16,7 +16,7 @@ public sealed class TagsController(ApplicationDbContext dbContext) : ControllerB
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<ActionResult<PaginationResult<TagDto>>> GetTags()
+    public async Task<IActionResult> GetTags()
     {
         List<TagDto> tags = await _dbContext.Tags.AsNoTracking()
             .Select(TagQueries.ProjectToDto())
