@@ -5,7 +5,7 @@ using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddControllers();
+builder.AddApiServices();
 builder.AddErrorHandling();
 builder.AddDatabase();
 builder.AddObservability();

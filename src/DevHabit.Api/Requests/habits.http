@@ -4,11 +4,13 @@
 
 ### Get Habits
 GET {{DevHabitApiHostAddress}}/{{BasePath}}
-Accept: application/json
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
 
 ### Get Habit by Id
 GET {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
-Accept: application/json
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
 
 ### Create Habit
 POST {{DevHabitApiHostAddress}}/{{BasePath}}

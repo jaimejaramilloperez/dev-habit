@@ -20,4 +20,7 @@ public sealed record HabitsQueryParameters
 
     [FromQuery(Name = "page_size")]
     public int PageSize { get; init; } = 10;
+
+    [FromHeader(Name = "Accept")]
+    public string? Accept { get; set; }
 }

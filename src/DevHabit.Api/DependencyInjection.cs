@@ -1,8 +1,11 @@
 using DevHabit.Api.Database;
 using DevHabit.Api.Middlewares;
+using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json.Serialization;
@@ -16,7 +19,7 @@ namespace DevHabit.Api;
 
 internal static class DependencyInjectionExtensions
 {
-    public static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddApiServices(this WebApplicationBuilder builder)
     {
         builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
 
@@ -35,6 +38,15 @@ internal static class DependencyInjectionExtensions
             options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         })
         .AddXmlSerializerFormatters();
+
+        builder.Services.Configure<MvcOptions>(options =>
+        {
+            NewtonsoftJsonOutputFormatter formatter = options.OutputFormatters
+                .OfType<NewtonsoftJsonOutputFormatter>()
+                .First();
+
+            formatter.SupportedMediaTypes.Add(CustomMediaTypes.Application.HateoasJson);
+        });
 
         builder.Services.AddOpenApi();
 
