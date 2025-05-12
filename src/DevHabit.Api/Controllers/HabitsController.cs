@@ -3,7 +3,8 @@ using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
-using DevHabit.Api.Services;
+using DevHabit.Api.Services.DataShapingServices;
+using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,12 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/habits")]
-public sealed class HabitsController(ApplicationDbContext dbContext) : ControllerBase
+public sealed class HabitsController(
+    ApplicationDbContext dbContext,
+    ILinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly ILinkService _linkService = linkService;
 
     [HttpGet]
     public async Task<IActionResult> GetHabits(
@@ -27,7 +31,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
 
         string? searchTerm = queryParams.SearchTerm?.Trim().ToLowerInvariant();
 
-        ShapedPaginationResult shapedPaginationResult = await _dbContext.Habits.AsNoTracking()
+        ShapedPaginationResult paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
@@ -42,9 +46,15 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
                 PageSize = queryParams.PageSize,
                 Fields = queryParams.Fields,
                 DataShaping = dataShapingService,
+                LinksFactory = x => CreateLinksForHabit(x.Id, queryParams.Fields),
             });
 
-        return Ok(shapedPaginationResult);
+        paginationResult.Links.AddRange(CreateLinksForHabits(
+            queryParams,
+            paginationResult.HasPreviousPage,
+            paginationResult.HasNextPage));
+
+        return Ok(paginationResult);
     }
 
     [HttpGet("{id}")]
@@ -58,9 +68,16 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
             .Select(HabitQueries.ProjectToDtoWithTags())
             .ToShapedFirstOrDefaultAsync(dataShapingService, fields);
 
-        return result is null
-            ? NotFound()
-            : Ok(result.Item);
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        var shapedHabitDto = result.Item;
+
+        shapedHabitDto.TryAdd("Links", CreateLinksForHabit(id, fields));
+
+        return Ok(shapedHabitDto);
     }
 
     [HttpPost]
@@ -73,9 +90,10 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
         Habit habit = createHabitDto.ToEntity();
 
         _dbContext.Habits.Add(habit);
+
         await _dbContext.SaveChangesAsync();
 
-        HabitDto habitDto = habit.ToDto();
+        HabitDto habitDto = habit.ToDto(CreateLinksForHabit(habit.Id));
 
         return CreatedAtAction(nameof(GetHabit), new { id = habitDto.Id }, habitDto);
     }
@@ -138,5 +156,70 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
         await _dbContext.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    private List<LinkDto> CreateLinksForHabit(string id, string? fields = null) =>
+    [
+        _linkService.Create(nameof(GetHabit), "self", HttpMethods.Get, new { id, fields }),
+        _linkService.Create(nameof(UpdateHabit), "update", HttpMethods.Put, new { id }),
+        _linkService.Create(nameof(PatchHabit), "patch", HttpMethods.Patch, new { id }),
+        _linkService.Create(nameof(DeleteHabit), "delete", HttpMethods.Delete, new { id }),
+        _linkService.Create(
+            nameof(HabitTagsController.UpsertHabitTags),
+            "upsert-tags",
+            HttpMethods.Put,
+            new { habitId = id },
+            HabitTagsController.Name),
+    ];
+
+    private List<LinkDto> CreateLinksForHabits(
+        HabitsQueryParameters parameters,
+        bool hasPreviousPage,
+        bool hasNextPage)
+    {
+        List<LinkDto> links =
+        [
+            _linkService.Create(nameof(GetHabits), "self", HttpMethods.Get, new
+                {
+                    q = parameters.SearchTerm,
+                    type = parameters.Type,
+                    status = parameters.Status,
+                    fields = parameters.Fields,
+                    sort = parameters.Sort,
+                    page = parameters.Page,
+                    page_size = parameters.PageSize,
+                }),
+                _linkService.Create(nameof(CreateHabit), "create", HttpMethods.Post),
+            ];
+
+        if (hasPreviousPage)
+        {
+            links.Add(_linkService.Create(nameof(GetHabits), "previous-page", HttpMethods.Get, new
+            {
+                q = parameters.SearchTerm,
+                type = parameters.Type,
+                status = parameters.Status,
+                fields = parameters.Fields,
+                sort = parameters.Sort,
+                page = parameters.Page - 1,
+                page_size = parameters.PageSize,
+            }));
+        }
+
+        if (hasNextPage)
+        {
+            links.Add(_linkService.Create(nameof(GetHabits), "next-page", HttpMethods.Get, new
+            {
+                q = parameters.SearchTerm,
+                type = parameters.Type,
+                status = parameters.Status,
+                fields = parameters.Fields,
+                sort = parameters.Sort,
+                page = parameters.Page + 1,
+                page_size = parameters.PageSize,
+            }));
+        }
+
+        return links;
     }
 }

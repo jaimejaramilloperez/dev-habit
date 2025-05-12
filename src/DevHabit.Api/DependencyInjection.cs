@@ -1,6 +1,7 @@
 using DevHabit.Api.Database;
 using DevHabit.Api.Middlewares;
-using DevHabit.Api.Services;
+using DevHabit.Api.Services.DataShapingServices;
+using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -91,9 +92,13 @@ internal static class DependencyInjectionExtensions
 
     public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpContextAccessor();
+
         builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
 
         builder.Services.AddTransient<IDataShapingService, DataShapingService>();
+
+        builder.Services.AddTransient<ILinkService, LinkService>();
 
         return builder;
     }

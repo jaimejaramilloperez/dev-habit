@@ -1,6 +1,8 @@
+using System.Dynamic;
+
 namespace DevHabit.Api.Dtos.Common;
 
 public interface IShapedCollectionResponse
 {
-    public object Data { get; init; }
+    public ICollection<ExpandoObject> Data { get; init; }
 }

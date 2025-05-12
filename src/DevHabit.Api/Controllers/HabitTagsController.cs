@@ -10,6 +10,9 @@ namespace DevHabit.Api.Controllers;
 [Route("/api/habits/{habitId}/tags")]
 public sealed class HabitTagsController(ApplicationDbContext dbContext) : ControllerBase
 {
+    public static readonly string Name = nameof(HabitTagsController)
+        .Replace("Controller", string.Empty, StringComparison.Ordinal);
+
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpPut]

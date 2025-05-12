@@ -1,6 +1,6 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Dtos.Common;
-using DevHabit.Api.Services;
+using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -103,9 +103,9 @@ public static class QueryableExtensions
 
     public static async Task<ShapedPaginationResult> ToShapedPaginationAsync<T>(
         this IQueryable<T> query,
-        ShapedPaginationResultOptions options)
+        ShapedPaginationResultOptions<T> options)
     {
-        var (page, pageSize, fields, dataShaping) = options;
+        var (page, pageSize, fields, dataShaping, linksFactory) = options;
 
         long totalCount = await query.LongCountAsync();
 
@@ -121,7 +121,7 @@ public static class QueryableExtensions
 
         return new()
         {
-            Data = dataShaping.ShapeCollectionData(items, fields!),
+            Data = dataShaping.ShapeCollectionData(items, fields!, linksFactory),
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,
