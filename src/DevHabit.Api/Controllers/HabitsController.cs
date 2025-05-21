@@ -82,9 +82,9 @@ public sealed class HabitsController(
             return NotFound();
         }
 
-        bool shouldIncludeLinks = string.Equals(accept, CustomMediaTypes.Application.HateoasJson, StringComparison.OrdinalIgnoreCase);
-
         var shapedHabitDto = result.Item;
+
+        bool shouldIncludeLinks = string.Equals(accept, CustomMediaTypes.Application.HateoasJson, StringComparison.OrdinalIgnoreCase);
 
         if (shouldIncludeLinks)
         {
@@ -180,11 +180,11 @@ public sealed class HabitsController(
         _linkService.Create(nameof(PatchHabit), "patch", HttpMethods.Patch, new { id }),
         _linkService.Create(nameof(DeleteHabit), "delete", HttpMethods.Delete, new { id }),
         _linkService.Create(
-            nameof(HabitTagsController.UpsertHabitTags),
-            "upsert-tags",
-            HttpMethods.Put,
-            new { habitId = id },
-            HabitTagsController.Name),
+            endpointName: nameof(HabitTagsController.UpsertHabitTags),
+            rel: "upsert-tags",
+            method: HttpMethods.Put,
+            values: new { habitId = id },
+            controllerName: HabitTagsController.Name),
     ];
 
     private List<LinkDto> CreateLinksForHabits(
@@ -195,17 +195,17 @@ public sealed class HabitsController(
         List<LinkDto> links =
         [
             _linkService.Create(nameof(GetHabits), "self", HttpMethods.Get, new
-                {
-                    q = parameters.SearchTerm,
-                    type = parameters.Type,
-                    status = parameters.Status,
-                    fields = parameters.Fields,
-                    sort = parameters.Sort,
-                    page = parameters.Page,
-                    page_size = parameters.PageSize,
-                }),
-                _linkService.Create(nameof(CreateHabit), "create", HttpMethods.Post),
-            ];
+            {
+                q = parameters.SearchTerm,
+                type = parameters.Type,
+                status = parameters.Status,
+                fields = parameters.Fields,
+                sort = parameters.Sort,
+                page = parameters.Page,
+                page_size = parameters.PageSize,
+            }),
+            _linkService.Create(nameof(CreateHabit), "create", HttpMethods.Post),
+        ];
 
         if (hasPreviousPage)
         {

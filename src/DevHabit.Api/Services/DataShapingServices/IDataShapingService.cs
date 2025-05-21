@@ -7,8 +7,8 @@ public interface IDataShapingService
 {
     ICollection<ExpandoObject> ShapeCollectionData<T>(
         ICollection<T> entities,
-        string? fields, Func<T,
-        ICollection<LinkDto>>? linksFactory = null);
+        string? fields,
+        Func<T, ICollection<LinkDto>>? linksFactory = null);
 
     ExpandoObject ShapeData<T>(T entity, string? fields);
 
