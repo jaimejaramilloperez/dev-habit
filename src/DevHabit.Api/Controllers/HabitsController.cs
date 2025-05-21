@@ -26,37 +26,41 @@ public sealed class HabitsController(
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json, CustomMediaTypes.Application.HateoasJson)]
     public async Task<IActionResult> GetHabits(
-        HabitsQueryParameters queryParams,
+        HabitsParameters habitParams,
         IDataShapingService dataShapingService,
-        IValidator<HabitsQueryParameters> validator)
+        IValidator<HabitsParameters> validator)
     {
-        await validator.ValidateAndThrowAsync(queryParams);
+        await validator.ValidateAndThrowAsync(habitParams);
 
-        string? searchTerm = queryParams.SearchTerm?.Trim().ToLowerInvariant();
-        bool shouldIncludeLinks = string.Equals(queryParams.Accept, CustomMediaTypes.Application.HateoasJson, StringComparison.OrdinalIgnoreCase);
+        string? searchTerm = habitParams.SearchTerm?.Trim().ToLowerInvariant();
+
+        bool shouldIncludeLinks = string.Equals(
+            habitParams.Accept,
+            CustomMediaTypes.Application.HateoasJson,
+            StringComparison.OrdinalIgnoreCase);
 
         ShapedPaginationResult paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
                 x.Description != null && x.Description.ToLower().Contains(searchTerm))
-            .Where(x => queryParams.Type == null || x.Type == queryParams.Type)
-            .Where(x => queryParams.Status == null || x.Status == queryParams.Status)
-            .SortByQueryString(queryParams.Sort, HabitMappings.SortMapping.Mappings)
+            .Where(x => habitParams.Type == null || x.Type == habitParams.Type)
+            .Where(x => habitParams.Status == null || x.Status == habitParams.Status)
+            .SortByQueryString(habitParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
             .ToShapedPaginationAsync(new()
             {
-                Page = queryParams.Page,
-                PageSize = queryParams.PageSize,
-                Fields = queryParams.Fields,
+                Page = habitParams.Page,
+                PageSize = habitParams.PageSize,
+                Fields = habitParams.Fields,
                 DataShaping = dataShapingService,
-                LinksFactory = shouldIncludeLinks ? x => CreateLinksForHabit(x.Id, queryParams.Fields) : null,
+                LinksFactory = shouldIncludeLinks ? x => CreateLinksForHabit(x.Id, habitParams.Fields) : null,
             });
 
         if (shouldIncludeLinks)
         {
             paginationResult.Links.AddRange(CreateLinksForHabits(
-                queryParams,
+                habitParams,
                 paginationResult.HasPreviousPage,
                 paginationResult.HasNextPage));
         }
@@ -68,14 +72,13 @@ public sealed class HabitsController(
     [Produces(MediaTypeNames.Application.Json, CustomMediaTypes.Application.HateoasJson)]
     public async Task<IActionResult> GetHabit(
         string id,
-        string? fields,
-        [FromHeader(Name = "Accept")] string? accept,
+        HabitParameters habitParameters,
         IDataShapingService dataShapingService)
     {
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
-            .ToShapedFirstOrDefaultAsync(dataShapingService, fields);
+            .ToShapedFirstOrDefaultAsync(dataShapingService, habitParameters.Fields);
 
         if (result is null)
         {
@@ -84,11 +87,14 @@ public sealed class HabitsController(
 
         var shapedHabitDto = result.Item;
 
-        bool shouldIncludeLinks = string.Equals(accept, CustomMediaTypes.Application.HateoasJson, StringComparison.OrdinalIgnoreCase);
+        bool shouldIncludeLinks = string.Equals(
+            habitParameters.Accept,
+            CustomMediaTypes.Application.HateoasJson,
+            StringComparison.OrdinalIgnoreCase);
 
         if (shouldIncludeLinks)
         {
-            shapedHabitDto.TryAdd("Links", CreateLinksForHabit(id, fields));
+            shapedHabitDto.TryAdd("Links", CreateLinksForHabit(id, habitParameters.Fields));
         }
 
         return Ok(shapedHabitDto);
@@ -188,7 +194,7 @@ public sealed class HabitsController(
     ];
 
     private List<LinkDto> CreateLinksForHabits(
-        HabitsQueryParameters parameters,
+        HabitsParameters parameters,
         bool hasPreviousPage,
         bool hasNextPage)
     {

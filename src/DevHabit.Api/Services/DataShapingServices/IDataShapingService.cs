@@ -11,6 +11,4 @@ public interface IDataShapingService
         Func<T, ICollection<LinkDto>>? linksFactory = null);
 
     ExpandoObject ShapeData<T>(T entity, string? fields);
-
-    bool AreAllFieldsValid<T>(string? fields);
 }

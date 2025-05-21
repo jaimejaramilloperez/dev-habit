@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace DevHabit.Api.Dtos.Habits;
 
-public sealed class HabitsQueryParametersValidator : AbstractValidator<HabitsQueryParameters>
+public sealed class HabitsParametersValidator : AbstractValidator<HabitsParameters>
 {
-    public HabitsQueryParametersValidator()
+    public HabitsParametersValidator()
     {
         RuleFor(x => x.Page).GreaterThan(0)
             .WithMessage("Page must be greater than 0");

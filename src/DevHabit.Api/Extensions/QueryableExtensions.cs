@@ -68,11 +68,6 @@ public static class QueryableExtensions
         IDataShapingService dataShaping,
         string? fields)
     {
-        if (!dataShaping.AreAllFieldsValid<T>(fields))
-        {
-            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
-        }
-
         T? item = await query.FirstOrDefaultAsync();
 
         return item is null
@@ -113,11 +108,6 @@ public static class QueryableExtensions
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-
-        if (!dataShaping.AreAllFieldsValid<T>(fields))
-        {
-            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
-        }
 
         return new()
         {

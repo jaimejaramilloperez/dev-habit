@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevHabit.Api.Dtos.Habits;
 
-public sealed record HabitsQueryParameters
+public sealed record HabitsParameters
 {
     [FromQuery(Name = "q")]
     public string? SearchTerm { get; init; }

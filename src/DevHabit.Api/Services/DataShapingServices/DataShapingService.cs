@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Reflection;
 using DevHabit.Api.Dtos.Common;
+using FluentValidation;
 
 namespace DevHabit.Api.Services.DataShapingServices;
 
@@ -11,6 +12,11 @@ public sealed class DataShapingService : IDataShapingService
 
     public ExpandoObject ShapeData<T>(T entity, string? fields)
     {
+        if (AreAllFieldsValid<T>(fields))
+        {
+            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
+        }
+
         HashSet<string> fieldsSet = fields?
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
@@ -41,6 +47,11 @@ public sealed class DataShapingService : IDataShapingService
         string? fields,
         Func<T, ICollection<LinkDto>>? linksFactory = null)
     {
+        if (AreAllFieldsValid<T>(fields))
+        {
+            throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
+        }
+
         HashSet<string> fieldsSet = fields?
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
@@ -78,7 +89,7 @@ public sealed class DataShapingService : IDataShapingService
         return shapedObjects;
     }
 
-    public bool AreAllFieldsValid<T>(string? fields)
+    private bool AreAllFieldsValid<T>(string? fields)
     {
         HashSet<string> fieldsSet = fields?
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
