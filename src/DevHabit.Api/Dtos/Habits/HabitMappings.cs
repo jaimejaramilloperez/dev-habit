@@ -81,7 +81,6 @@ internal static class HabitMappings
             CreatedAtUtc = habit.CreatedAtUtc,
             UpdatedAtUtc = habit.UpdatedAtUtc,
             LastCompletedAtUtc = habit.LastCompletedAtUtc,
-            Links = links is null ? [] : links,
         };
     }
 

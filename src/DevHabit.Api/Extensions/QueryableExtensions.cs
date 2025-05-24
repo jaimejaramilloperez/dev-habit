@@ -1,5 +1,6 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Common;
+using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
@@ -66,14 +67,14 @@ public static class QueryableExtensions
 
     public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
-        IDataShapingService dataShaping,
+        IDataShapingService dataShapingService,
         string? fields)
     {
         T? item = await query.FirstOrDefaultAsync();
 
         return item is null
             ? null
-            : new(dataShaping.ShapeData(item, fields));
+            : new(dataShapingService.ShapeData(item, fields));
     }
 
     public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
@@ -129,7 +130,7 @@ public static class QueryableExtensions
         this IQueryable<T> query,
         ShapedPaginationResultOptions<T> options)
     {
-        var (page, pageSize, fields, dataShaping, linksFactory) = options;
+        var (page, pageSize, fields, dataShapingService, linksFactory) = options;
 
         long totalCount = await query.LongCountAsync();
 
@@ -140,7 +141,7 @@ public static class QueryableExtensions
 
         return new()
         {
-            Data = dataShaping.ShapeCollectionData(items, fields, linksFactory),
+            Data = dataShapingService.ShapeCollectionData(items, fields, linksFactory),
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,
