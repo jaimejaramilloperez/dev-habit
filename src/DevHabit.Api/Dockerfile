@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine3.21@sha256:3fce6771d84422e2396c77267865df61174a3e503c049f1fe242224c012fde65 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine3.21@sha256:30fdbd1b5963bba6ed66190d72d877b750d4203a671c9b54592f4551b8c5a087 AS base
 WORKDIR /app
 EXPOSE 5000
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine3.21@sha256:33be1326b4a2602d08e145cf7e4a8db4b243db3cac3bdec42e91aef930656080 AS restore
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine3.21@sha256:2244f80ac7179b0feaf83ffca8fe82d31fbced5b7e353755bf9515a420eba711 AS restore
 WORKDIR /src
 COPY ["nuget.config", "global.json", "Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["src/DevHabit.Api/DevHabit.Api.csproj", "./src/DevHabit.Api/"]
