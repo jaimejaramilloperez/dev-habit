@@ -1,4 +1,4 @@
-namespace DevHabit.Api.Services.DataShapingServices;
+namespace DevHabit.Api.Common;
 
 public static class HateoasPropertyNames
 {
