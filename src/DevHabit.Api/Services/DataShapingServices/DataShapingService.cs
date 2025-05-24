@@ -12,7 +12,7 @@ public sealed class DataShapingService : IDataShapingService
 
     public ExpandoObject ShapeData<T>(T entity, string? fields)
     {
-        if (AreAllFieldsValid<T>(fields))
+        if (!AreAllFieldsValid<T>(fields))
         {
             throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
         }
@@ -47,7 +47,7 @@ public sealed class DataShapingService : IDataShapingService
         string? fields,
         Func<T, ICollection<LinkDto>>? linksFactory = null)
     {
-        if (AreAllFieldsValid<T>(fields))
+        if (!AreAllFieldsValid<T>(fields))
         {
             throw new ValidationException([new("fields", $"Fields value '{fields}' is not valid")]);
         }
