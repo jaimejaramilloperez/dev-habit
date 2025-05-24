@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using DevHabit.Api.Common;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;

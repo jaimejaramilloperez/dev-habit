@@ -67,7 +67,7 @@ public sealed class DataShapingService : IDataShapingService
                 .ToArray();
         }
 
-        List<ExpandoObject> shapedObjects = [];
+        List<ExpandoObject> shapedObjects = new(entities.Count);
 
         foreach (var entity in entities)
         {

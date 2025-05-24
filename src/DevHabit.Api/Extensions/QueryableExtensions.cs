@@ -1,5 +1,5 @@
 using System.Linq.Dynamic.Core;
-using DevHabit.Api.Dtos.Common;
+using DevHabit.Api.Common;
 using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;

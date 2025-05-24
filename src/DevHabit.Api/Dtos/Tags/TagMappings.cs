@@ -2,7 +2,7 @@ using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Tags;
 
-internal static class TagMapping
+internal static class TagMappings
 {
     public static Tag ToEntity(this CreateTagDto dto)
     {

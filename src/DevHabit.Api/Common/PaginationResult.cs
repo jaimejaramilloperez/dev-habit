@@ -1,6 +1,8 @@
-namespace DevHabit.Api.Dtos.Common;
+using DevHabit.Api.Dtos.Common;
 
-public sealed record PaginationResult<T> : ICollectionResponse<T>, ILinksResponse
+namespace DevHabit.Api.Common;
+
+public sealed record PaginationResult<T> : ICollectionResponse<T>, IPaginationResult, ILinksResponse
 {
     public required ICollection<T> Data { get; init; }
     public int Page { get; init; }

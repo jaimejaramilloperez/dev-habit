@@ -1,4 +1,4 @@
-namespace DevHabit.Api.Dtos.Common;
+namespace DevHabit.Api.Common;
 
 public static class Sort
 {

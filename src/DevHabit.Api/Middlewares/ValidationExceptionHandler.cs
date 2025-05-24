@@ -49,8 +49,8 @@ public sealed partial class ValidationExceptionHandler(IProblemDetailsService pr
     }
 
     /// <summary>
-    /// Convierte una cadena en formato PascalCase a camelCase,
-    /// manteniendo la estructura de propiedades anidadas (separadas por punto)
+    /// Converts a string in PascalCase format to camelCase,
+    /// keeping the nested property structure (separated by dot)
     /// </summary>
     private static string ToCamelCase(string value)
     {

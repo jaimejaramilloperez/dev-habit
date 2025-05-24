@@ -1,8 +1,9 @@
 using System.Dynamic;
+using DevHabit.Api.Dtos.Common;
 
-namespace DevHabit.Api.Dtos.Common;
+namespace DevHabit.Api.Common;
 
-public sealed record ShapedPaginationResult : IShapedCollectionResponse, ILinksResponse
+public sealed record ShapedPaginationResult : IShapedCollectionResponse, IPaginationResult, ILinksResponse
 {
     public required ICollection<ExpandoObject> Data { get; init; }
     public int Page { get; init; }

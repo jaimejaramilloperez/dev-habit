@@ -1,6 +1,6 @@
 using System.Dynamic;
 
-namespace DevHabit.Api.Dtos.Common;
+namespace DevHabit.Api.Common;
 
 public interface IShapedCollectionResponse
 {
