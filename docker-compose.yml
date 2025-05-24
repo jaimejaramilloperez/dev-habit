@@ -1,7 +1,7 @@
 services:
   devhabit.postgres:
     container_name: devhabit.postgres
-    image: postgres:17.3-alpine3.21
+    image: postgres:17.5-alpine3.21
     restart: unless-stopped
     ports:
       - 5432:${POSTGRES_PORT}
@@ -20,7 +20,7 @@ services:
 
   devhabit.pgadmin:
     container_name: devhabit.pgadmin
-    image: dpage/pgadmin4:9.2.0
+    image: dpage/pgadmin4:9.3.0
     restart: unless-stopped
     ports:
       - 8080:80
@@ -39,7 +39,7 @@ services:
 
   devhabit.seq:
     container_name: devhabit.seq
-    image: datalust/seq:2024.3
+    image: datalust/seq:2025.1
     restart: unless-stopped
     ports:
       - 7080:80
@@ -51,7 +51,7 @@ services:
 
   devhabit.aspire-dashboard:
     container_name: devhabit.aspire-dashboard
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.2
     ports:
       - 18888:18888
       - 18889:18889
