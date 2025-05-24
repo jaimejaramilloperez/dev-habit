@@ -96,7 +96,7 @@ public static class QueryableExtensions
         };
     }
 
-    public static async Task<ShapedPaginationResult> ToShapedPaginationAsync<T>(
+    public static async Task<ShapedPaginationResult> ToShapedPaginationResultAsync<T>(
         this IQueryable<T> query,
         ShapedPaginationResultOptions<T> options)
     {
@@ -111,7 +111,7 @@ public static class QueryableExtensions
 
         return new()
         {
-            Data = dataShaping.ShapeCollectionData(items, fields!, linksFactory),
+            Data = dataShaping.ShapeCollectionData(items, fields, linksFactory),
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,

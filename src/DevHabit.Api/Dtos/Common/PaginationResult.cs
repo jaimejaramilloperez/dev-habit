@@ -1,4 +1,3 @@
-
 namespace DevHabit.Api.Dtos.Common;
 
 public sealed record PaginationResult<T> : ICollectionResponse<T>, ILinksResponse

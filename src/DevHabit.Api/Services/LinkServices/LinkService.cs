@@ -19,11 +19,8 @@ public sealed class LinkService(
             controllerName,
             values);
 
-        return new()
-        {
-            Href = href ?? throw new InvalidOperationException("The provided endpoint name is invalid"),
-            Rel = rel,
-            Method = method,
-        };
+        return string.IsNullOrWhiteSpace(href)
+            ? throw new InvalidOperationException("The provided endpoint name is invalid")
+            : new(href, rel, method);
     }
 }

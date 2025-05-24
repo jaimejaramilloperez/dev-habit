@@ -48,7 +48,7 @@ public sealed class HabitsController(
             .Where(x => habitParams.Status == null || x.Status == habitParams.Status)
             .SortByQueryString(habitParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
-            .ToShapedPaginationAsync(new()
+            .ToShapedPaginationResultAsync(new()
             {
                 Page = habitParams.Page,
                 PageSize = habitParams.PageSize,
