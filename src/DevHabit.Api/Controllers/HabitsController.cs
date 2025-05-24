@@ -95,7 +95,7 @@ public sealed class HabitsController(
 
         if (shouldIncludeLinks)
         {
-            shapedHabitDto.TryAdd("Links", CreateLinksForHabit(id, habitParameters.Fields));
+            shapedHabitDto.TryAdd(HateoasPropertyNames.Links, CreateLinksForHabit(id, habitParameters.Fields));
         }
 
         return Ok(shapedHabitDto);
@@ -182,13 +182,13 @@ public sealed class HabitsController(
 
     private List<LinkDto> CreateLinksForHabit(string id, string? fields = null) =>
     [
-        _linkService.Create(nameof(GetHabit), "self", HttpMethods.Get, new { id, fields }),
-        _linkService.Create(nameof(UpdateHabit), "update", HttpMethods.Put, new { id }),
-        _linkService.Create(nameof(PatchHabit), "patch", HttpMethods.Patch, new { id }),
-        _linkService.Create(nameof(DeleteHabit), "delete", HttpMethods.Delete, new { id }),
+        _linkService.Create(nameof(GetHabit), LinkRelations.Self, HttpMethods.Get, new { id, fields }),
+        _linkService.Create(nameof(UpdateHabit), LinkRelations.Update, HttpMethods.Put, new { id }),
+        _linkService.Create(nameof(PatchHabit), LinkRelations.Patch, HttpMethods.Patch, new { id }),
+        _linkService.Create(nameof(DeleteHabit), LinkRelations.Delete, HttpMethods.Delete, new { id }),
         _linkService.Create(
             endpointName: nameof(HabitTagsController.UpsertHabitTags),
-            rel: "upsert-tags",
+            rel: LinkRelations.UpsertTags,
             method: HttpMethods.Put,
             values: new { habitId = id },
             controllerName: HabitTagsController.Name),
@@ -201,7 +201,7 @@ public sealed class HabitsController(
     {
         List<LinkDto> links =
         [
-            _linkService.Create(nameof(GetHabits), "self", HttpMethods.Get, new
+            _linkService.Create(nameof(GetHabits), LinkRelations.Self, HttpMethods.Get, new
             {
                 q = parameters.SearchTerm,
                 type = parameters.Type,
@@ -211,12 +211,12 @@ public sealed class HabitsController(
                 page = parameters.Page,
                 page_size = parameters.PageSize,
             }),
-            _linkService.Create(nameof(CreateHabit), "create", HttpMethods.Post),
+            _linkService.Create(nameof(CreateHabit), LinkRelations.Create, HttpMethods.Post),
         ];
 
         if (hasPreviousPage)
         {
-            links.Add(_linkService.Create(nameof(GetHabits), "previous-page", HttpMethods.Get, new
+            links.Add(_linkService.Create(nameof(GetHabits), LinkRelations.PreviousPage, HttpMethods.Get, new
             {
                 q = parameters.SearchTerm,
                 type = parameters.Type,
@@ -230,7 +230,7 @@ public sealed class HabitsController(
 
         if (hasNextPage)
         {
-            links.Add(_linkService.Create(nameof(GetHabits), "next-page", HttpMethods.Get, new
+            links.Add(_linkService.Create(nameof(GetHabits), LinkRelations.NextPage, HttpMethods.Get, new
             {
                 q = parameters.SearchTerm,
                 type = parameters.Type,

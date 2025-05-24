@@ -80,7 +80,7 @@ public sealed class DataShapingService : IDataShapingService
 
             if (linksFactory is not null)
             {
-                shapedObject["Links"] = linksFactory(entity);
+                shapedObject[HateoasPropertyNames.Links] = linksFactory(entity);
             }
 
             shapedObjects.Add((ExpandoObject)shapedObject);
