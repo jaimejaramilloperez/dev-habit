@@ -1,9 +1,21 @@
+using DevHabit.Api.Common;
 using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Tags;
 
 internal static class TagMappings
 {
+    public static readonly SortMappingDefinition<TagDto, Tag> SortMapping = new()
+    {
+        Mappings = [
+            new SortMapping(nameof(TagDto.Id), nameof(Tag.Id)),
+            new SortMapping(nameof(TagDto.Name), nameof(Tag.Name)),
+            new SortMapping(nameof(TagDto.Description), nameof(Tag.Description)),
+            new SortMapping(nameof(TagDto.CreatedAtUtc), nameof(Tag.CreatedAtUtc)),
+            new SortMapping(nameof(TagDto.UpdatedAtUtc), nameof(Tag.UpdatedAtUtc)),
+        ],
+    };
+
     public static Tag ToEntity(this CreateTagDto dto)
     {
         return new()

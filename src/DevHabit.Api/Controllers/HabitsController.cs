@@ -54,7 +54,7 @@ public sealed class HabitsController(
                 Page = habitParams.Page,
                 PageSize = habitParams.PageSize,
                 Fields = habitParams.Fields,
-                DataShaping = dataShapingService,
+                DataShapingService = dataShapingService,
                 LinksFactory = shouldIncludeLinks ? x => CreateLinksForHabit(x.Id, habitParams.Fields) : null,
             });
 
@@ -70,35 +70,25 @@ public sealed class HabitsController(
     }
 
     [HttpGet("{id}")]
-    [Produces(MediaTypeNames.Application.Json, CustomMediaTypes.Application.HateoasJson)]
     public async Task<IActionResult> GetHabit(
         string id,
         HabitParameters habitParameters,
         IDataShapingService dataShapingService)
     {
+        var (fields, accept) = habitParameters;
+
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
-            .ToShapedFirstOrDefaultAsync(dataShapingService, habitParameters.Fields);
+            .ToShapedFirstOrDefaultAsync(new()
+            {
+                Fields = fields,
+                AcceptHeader = accept,
+                Links = CreateLinksForHabit(id, fields),
+                DataShapingService = dataShapingService,
+            });
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var shapedHabitDto = result.Item;
-
-        bool shouldIncludeLinks = string.Equals(
-            habitParameters.Accept,
-            CustomMediaTypes.Application.HateoasJson,
-            StringComparison.OrdinalIgnoreCase);
-
-        if (shouldIncludeLinks)
-        {
-            shapedHabitDto.TryAdd(HateoasPropertyNames.Links, CreateLinksForHabit(id, habitParameters.Fields));
-        }
-
-        return Ok(shapedHabitDto);
+        return result is null ? NotFound() : Ok(result.Item);
     }
 
     [HttpPost]
@@ -131,6 +121,7 @@ public sealed class HabitsController(
         }
 
         habit.UpdateFromDto(updateHabitDto);
+
         await _dbContext.SaveChangesAsync();
 
         return NoContent();
@@ -175,6 +166,7 @@ public sealed class HabitsController(
         }
 
         _dbContext.Habits.Remove(habit);
+
         await _dbContext.SaveChangesAsync();
 
         return NoContent();

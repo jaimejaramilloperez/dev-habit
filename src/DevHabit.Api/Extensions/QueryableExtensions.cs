@@ -1,5 +1,6 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Common;
+using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +76,35 @@ public static class QueryableExtensions
             : new(dataShaping.ShapeData(item, fields));
     }
 
-    public static async Task<PaginationResult<T>> ToPaginationResult<T>(
+    public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
+        this IQueryable<T> query,
+        ShapedFirstOrDefaultOptions options)
+    {
+        var (fields, acceptHeader, links, dataShapingService) = options;
+
+        T? item = await query.FirstOrDefaultAsync();
+
+        if (item is null)
+        {
+            return null;
+        }
+
+        ShapedResult result = new(dataShapingService.ShapeData(item, fields));
+
+        bool shouldIncludeLinks = string.Equals(
+            acceptHeader,
+            CustomMediaTypes.Application.HateoasJson,
+            StringComparison.OrdinalIgnoreCase);
+
+        if (shouldIncludeLinks)
+        {
+            result.Item.TryAdd(HateoasPropertyNames.Links, links);
+        }
+
+        return result;
+    }
+
+    public static async Task<PaginationResult<T>> ToPaginationResultAsync<T>(
         this IQueryable<T> query,
         int page,
         int pageSize)

@@ -13,6 +13,8 @@ public sealed record SortMapping(
             mappings.Select(m => m.SortField),
             StringComparer.OrdinalIgnoreCase);
 
-        return sortFields.All(validFields.Contains);
+        return sortFields
+            .Select(x => x[0] == '-' ? x[1..] : x)
+            .All(x => validFields.Contains(x));
     }
 }

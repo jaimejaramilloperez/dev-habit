@@ -1,8 +1,12 @@
 using DevHabit.Api.Common;
 using DevHabit.Api.Database;
+using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Dtos.Tags;
 using DevHabit.Api.Entities;
+using DevHabit.Api.Extensions;
+using DevHabit.Api.Services.DataShapingServices;
+using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,34 +15,54 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/tags")]
-public sealed class TagsController(ApplicationDbContext dbContext) : ControllerBase
+public sealed class TagsController(
+    ApplicationDbContext dbContext,
+    ILinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly ILinkService _linkService = linkService;
 
     [HttpGet]
-    public async Task<IActionResult> GetTags()
+    public async Task<IActionResult> GetTags(
+        TagsParameters tagsParameters,
+        IValidator<TagsParameters> validator)
     {
-        List<TagDto> tags = await _dbContext.Tags.AsNoTracking()
+        await validator.ValidateAndThrowAsync(tagsParameters);
+
+        string? searchTerm = tagsParameters.SearchTerm?.Trim().ToLowerInvariant();
+
+        PaginationResult<TagDto> result = await _dbContext.Tags.AsNoTracking()
+            .Where(x =>
+                searchTerm == null ||
+                x.Name.ToLower().Contains(searchTerm) ||
+                x.Description != null && x.Description.ToLower().Contains(searchTerm))
+            .SortByQueryString(tagsParameters.Sort, TagMappings.SortMapping.Mappings)
             .Select(TagQueries.ProjectToDto())
-            .ToListAsync();
+            .ToPaginationResultAsync(tagsParameters.Page, tagsParameters.PageSize);
 
-        PaginationResult<TagDto> paginationResult = new()
-        {
-            Data = tags,
-        };
-
-        return Ok(paginationResult);
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetTag(string id)
+    public async Task<IActionResult> GetTag(
+        string id,
+        TagParameters tagParameters,
+        IDataShapingService dataShapingService)
     {
-        TagDto? tag = await _dbContext.Tags.AsNoTracking()
+        var (fields, accept) = tagParameters;
+
+        ShapedResult? result = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(TagQueries.ProjectToDto())
-            .FirstOrDefaultAsync();
+            .ToShapedFirstOrDefaultAsync(new()
+            {
+                Fields = fields,
+                AcceptHeader = accept,
+                Links = CreateLinksForTag(id, fields),
+                DataShapingService = dataShapingService,
+            });
 
-        return tag is null ? NotFound() : Ok(tag);
+        return result is null ? NotFound() : Ok(result.Item);
     }
 
     [HttpPost]
@@ -61,6 +85,7 @@ public sealed class TagsController(ApplicationDbContext dbContext) : ControllerB
         }
 
         _dbContext.Tags.Add(tag);
+
         await _dbContext.SaveChangesAsync();
 
         TagDto tagDto = tag.ToDto();
@@ -89,6 +114,7 @@ public sealed class TagsController(ApplicationDbContext dbContext) : ControllerB
         }
 
         tag.UpdateFromDto(updateTagDto);
+
         await _dbContext.SaveChangesAsync();
 
         return NoContent();
@@ -105,8 +131,16 @@ public sealed class TagsController(ApplicationDbContext dbContext) : ControllerB
         }
 
         _dbContext.Tags.Remove(tag);
+
         await _dbContext.SaveChangesAsync();
 
         return NoContent();
     }
+
+    private List<LinkDto> CreateLinksForTag(string id, string? fields) =>
+    [
+        _linkService.Create(nameof(GetTag), LinkRelations.Self, HttpMethods.Get, new { id, fields }),
+        _linkService.Create(nameof(UpdateTag), LinkRelations.Update, HttpMethods.Put, new { id }),
+        _linkService.Create(nameof(DeleteTag), LinkRelations.Delete, HttpMethods.Delete, new { id }),
+    ];
 }

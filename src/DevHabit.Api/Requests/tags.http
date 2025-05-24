@@ -4,11 +4,13 @@
 
 ### Get Tags
 GET {{DevHabitApiHostAddress}}/{{BasePath}}
-Accept: application/json
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
 
 ### Get Tag by Id
 GET {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
-Accept: application/json
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
 
 ### Create Tag
 POST {{DevHabitApiHostAddress}}/{{BasePath}}

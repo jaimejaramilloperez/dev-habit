@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevHabit.Api.Dtos.Habits;
+namespace DevHabit.Api.Dtos.Tags;
 
-public sealed record HabitParameters
+public sealed record TagParameters
 {
     public string? Fields { get; init; }
 

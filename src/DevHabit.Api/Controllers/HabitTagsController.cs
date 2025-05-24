@@ -74,6 +74,7 @@ public sealed class HabitTagsController(ApplicationDbContext dbContext) : Contro
         }
 
         _dbContext.HabitTags.Remove(habitTag);
+
         await _dbContext.SaveChangesAsync();
 
         return NoContent();

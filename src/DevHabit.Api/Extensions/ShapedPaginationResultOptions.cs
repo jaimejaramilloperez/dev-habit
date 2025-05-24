@@ -8,20 +8,20 @@ public sealed record ShapedPaginationResultOptions<T>
     public int Page { get; init; }
     public int PageSize { get; init; }
     public string? Fields { get; init; }
-    public required IDataShapingService DataShaping { get; init; }
+    public required IDataShapingService DataShapingService { get; init; }
     public Func<T, ICollection<LinkDto>>? LinksFactory { get; init; }
 
     public void Deconstruct(
         out int page,
         out int pageSize,
         out string? fields,
-        out IDataShapingService dataShaping,
+        out IDataShapingService dataShapingService,
         out Func<T, ICollection<LinkDto>>? linksFactory)
     {
         page = Page;
         pageSize = PageSize;
         fields = Fields;
-        dataShaping = DataShaping;
+        dataShapingService = DataShapingService;
         linksFactory = LinksFactory;
     }
 }
