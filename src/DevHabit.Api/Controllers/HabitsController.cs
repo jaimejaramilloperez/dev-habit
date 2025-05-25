@@ -25,7 +25,7 @@ public sealed class HabitsController(
     private readonly ILinkService _linkService = linkService;
 
     [HttpGet]
-    [Produces(MediaTypeNames.Application.Json, CustomMediaTypes.Application.HateoasJson)]
+    [Produces(MediaTypeNames.Application.Json, CustomMediaTypesNames.Application.HateoasJson)]
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParams,
         IValidator<HabitsParameters> validator)

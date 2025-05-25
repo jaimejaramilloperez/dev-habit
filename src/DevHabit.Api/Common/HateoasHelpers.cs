@@ -8,7 +8,7 @@ internal static class HateoasHelpers
     {
         return string.Equals(
             acceptHeader,
-            CustomMediaTypes.Application.HateoasJson,
+            CustomMediaTypesNames.Application.HateoasJson,
             StringComparison.OrdinalIgnoreCase);
     }
 }

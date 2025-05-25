@@ -1,6 +1,6 @@
 namespace DevHabit.Api.Services;
 
-internal static class CustomMediaTypes
+internal static class CustomMediaTypesNames
 {
     internal static class Application
     {

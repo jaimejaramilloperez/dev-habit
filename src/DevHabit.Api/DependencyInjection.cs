@@ -46,7 +46,7 @@ internal static class DependencyInjectionExtensions
                 .OfType<NewtonsoftJsonOutputFormatter>()
                 .First();
 
-            formatter.SupportedMediaTypes.Add(CustomMediaTypes.Application.HateoasJson);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.HateoasJson);
         });
 
         builder.Services.AddApiVersioning(options =>
