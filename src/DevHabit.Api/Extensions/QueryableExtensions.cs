@@ -1,6 +1,5 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Common;
-using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -95,12 +94,7 @@ public static class QueryableExtensions
 
         ShapedResult result = new(dataShapingService.ShapeData(item, fields));
 
-        bool shouldIncludeLinks = string.Equals(
-            acceptHeader,
-            CustomMediaTypes.Application.HateoasJson,
-            StringComparison.OrdinalIgnoreCase);
-
-        if (shouldIncludeLinks)
+        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
         {
             result.Item.TryAdd(HateoasPropertyNames.Links, links);
         }

@@ -11,7 +11,10 @@ public sealed class DataShapingService : IDataShapingService
 {
     private readonly ConcurrentDictionary<Type, PropertyInfo[]> _propertiesCache = [];
 
-    public ExpandoObject ShapeData<T>(T entity, string? fields)
+    public ExpandoObject ShapeData<T>(
+        T entity,
+        string? fields = null,
+        ICollection<LinkDto>? links = null)
     {
         if (!AreAllFieldsValid<T>(fields))
         {
@@ -40,12 +43,17 @@ public sealed class DataShapingService : IDataShapingService
             shapedObject[propertyInfo.Name] = propertyInfo.GetValue(entity);
         }
 
+        if (links is not null)
+        {
+            shapedObject.TryAdd(HateoasPropertyNames.Links, links);
+        }
+
         return (ExpandoObject)shapedObject;
     }
 
     public ICollection<ExpandoObject> ShapeCollectionData<T>(
         ICollection<T> entities,
-        string? fields,
+        string? fields = null,
         Func<T, ICollection<LinkDto>>? linksFactory = null)
     {
         if (!AreAllFieldsValid<T>(fields))
@@ -81,7 +89,7 @@ public sealed class DataShapingService : IDataShapingService
 
             if (linksFactory is not null)
             {
-                shapedObject[HateoasPropertyNames.Links] = linksFactory(entity);
+                shapedObject.TryAdd(HateoasPropertyNames.Links, linksFactory(entity));
             }
 
             shapedObjects.Add((ExpandoObject)shapedObject);

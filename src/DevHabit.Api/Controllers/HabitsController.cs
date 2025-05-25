@@ -6,6 +6,7 @@ using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Services;
+using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
@@ -33,10 +34,7 @@ public sealed class HabitsController(
 
         string? searchTerm = habitParams.SearchTerm?.Trim().ToLowerInvariant();
 
-        bool shouldIncludeLinks = string.Equals(
-            habitParams.Accept,
-            CustomMediaTypes.Application.HateoasJson,
-            StringComparison.OrdinalIgnoreCase);
+        bool shouldIncludeLinks = HateoasHelpers.ShouldIncludeHateoas(habitParams.Accept);
 
         ShapedPaginationResult paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
@@ -89,6 +87,8 @@ public sealed class HabitsController(
     [Consumes(MediaTypeNames.Application.Json)]
     public async Task<ActionResult<HabitDto>> CreateHabit(
         CreateHabitDto createHabitDto,
+        [FromHeader(Name = "Accept")] string? acceptHeader,
+        IDataShapingService dataShapingService,
         IValidator<CreateHabitDto> validator)
     {
         await validator.ValidateAndThrowAsync(createHabitDto);
@@ -100,6 +100,12 @@ public sealed class HabitsController(
         await _dbContext.SaveChangesAsync();
 
         HabitDto habitDto = habit.ToDto();
+
+        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
+        {
+            var result = dataShapingService.ShapeData(habitDto, null, CreateLinksForHabit(habitDto.Id));
+            return CreatedAtAction(nameof(GetHabit), new { id = habitDto.Id }, result);
+        }
 
         return CreatedAtAction(nameof(GetHabit), new { id = habitDto.Id }, habitDto);
     }
