@@ -52,7 +52,7 @@ internal static class HabitMappings
         };
     }
 
-    public static HabitDto ToDto(this Habit habit, List<LinkDto>? links = null)
+    public static HabitDto ToDto(this Habit habit)
     {
         return new()
         {

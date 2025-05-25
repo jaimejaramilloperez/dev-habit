@@ -1,24 +1,24 @@
 using DevHabit.Api.Dtos.Common;
-using DevHabit.Api.Services.DataShapingServices;
+using Microsoft.Extensions.Primitives;
 
 namespace DevHabit.Api.Extensions;
 
 public sealed record ShapedFirstOrDefaultOptions
 {
     public string? Fields { get; init; }
-    public string? AcceptHeader { get; init; }
-    public required List<LinkDto> Links { get; init; }
-    public required IDataShapingService DataShapingService { get; init; }
+    public required ICollection<LinkDto> Links { get; init; }
+    public required HttpContext HttpContext { get; init; }
+    public StringValues AcceptHeader => HttpContext.Request.Headers.Accept;
 
     public void Deconstruct(
         out string? fields,
-        out string? acceptHeader,
-        out List<LinkDto> links,
-        out IDataShapingService dataShapingService)
+        out ICollection<LinkDto> links,
+        out StringValues acceptHeader,
+        out HttpContext httpContext)
     {
         fields = Fields;
-        acceptHeader = AcceptHeader;
         links = Links;
-        dataShapingService = DataShapingService;
+        acceptHeader = AcceptHeader;
+        httpContext = HttpContext;
     }
 }

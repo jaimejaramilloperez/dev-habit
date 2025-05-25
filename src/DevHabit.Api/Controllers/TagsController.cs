@@ -5,7 +5,6 @@ using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Dtos.Tags;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
-using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -44,12 +43,9 @@ public sealed class TagsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetTag(
-        string id,
-        TagParameters tagParameters,
-        IDataShapingService dataShapingService)
+    public async Task<IActionResult> GetTag(string id, TagParameters tagParameters)
     {
-        var (fields, accept) = tagParameters;
+        string? fields = tagParameters.Fields;
 
         ShapedResult? result = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.Id == id)
@@ -57,9 +53,8 @@ public sealed class TagsController(
             .ToShapedFirstOrDefaultAsync(new()
             {
                 Fields = fields,
-                AcceptHeader = accept,
                 Links = CreateLinksForTag(id, fields),
-                DataShapingService = dataShapingService,
+                HttpContext = HttpContext,
             });
 
         return result is null ? NotFound() : Ok(result.Item);
@@ -137,7 +132,7 @@ public sealed class TagsController(
         return NoContent();
     }
 
-    private List<LinkDto> CreateLinksForTag(string id, string? fields) =>
+    private ICollection<LinkDto> CreateLinksForTag(string id, string? fields) =>
     [
         _linkService.Create(nameof(GetTag), LinkRelations.Self, HttpMethods.Get, new { id, fields }),
         _linkService.Create(nameof(UpdateTag), LinkRelations.Update, HttpMethods.Put, new { id }),

@@ -29,3 +29,12 @@ dotnet dev-certs https -ep ./src/DevHabit.Api/aspnetapp.pfx -p Test1234!
 ```sh
 dotnet dotnet-ef migrations add MigrationName -p src/DevHabit.Api -o Migrations/Application
 ```
+
+## Env dev
+
+```sh
+export ConnectionStrings__Database="Server=localhost;Port=5432;Database=devhabit;Username=spartan;Password=123456;" &&
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:18889" &&
+export OTEL_EXPORTER_OTLP_PROTOCOL="grpc" &&
+source ~/.bashrc
+```

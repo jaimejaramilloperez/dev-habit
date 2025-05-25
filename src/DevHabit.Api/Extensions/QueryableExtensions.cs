@@ -1,6 +1,5 @@
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Common;
-using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using FluentValidation;
@@ -67,9 +66,11 @@ public static class QueryableExtensions
 
     public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
-        IDataShapingService dataShapingService,
-        string? fields)
+        string? fields,
+        HttpContext httpContext)
     {
+        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
+
         T? item = await query.FirstOrDefaultAsync();
 
         return item is null
@@ -81,7 +82,9 @@ public static class QueryableExtensions
         this IQueryable<T> query,
         ShapedFirstOrDefaultOptions options)
     {
-        var (fields, acceptHeader, links, dataShapingService) = options;
+        var (fields, links, acceptHeader, httpContext) = options;
+
+        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
 
         T? item = await query.FirstOrDefaultAsync();
 
@@ -130,7 +133,9 @@ public static class QueryableExtensions
         this IQueryable<T> query,
         ShapedPaginationResultOptions<T> options)
     {
-        var (page, pageSize, fields, dataShapingService, linksFactory) = options;
+        var (page, pageSize, fields, httpContext, linksFactory) = options;
+
+        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
 
         long totalCount = await query.LongCountAsync();
 

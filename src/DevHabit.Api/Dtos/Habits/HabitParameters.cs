@@ -8,10 +8,4 @@ public sealed record HabitParameters
 
     [FromHeader(Name = "Accept")]
     public string? Accept { get; set; }
-
-    public void Deconstruct(out string? fields, out string? accept)
-    {
-        fields = Fields;
-        accept = Accept;
-    }
 }

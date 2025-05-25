@@ -6,7 +6,6 @@ using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Services;
-using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
@@ -28,7 +27,6 @@ public sealed class HabitsController(
     [Produces(MediaTypeNames.Application.Json, CustomMediaTypes.Application.HateoasJson)]
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParams,
-        IDataShapingService dataShapingService,
         IValidator<HabitsParameters> validator)
     {
         await validator.ValidateAndThrowAsync(habitParams);
@@ -54,7 +52,7 @@ public sealed class HabitsController(
                 Page = habitParams.Page,
                 PageSize = habitParams.PageSize,
                 Fields = habitParams.Fields,
-                DataShapingService = dataShapingService,
+                HttpContext = HttpContext,
                 LinksFactory = shouldIncludeLinks ? x => CreateLinksForHabit(x.Id, habitParams.Fields) : null,
             });
 
@@ -70,12 +68,9 @@ public sealed class HabitsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetHabit(
-        string id,
-        HabitParameters habitParameters,
-        IDataShapingService dataShapingService)
+    public async Task<IActionResult> GetHabit(string id, HabitParameters habitParameters)
     {
-        var (fields, accept) = habitParameters;
+        string? fields = habitParameters.Fields;
 
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
@@ -83,9 +78,8 @@ public sealed class HabitsController(
             .ToShapedFirstOrDefaultAsync(new()
             {
                 Fields = fields,
-                AcceptHeader = accept,
                 Links = CreateLinksForHabit(id, fields),
-                DataShapingService = dataShapingService,
+                HttpContext = HttpContext,
             });
 
         return result is null ? NotFound() : Ok(result.Item);
@@ -105,7 +99,7 @@ public sealed class HabitsController(
 
         await _dbContext.SaveChangesAsync();
 
-        HabitDto habitDto = habit.ToDto(CreateLinksForHabit(habit.Id));
+        HabitDto habitDto = habit.ToDto();
 
         return CreatedAtAction(nameof(GetHabit), new { id = habitDto.Id }, habitDto);
     }
@@ -172,7 +166,7 @@ public sealed class HabitsController(
         return NoContent();
     }
 
-    private List<LinkDto> CreateLinksForHabit(string id, string? fields = null) =>
+    private ICollection<LinkDto> CreateLinksForHabit(string id, string? fields = null) =>
     [
         _linkService.Create(nameof(GetHabit), LinkRelations.Self, HttpMethods.Get, new { id, fields }),
         _linkService.Create(nameof(UpdateHabit), LinkRelations.Update, HttpMethods.Put, new { id }),
@@ -186,12 +180,12 @@ public sealed class HabitsController(
             controllerName: HabitTagsController.Name),
     ];
 
-    private List<LinkDto> CreateLinksForHabits(
+    private ICollection<LinkDto> CreateLinksForHabits(
         HabitsParameters parameters,
         bool hasPreviousPage,
         bool hasNextPage)
     {
-        List<LinkDto> links =
+        ICollection<LinkDto> links =
         [
             _linkService.Create(nameof(GetHabits), LinkRelations.Self, HttpMethods.Get, new
             {

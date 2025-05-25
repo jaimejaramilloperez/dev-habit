@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using DevHabit.Api.Database;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
@@ -47,6 +48,16 @@ internal static class DependencyInjectionExtensions
 
             formatter.SupportedMediaTypes.Add(CustomMediaTypes.Application.HateoasJson);
         });
+
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1.0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
+            options.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
+        })
+        .AddMvc();
 
         builder.Services.AddOpenApi();
 
