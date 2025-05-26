@@ -1,5 +1,4 @@
 using DevHabit.Api.Common;
-using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Habits;
