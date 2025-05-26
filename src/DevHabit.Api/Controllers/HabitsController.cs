@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using Asp.Versioning;
 using DevHabit.Api.Common;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
@@ -16,7 +17,10 @@ using Microsoft.EntityFrameworkCore;
 namespace DevHabit.Api.Controllers;
 
 [ApiController]
+// [Route("v{version:apiVersion}/api/habits")]
 [Route("api/habits")]
+[ApiVersion(1.0)]
+// [ApiVersion(2.0)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
     ILinkService linkService) : ControllerBase
@@ -66,6 +70,7 @@ public sealed class HabitsController(
     }
 
     [HttpGet("{id}")]
+    [MapToApiVersion(1.0)]
     public async Task<IActionResult> GetHabit(string id, HabitParameters habitParameters)
     {
         string? fields = habitParameters.Fields;
@@ -73,6 +78,26 @@ public sealed class HabitsController(
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
+            .ToShapedFirstOrDefaultAsync(new()
+            {
+                Fields = fields,
+                Links = CreateLinksForHabit(id, fields),
+                HttpContext = HttpContext,
+            });
+
+        return result is null ? NotFound() : Ok(result.Item);
+    }
+
+    [HttpGet("{id}")]
+    // [MapToApiVersion(2.0)]
+    [ApiVersion(2.0)]
+    public async Task<IActionResult> GetHabitV2(string id, HabitParameters habitParameters)
+    {
+        string? fields = habitParameters.Fields;
+
+        ShapedResult? result = await _dbContext.Habits.AsNoTracking()
+            .Where(x => x.Id == id)
+            .Select(HabitQueries.ProjectToDtoWithTagsV2())
             .ToShapedFirstOrDefaultAsync(new()
             {
                 Fields = fields,
