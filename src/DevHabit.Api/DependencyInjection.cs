@@ -54,7 +54,6 @@ internal static class DependencyInjectionExtensions
             options.DefaultApiVersion = new ApiVersion(1.0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
-            options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
             options.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
         })
         .AddMvc();
@@ -119,9 +118,9 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
 
-        builder.Services.AddTransient<IDataShapingService, DataShapingService>();
+        builder.Services.AddSingleton<IDataShapingService, DataShapingService>();
 
-        builder.Services.AddTransient<ILinkService, LinkService>();
+        builder.Services.AddScoped<ILinkService, LinkService>();
 
         return builder;
     }
