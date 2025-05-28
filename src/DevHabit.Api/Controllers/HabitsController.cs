@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using Asp.Versioning;
 using DevHabit.Api.Common;
 using DevHabit.Api.Database;
@@ -6,7 +5,6 @@ using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
-using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
@@ -17,10 +15,8 @@ using Microsoft.EntityFrameworkCore;
 namespace DevHabit.Api.Controllers;
 
 [ApiController]
-// [Route("v{version:apiVersion}/api/habits")]
 [Route("api/habits")]
 [ApiVersion(1.0)]
-// [ApiVersion(2.0)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
     ILinkService linkService) : ControllerBase
@@ -29,7 +25,6 @@ public sealed class HabitsController(
     private readonly ILinkService _linkService = linkService;
 
     [HttpGet]
-    [Produces(MediaTypeNames.Application.Json, CustomMediaTypesNames.Application.HateoasJson)]
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParams,
         IValidator<HabitsParameters> validator)
@@ -89,7 +84,6 @@ public sealed class HabitsController(
     }
 
     [HttpGet("{id}")]
-    // [MapToApiVersion(2.0)]
     [ApiVersion(2.0)]
     public async Task<IActionResult> GetHabitV2(string id, HabitParameters habitParameters)
     {
@@ -109,7 +103,6 @@ public sealed class HabitsController(
     }
 
     [HttpPost]
-    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<ActionResult<HabitDto>> CreateHabit(
         CreateHabitDto createHabitDto,
         [FromHeader(Name = "Accept")] string? acceptHeader,

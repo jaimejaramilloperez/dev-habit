@@ -9,6 +9,12 @@ internal static class CustomMediaTypesNames
         public const string HateoasJson = "application/vnd.dev-habit.hateoas+json";
         public const string HateoasJsonV1 = "application/vnd.dev-habit.hateoas.v1+json";
         public const string HateoasJsonV2 = "application/vnd.dev-habit.hateoas.v2+json";
-        public static readonly IReadOnlyCollection<string> HateoasMediaTypes = [HateoasJson, HateoasJsonV1, HateoasJsonV2];
+
+        public static readonly HashSet<string> HateoasMediaTypes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            HateoasJson,
+            HateoasJsonV1,
+            HateoasJsonV2
+        };
     }
 }
