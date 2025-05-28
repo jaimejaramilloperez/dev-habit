@@ -27,7 +27,7 @@ dotnet dev-certs https -ep ./src/DevHabit.Api/aspnetapp.pfx -p Test1234!
 ### Create a database migration
 
 ```sh
-dotnet dotnet-ef migrations add MigrationName -p src/DevHabit.Api -o Migrations/Application
+dotnet dotnet-ef migrations add MigrationName -p src/DevHabit.Api -o Migrations/Application -c DbContext
 ```
 
 ## Env dev

@@ -1,0 +1,7 @@
+@DevHabitApiHostAddress = https://localhost:5001
+@BasePath = api/users
+@ResourceId = u_019718c8-a728-7a03-8f07-88983cb6244a
+
+### Get User by Id
+GET {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+Accept: application/json

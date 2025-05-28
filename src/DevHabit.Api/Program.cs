@@ -10,6 +10,7 @@ builder.AddErrorHandling();
 builder.AddDatabase();
 builder.AddObservability();
 builder.AddApplicationServices();
+builder.AddAuthenticationServices();
 
 var app = builder.Build();
 
@@ -17,6 +18,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.ApplyMigrations<ApplicationDbContext>();
+    app.ApplyMigrations<ApplicationIdentityDbContext>();
 }
 
 app.UseHttpsRedirection();

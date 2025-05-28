@@ -5,6 +5,7 @@ using DevHabit.Api.Services;
 using DevHabit.Api.Services.DataShapingServices;
 using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -92,6 +93,11 @@ internal static class DependencyInjectionExtensions
                 npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Application))
             .UseSnakeCaseNamingConvention());
 
+        builder.Services.AddDbContext<ApplicationIdentityDbContext>(options => options
+            .UseNpgsql(builder.Configuration.GetConnectionString("Database"), npgsqlOptions =>
+                npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Identity))
+            .UseSnakeCaseNamingConvention());
+
         return builder;
     }
 
@@ -130,6 +136,14 @@ internal static class DependencyInjectionExtensions
         builder.Services.AddSingleton<IDataShapingService, DataShapingService>();
 
         builder.Services.AddScoped<ILinkService, LinkService>();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddAuthenticationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
 
         return builder;
     }

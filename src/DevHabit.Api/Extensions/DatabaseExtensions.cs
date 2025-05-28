@@ -13,11 +13,11 @@ public static class DatabaseExtensions
         try
         {
             dbContext.Database.Migrate();
-            app.Logger.LogInformation("Database migrations applied successfully");
+            app.Logger.LogInformation("Database migrations for {DbContext} applied successfully", typeof(TDbContext).Name);
         }
         catch (Exception ex)
         {
-            app.Logger.LogError(ex, "An error occurred while applying database migrations");
+            app.Logger.LogError(ex, "An error occurred while applying database migrations for {DbContext}", typeof(TDbContext).Name);
             throw;
         }
     }
@@ -31,11 +31,11 @@ public static class DatabaseExtensions
         try
         {
             await dbContext.Database.MigrateAsync();
-            app.Logger.LogInformation("Database migrations applied successfully");
+            app.Logger.LogInformation("Database migrations for {DbContext} applied successfully", typeof(TDbContext).Name);
         }
         catch (Exception ex)
         {
-            app.Logger.LogError(ex, "An error occurred while applying database migrations");
+            app.Logger.LogError(ex, "An error occurred while applying database migrations for {DbContext}", typeof(TDbContext).Name);
             throw;
         }
     }
