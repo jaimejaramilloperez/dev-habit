@@ -1,8 +1,9 @@
+using DevHabit.Api.Dtos.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevHabit.Api.Dtos.Tags;
 
-public sealed record TagsParameters
+public sealed record TagsParameters : AcceptHeaderDto
 {
     [FromQuery(Name = "q")]
     public string? SearchTerm { get; init; }
@@ -15,7 +16,4 @@ public sealed record TagsParameters
 
     [FromQuery(Name = "page_size")]
     public int PageSize { get; init; } = 10;
-
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; set; }
 }

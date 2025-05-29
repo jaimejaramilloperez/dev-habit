@@ -1,13 +1,16 @@
+using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Auth;
 using DevHabit.Api.Dtos.Users;
 using DevHabit.Api.Entities;
+using DevHabit.Api.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Options;
 
 namespace DevHabit.Api.Controllers;
 
@@ -17,11 +20,15 @@ namespace DevHabit.Api.Controllers;
 public sealed class AuthController(
     UserManager<IdentityUser> userManager,
     ApplicationDbContext appDbContext,
-    ApplicationIdentityDbContext identityDbContext) : ControllerBase
+    ApplicationIdentityDbContext identityDbContext,
+    TokenProvider tokenProvider,
+    IOptions<JwtAuthOptions> options) : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager = userManager;
     private readonly ApplicationDbContext _appDbContext = appDbContext;
     private readonly ApplicationIdentityDbContext _identityDbContext = identityDbContext;
+    private readonly TokenProvider _tokenProvider = tokenProvider;
+    private readonly JwtAuthOptions _jwtAuthOptions = options.Value;
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(
@@ -81,8 +88,76 @@ public sealed class AuthController(
 
         await _appDbContext.SaveChangesAsync();
 
+        TokenRequestDto tokenRequest = new(identityUser.Id, identityUser.Email);
+        AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
+
+        RefreshToken refreshToken = new()
+        {
+            Id = Guid.CreateVersion7(),
+            UserId = identityUser.Id,
+            Token = accessTokens.RefreshToken,
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
+            User = identityUser,
+        };
+
+        _identityDbContext.RefreshTokens.Add(refreshToken);
+
+        await _identityDbContext.SaveChangesAsync();
+
         await transaction.CommitAsync();
 
-        return Ok();
+        return Ok(accessTokens);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    {
+        IdentityUser? identityUser = await _userManager.FindByEmailAsync(loginUserDto.Email);
+
+        if (identityUser is null || !await _userManager.CheckPasswordAsync(identityUser, loginUserDto.Password))
+        {
+            return Unauthorized();
+        }
+
+        TokenRequestDto tokenRequest = new(identityUser.Id, identityUser.Email!);
+        AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
+
+        RefreshToken refreshToken = new()
+        {
+            Id = Guid.CreateVersion7(),
+            UserId = identityUser.Id,
+            Token = accessTokens.RefreshToken,
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
+            User = identityUser,
+        };
+
+        _identityDbContext.RefreshTokens.Add(refreshToken);
+
+        await _identityDbContext.SaveChangesAsync();
+
+        return Ok(accessTokens);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(RefreshTokenDto refreshTokenDto)
+    {
+        RefreshToken? refreshToken = await _identityDbContext.RefreshTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Token == refreshTokenDto.RefreshToken);
+
+        if (refreshToken is null || refreshToken.ExpiresAtUtc < DateTime.UtcNow)
+        {
+            return Unauthorized();
+        }
+
+        TokenRequestDto tokenRequest = new(refreshToken.User.Id, refreshToken.User.Email!);
+        AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
+
+        refreshToken.Token = accessTokens.RefreshToken;
+        refreshToken.ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtAuthOptions.RefreshTokenExpirationInDays);
+
+        await _identityDbContext.SaveChangesAsync();
+
+        return Ok(accessTokens);
     }
 }

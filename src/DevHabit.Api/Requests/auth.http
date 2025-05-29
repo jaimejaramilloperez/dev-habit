@@ -12,3 +12,22 @@ Content-Type: application/json
   "password": "Az123456!",
   "confirmationPassword": "Az123456!",
 }
+
+### Login a User
+POST {{DevHabitApiHostAddress}}/{{BasePath}}/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "Az123456!",
+}
+
+### Refresh a User Tokens
+POST {{DevHabitApiHostAddress}}/{{BasePath}}/refresh
+Accept: application/json
+Content-Type: application/json
+
+{
+  "refreshToken": "",
+}

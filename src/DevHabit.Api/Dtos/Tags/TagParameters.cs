@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+using DevHabit.Api.Dtos.Common;
 
 namespace DevHabit.Api.Dtos.Tags;
 
-public sealed record TagParameters
+public sealed record TagParameters : AcceptHeaderDto
 {
     public string? Fields { get; init; }
-
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; set; }
 }

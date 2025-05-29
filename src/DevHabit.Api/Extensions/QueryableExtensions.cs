@@ -1,6 +1,7 @@
 using System.Linq.Dynamic.Core;
-using DevHabit.Api.Common;
-using DevHabit.Api.Services.DataShapingServices;
+using DevHabit.Api.Common.DataShaping;
+using DevHabit.Api.Common.Pagination;
+using DevHabit.Api.Common.Sorting;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,23 +11,23 @@ public static class QueryableExtensions
 {
     public static IQueryable<T> SortByQueryString<T>(
         this IQueryable<T> query,
-        string? sort,
+        string? sortExpression,
         ICollection<SortMapping> mappings,
         string? defaultOrderField = null)
     {
-        if (string.IsNullOrWhiteSpace(sort))
+        if (string.IsNullOrWhiteSpace(sortExpression))
         {
             return ApplyDefaultOrder(query, defaultOrderField);
         }
 
-        string[] sortFields = sort
+        string[] sortFields = sortExpression
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(x => x.ToLowerInvariant())
             .ToArray();
 
         if (!SortMapping.AreAllSortFieldsValid(mappings, sortFields))
         {
-            throw new ValidationException([new("sort", $"Sort value '{sort}' is not valid")]);
+            throw new ValidationException([new("sort", $"Sort value '{sortExpression}' is not valid")]);
         }
 
         List<string> sortClauses = new(sortFields.Length);
@@ -65,41 +66,13 @@ public static class QueryableExtensions
 
     public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
-        string? fields,
-        HttpContext httpContext)
+        string? fields)
     {
-        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
-
         T? item = await query.FirstOrDefaultAsync();
 
         return item is null
             ? null
-            : new(dataShapingService.ShapeData(item, fields));
-    }
-
-    public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
-        this IQueryable<T> query,
-        ShapedFirstOrDefaultOptions options)
-    {
-        var (fields, links, acceptHeader, httpContext) = options;
-
-        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
-
-        T? item = await query.FirstOrDefaultAsync();
-
-        if (item is null)
-        {
-            return null;
-        }
-
-        ShapedResult result = new(dataShapingService.ShapeData(item, fields));
-
-        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
-        {
-            result.Item.TryAdd(HateoasPropertyNames.Links, links);
-        }
-
-        return result;
+            : new(DataShaper.ShapeData(item, fields));
     }
 
     public static async Task<PaginationResult<T>> ToPaginationResultAsync<T>(
@@ -123,14 +96,12 @@ public static class QueryableExtensions
         };
     }
 
-    public static async Task<ShapedPaginationResult> ToShapedPaginationResultAsync<T>(
+    public static async Task<ShapedPaginationResult<T>> ToShapedPaginationResultAsync<T>(
         this IQueryable<T> query,
-        ShapedPaginationResultOptions<T> options)
+        int page,
+        int pageSize,
+        string? fields)
     {
-        var (page, pageSize, fields, httpContext, linksFactory) = options;
-
-        var dataShapingService = httpContext.RequestServices.GetRequiredService<IDataShapingService>();
-
         long totalCount = await query.LongCountAsync();
 
         List<T> items = await query
@@ -140,7 +111,8 @@ public static class QueryableExtensions
 
         return new()
         {
-            Data = dataShapingService.ShapeCollectionData(items, fields, linksFactory),
+            Data = DataShaper.ShapeCollectionData(items, fields),
+            OriginalData = items,
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,

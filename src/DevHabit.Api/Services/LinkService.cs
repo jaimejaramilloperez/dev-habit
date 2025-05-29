@@ -1,10 +1,10 @@
 using DevHabit.Api.Dtos.Common;
 
-namespace DevHabit.Api.Services.LinkServices;
+namespace DevHabit.Api.Services;
 
 public sealed class LinkService(
     LinkGenerator linkGenerator,
-    IHttpContextAccessor httpContextAccessor) : ILinkService
+    IHttpContextAccessor httpContextAccessor)
 {
     public LinkDto Create(
         string endpointName,

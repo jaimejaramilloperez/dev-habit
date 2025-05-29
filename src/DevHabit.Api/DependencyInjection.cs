@@ -1,15 +1,18 @@
+using System.Text;
 using Asp.Versioning;
+using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
-using DevHabit.Api.Services.DataShapingServices;
-using DevHabit.Api.Services.LinkServices;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
 using OpenTelemetry;
@@ -59,7 +62,6 @@ internal static class DependencyInjectionExtensions
             options.DefaultApiVersion = new ApiVersion(1.0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
-            // options.ApiVersionReader = new UrlSegmentApiVersionReader();
             options.ApiVersionReader = ApiVersionReader.Combine(
                 new MediaTypeApiVersionReader(),
                 new MediaTypeApiVersionReaderBuilder()
@@ -133,9 +135,9 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
 
-        builder.Services.AddSingleton<IDataShapingService, DataShapingService>();
+        builder.Services.AddScoped<LinkService>();
 
-        builder.Services.AddScoped<ILinkService, LinkService>();
+        builder.Services.AddScoped<TokenProvider>();
 
         return builder;
     }
@@ -144,6 +146,29 @@ internal static class DependencyInjectionExtensions
     {
         builder.Services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
+
+        builder.Services.Configure<JwtAuthOptions>(builder.Configuration.GetSection("Jwt"));
+
+        JwtAuthOptions jwtAuthOptions = builder.Configuration.GetSection("Jwt").Get<JwtAuthOptions>()!;
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new()
+            {
+                ValidIssuer = jwtAuthOptions.Issuer,
+                ValidAudience = jwtAuthOptions.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtAuthOptions.Key)),
+                ValidateIssuerSigningKey = true,
+            };
+        });
+
+        builder.Services.AddAuthorization();
 
         return builder;
     }

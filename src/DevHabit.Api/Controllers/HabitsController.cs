@@ -1,13 +1,14 @@
 using Asp.Versioning;
-using DevHabit.Api.Common;
+using DevHabit.Api.Common.DataShaping;
+using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
-using DevHabit.Api.Services.DataShapingServices;
-using DevHabit.Api.Services.LinkServices;
+using DevHabit.Api.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +17,14 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/habits")]
+[Authorize]
 [ApiVersion(1.0)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
-    ILinkService linkService) : ControllerBase
+    LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly ILinkService _linkService = linkService;
+    private readonly LinkService _linkService = linkService;
 
     [HttpGet]
     public async Task<IActionResult> GetHabits(
@@ -33,9 +35,7 @@ public sealed class HabitsController(
 
         string? searchTerm = habitParams.SearchTerm?.Trim().ToLowerInvariant();
 
-        bool shouldIncludeLinks = HateoasHelpers.ShouldIncludeHateoas(habitParams.Accept);
-
-        ShapedPaginationResult paginationResult = await _dbContext.Habits.AsNoTracking()
+        ShapedPaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
@@ -44,22 +44,13 @@ public sealed class HabitsController(
             .Where(x => habitParams.Status == null || x.Status == habitParams.Status)
             .SortByQueryString(habitParams.Sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
-            .ToShapedPaginationResultAsync(new()
+            .ToShapedPaginationResultAsync(habitParams.Page, habitParams.PageSize, habitParams.Fields)
+            .WithHateoasAsync(new()
             {
-                Page = habitParams.Page,
-                PageSize = habitParams.PageSize,
-                Fields = habitParams.Fields,
-                HttpContext = HttpContext,
-                LinksFactory = shouldIncludeLinks ? x => CreateLinksForHabit(x.Id, habitParams.Fields) : null,
+                ItemLinksFactory = x => CreateLinksForHabit(x.Id, habitParams.Fields),
+                CollectionLinksFactory = x => CreateLinksForHabits(habitParams, x.HasPreviousPage, x.HasNextPage),
+                AcceptHeader = habitParams.Accept,
             });
-
-        if (shouldIncludeLinks)
-        {
-            paginationResult.Links.AddRange(CreateLinksForHabits(
-                habitParams,
-                paginationResult.HasPreviousPage,
-                paginationResult.HasNextPage));
-        }
 
         return Ok(paginationResult);
     }
@@ -73,12 +64,8 @@ public sealed class HabitsController(
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTags())
-            .ToShapedFirstOrDefaultAsync(new()
-            {
-                Fields = fields,
-                Links = CreateLinksForHabit(id, fields),
-                HttpContext = HttpContext,
-            });
+            .ToShapedFirstOrDefaultAsync(fields)
+            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
 
         return result is null ? NotFound() : Ok(result.Item);
     }
@@ -92,12 +79,8 @@ public sealed class HabitsController(
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id)
             .Select(HabitQueries.ProjectToDtoWithTagsV2())
-            .ToShapedFirstOrDefaultAsync(new()
-            {
-                Fields = fields,
-                Links = CreateLinksForHabit(id, fields),
-                HttpContext = HttpContext,
-            });
+            .ToShapedFirstOrDefaultAsync(fields)
+            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
 
         return result is null ? NotFound() : Ok(result.Item);
     }
@@ -105,8 +88,7 @@ public sealed class HabitsController(
     [HttpPost]
     public async Task<ActionResult<HabitDto>> CreateHabit(
         CreateHabitDto createHabitDto,
-        [FromHeader(Name = "Accept")] string? acceptHeader,
-        IDataShapingService dataShapingService,
+        AcceptHeaderDto acceptHeaderDto,
         IValidator<CreateHabitDto> validator)
     {
         await validator.ValidateAndThrowAsync(createHabitDto);
@@ -119,9 +101,9 @@ public sealed class HabitsController(
 
         HabitDto habitDto = habit.ToDto();
 
-        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
+        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeaderDto.Accept))
         {
-            var result = dataShapingService.ShapeData(habitDto, null, CreateLinksForHabit(habitDto.Id));
+            var result = DataShaper.ShapeData(habitDto, CreateLinksForHabit(habitDto.Id));
             return CreatedAtAction(nameof(GetHabit), new { id = habitDto.Id }, result);
         }
 

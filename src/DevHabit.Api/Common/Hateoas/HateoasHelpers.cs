@@ -1,6 +1,4 @@
-using DevHabit.Api.Services;
-
-namespace DevHabit.Api.Common;
+namespace DevHabit.Api.Common.Hateoas;
 
 internal static class HateoasHelpers
 {

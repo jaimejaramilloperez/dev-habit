@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+using DevHabit.Api.Dtos.Common;
 
 namespace DevHabit.Api.Dtos.Habits;
 
-public sealed record HabitParameters
+public sealed record HabitParameters : AcceptHeaderDto
 {
     public string? Fields { get; init; }
-
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; set; }
 }

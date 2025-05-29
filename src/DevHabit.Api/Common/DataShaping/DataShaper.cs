@@ -1,17 +1,17 @@
 using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Reflection;
-using DevHabit.Api.Common;
+using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Dtos.Common;
 using FluentValidation;
 
-namespace DevHabit.Api.Services.DataShapingServices;
+namespace DevHabit.Api.Common.DataShaping;
 
-public sealed class DataShapingService : IDataShapingService
+public static class DataShaper
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> PropertiesCache = [];
 
-    public ExpandoObject ShapeData<T>(
+    public static ExpandoObject ShapeData<T>(
         T entity,
         string? fields = null,
         ICollection<LinkDto>? links = null)
@@ -42,8 +42,29 @@ public sealed class DataShapingService : IDataShapingService
         return (ExpandoObject)shapedObject;
     }
 
-    public ICollection<ExpandoObject> ShapeCollectionData<T>(
-        ICollection<T> entities,
+    public static ExpandoObject ShapeData<T>(
+        T entity,
+        ICollection<LinkDto>? links = null)
+    {
+        PropertyInfo[] propertyInfos = GetFilteredProperties<T>([]);
+
+        IDictionary<string, object?> shapedObject = new ExpandoObject();
+
+        foreach (var propertyInfo in propertyInfos)
+        {
+            shapedObject[propertyInfo.Name] = propertyInfo.GetValue(entity);
+        }
+
+        if (links is not null)
+        {
+            shapedObject.TryAdd(HateoasPropertyNames.Links, links);
+        }
+
+        return (ExpandoObject)shapedObject;
+    }
+
+    public static IReadOnlyCollection<ExpandoObject> ShapeCollectionData<T>(
+        IReadOnlyCollection<T> entities,
         string? fields = null,
         Func<T, ICollection<LinkDto>>? linksFactory = null)
     {
@@ -90,15 +111,15 @@ public sealed class DataShapingService : IDataShapingService
             .GetOrAdd(
                 typeof(T),
                 type => type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            .Select(p => p.Name)
+            .Select(x => x.Name)
             .ToArray();
 
-        return fieldsSet.All(f => propertyNames.Contains(f, StringComparer.OrdinalIgnoreCase));
+        return fieldsSet.All(x => propertyNames.Contains(x, StringComparer.OrdinalIgnoreCase));
     }
 
     private static PropertyInfo[] GetFilteredProperties<T>(HashSet<string> fieldsSet)
     {
-        var properties = PropertiesCache.GetOrAdd(
+        PropertyInfo[] properties = PropertiesCache.GetOrAdd(
             typeof(T),
             type => type.GetProperties(BindingFlags.Public | BindingFlags.Instance));
 

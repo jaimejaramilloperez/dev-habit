@@ -1,4 +1,4 @@
-namespace DevHabit.Api.Common;
+namespace DevHabit.Api.Common.Hateoas;
 
 internal static class HateoasPropertyNames
 {

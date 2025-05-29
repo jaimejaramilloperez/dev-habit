@@ -1,4 +1,4 @@
-using DevHabit.Api.Common;
+using DevHabit.Api.Common.Sorting;
 using DevHabit.Api.Entities;
 
 namespace DevHabit.Api.Dtos.Habits;

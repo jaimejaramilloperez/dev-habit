@@ -25,6 +25,10 @@ app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+
 app.MapHealthChecks("health", new()
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

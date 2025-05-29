@@ -1,4 +1,4 @@
-namespace DevHabit.Api.Common;
+namespace DevHabit.Api.Common.Sorting;
 
 public sealed record SortMapping(
     string SortField,

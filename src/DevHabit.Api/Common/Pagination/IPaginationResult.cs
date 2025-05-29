@@ -1,4 +1,4 @@
-namespace DevHabit.Api.Common;
+namespace DevHabit.Api.Common.Pagination;
 
 public interface IPaginationResult
 {
