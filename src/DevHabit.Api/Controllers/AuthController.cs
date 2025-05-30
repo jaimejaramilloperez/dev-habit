@@ -97,7 +97,6 @@ public sealed class AuthController(
             UserId = identityUser.Id,
             Token = accessTokens.RefreshToken,
             ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
-            User = identityUser,
         };
 
         _identityDbContext.RefreshTokens.Add(refreshToken);
@@ -128,7 +127,6 @@ public sealed class AuthController(
             UserId = identityUser.Id,
             Token = accessTokens.RefreshToken,
             ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
-            User = identityUser,
         };
 
         _identityDbContext.RefreshTokens.Add(refreshToken);

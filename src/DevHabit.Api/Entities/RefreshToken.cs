@@ -8,5 +8,5 @@ public sealed class RefreshToken
     public required string UserId { get; set; }
     public required string Token { get; set; }
     public DateTime ExpiresAtUtc { get; set; }
-    public required IdentityUser User { get; set; }
+    public IdentityUser User { get; set; } = null!;
 }
