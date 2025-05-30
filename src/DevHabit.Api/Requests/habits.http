@@ -1,19 +1,18 @@
-@DevHabitApiHostAddress = https://localhost:5001
-@BasePath = api/habits
-@ResourceId = h_01962bc2-765b-7e35-846e-42568b36975b
+@basePath = api/habits
+@habitId = h_01962bc2-765b-7e35-846e-42568b36975b
 
 ### Get Habits
-GET {{DevHabitApiHostAddress}}/{{BasePath}}
+GET {{devHabitApiHostAddress}}/{{basePath}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Get Habit by Id
-GET {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+GET {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Create Habit
-POST {{DevHabitApiHostAddress}}/{{BasePath}}
+POST {{devHabitApiHostAddress}}/{{basePath}}
 Accept: application/json
 Content-Type: application/json
 
@@ -36,7 +35,7 @@ Content-Type: application/json
 }
 
 ### Update Habit
-PUT {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+PUT {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
 Accept: application/json
 Content-Type: application/json
 
@@ -58,7 +57,7 @@ Content-Type: application/json
 }
 
 ### Partially Update Habit
-PATCH {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+PATCH {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
 Accept: application/json
 Content-Type: application/json
 
@@ -75,5 +74,5 @@ Content-Type: application/json
 ]
 
 ### Delete Habit
-DELETE  {{DevHabitApiHostAddress}}/{{BasePath}}/{{ResourceId}}
+DELETE  {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
 Accept: application/json

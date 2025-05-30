@@ -1,8 +1,7 @@
-@DevHabitApiHostAddress = https://localhost:5001
-@BasePath = api/auth
+@basePath = api/auth
 
 ### Register a User
-POST {{DevHabitApiHostAddress}}/{{BasePath}}/register
+POST {{devHabitApiHostAddress}}/{{basePath}}/register
 Accept: application/json
 Content-Type: application/json
 
@@ -14,7 +13,7 @@ Content-Type: application/json
 }
 
 ### Login a User
-POST {{DevHabitApiHostAddress}}/{{BasePath}}/login
+POST {{devHabitApiHostAddress}}/{{basePath}}/login
 Accept: application/json
 Content-Type: application/json
 
@@ -24,7 +23,7 @@ Content-Type: application/json
 }
 
 ### Refresh a User Tokens
-POST {{DevHabitApiHostAddress}}/{{BasePath}}/refresh
+POST {{devHabitApiHostAddress}}/{{basePath}}/refresh
 Accept: application/json
 Content-Type: application/json
 
