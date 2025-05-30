@@ -1,28 +1,32 @@
 @basePath = api/tags
-@tagId = t_0196350a-0a40-7195-aba3-f759778f9262
+@tagId = t_01972353-5acd-7aef-918d-0b73a3904d94
 
 ### Get Tags
 GET {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Get Tag by Id
 GET {{devHabitApiHostAddress}}/{{basePath}}/{{tagId}}
+Authorization: Bearer {{token}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Create Tag
 POST {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Coding",
+  "name": ".net",
   "description": null
 }
 
 ### Update Tag
 PUT {{devHabitApiHostAddress}}/{{basePath}}/{{tagId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
@@ -33,4 +37,5 @@ Content-Type: application/json
 
 ### Delete Tag
 DELETE  {{devHabitApiHostAddress}}/{{basePath}}/{{tagId}}
+Authorization: Bearer {{token}}
 Accept: application/json

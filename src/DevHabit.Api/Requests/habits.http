@@ -1,27 +1,30 @@
 @basePath = api/habits
-@habitId = h_01962bc2-765b-7e35-846e-42568b36975b
+@habitId = h_01972355-6f47-7227-9838-0ca60418594f
 
 ### Get Habits
 GET {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Get Habit by Id
 GET {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
+Authorization: Bearer {{token}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
 ### Create Habit
 POST {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "name": null,
+  "name": "Daily coding",
   "description": null,
-  "type": 4,
+  "type": 2,
   "frequency": {
-    "type": 5,
+    "type": 2,
     "timesPerPeriod": 1
   },
   "target": {
@@ -29,22 +32,23 @@ Content-Type: application/json
     "unit": "minutes"
   },
   "milestone": {
-    "target": -1
+    "target": 1
   },
-  "endDate": "2024-12-01"
+  "endDate": "2025-12-01"
 }
 
 ### Update Habit
 PUT {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Daily Coding",
+  "name": "Daily coding",
   "description": "The new description",
   "type": 2,
   "frequency": {
-    "type": 1,
+    "type": 2,
     "timesPerPeriod": 1
   },
   "target": {
@@ -58,6 +62,7 @@ Content-Type: application/json
 
 ### Partially Update Habit
 PATCH {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
@@ -75,4 +80,5 @@ Content-Type: application/json
 
 ### Delete Habit
 DELETE  {{devHabitApiHostAddress}}/{{basePath}}/{{habitId}}
+Authorization: Bearer {{token}}
 Accept: application/json

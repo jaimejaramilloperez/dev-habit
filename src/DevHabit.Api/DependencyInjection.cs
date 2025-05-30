@@ -135,9 +135,13 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddValidatorsFromAssemblyContaining<IApiMarker>();
 
+        builder.Services.AddMemoryCache();
+
         builder.Services.AddScoped<LinkService>();
 
         builder.Services.AddScoped<TokenProvider>();
+
+        builder.Services.AddScoped<UserContext>();
 
         return builder;
     }

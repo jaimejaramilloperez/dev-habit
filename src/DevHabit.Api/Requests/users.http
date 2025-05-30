@@ -3,4 +3,10 @@
 
 ### Get User by Id
 GET {{devHabitApiHostAddress}}/{{basePath}}/{{userId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get Current User
+GET {{devHabitApiHostAddress}}/{{basePath}}/me
+Authorization: Bearer {{token}}
 Accept: application/json

@@ -1,19 +1,21 @@
-@habitId = h_01962bc2-765b-7e35-846e-42568b36975b
+@habitId = h_01972355-6f47-7227-9838-0ca60418594f
 @basePath = api/habits/{{habitId}}/tags
-@tagId = t_019630d0-d41f-75bb-901a-e74d41bf62ca
+@tagId = t_01972353-5acd-7aef-918d-0b73a3904d94
 
 ### Upsert Habit Tags
 PUT {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
 
 {
   "tagIds": [
-    "t_0196350a-0a40-7195-aba3-f759778f9262",
-    "t_019630d0-d41f-75bb-901a-e74d41bf62ca"
+    "t_01972353-7877-7cec-b0b7-f833abdbfd7a",
+    "t_01972353-5acd-7aef-918d-0b73a3904d94"
   ]
 }
 
 ### Delete Habit Tag
 Delete {{devHabitApiHostAddress}}/{{basePath}}/{{tagId}}
+Authorization: Bearer {{token}}
 Accept: application/json

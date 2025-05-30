@@ -5,7 +5,7 @@
       "devHabitApiHostAddress": "https://localhost:5001"
     },
     "dev": {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJkZXYtaGFiaXQuYXBwIiwiaXNzIjoiZGV2LWhhYml0LmFwaSIsImV4cCI6MTc0ODU1OTI0OCwic3ViIjoiMDMzMTE3MDQtYjg4Ny00YTBlLWFlNmMtN2YyNDA3MzkxODg5IiwiZW1haWwiOiJ0ZXN0QG1haWwuY29tIiwiaWF0IjoxNzQ4NTU3NDQ4LCJuYmYiOjE3NDg1NTc0NDh9.KvaGe3skqjJ2xSkYDi6x0lm3pS78PaPx7--OwZ60tEI"
+      "token": ""
     }
   },
   "cSpell.words": [

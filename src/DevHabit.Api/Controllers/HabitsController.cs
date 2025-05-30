@@ -21,21 +21,31 @@ namespace DevHabit.Api.Controllers;
 [ApiVersion(1.0)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
-    LinkService linkService) : ControllerBase
+    LinkService linkService,
+    UserContext userContext) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly LinkService _linkService = linkService;
+    private readonly UserContext _userContext = userContext;
 
     [HttpGet]
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParams,
         IValidator<HabitsParameters> validator)
     {
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(habitParams);
 
         string? searchTerm = habitParams.SearchTerm?.Trim().ToLowerInvariant();
 
         ShapedPaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()
+            .Where(x => x.UserId == userId)
             .Where(x =>
                 searchTerm == null ||
                 x.Name.ToLower().Contains(searchTerm) ||
@@ -59,10 +69,17 @@ public sealed class HabitsController(
     [MapToApiVersion(1.0)]
     public async Task<IActionResult> GetHabit(string id, HabitParameters habitParameters)
     {
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
         string? fields = habitParameters.Fields;
 
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTags())
             .ToShapedFirstOrDefaultAsync(fields)
             .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
@@ -74,10 +91,17 @@ public sealed class HabitsController(
     [ApiVersion(2.0)]
     public async Task<IActionResult> GetHabitV2(string id, HabitParameters habitParameters)
     {
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
         string? fields = habitParameters.Fields;
 
         ShapedResult? result = await _dbContext.Habits.AsNoTracking()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTagsV2())
             .ToShapedFirstOrDefaultAsync(fields)
             .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
@@ -91,9 +115,16 @@ public sealed class HabitsController(
         AcceptHeaderDto acceptHeaderDto,
         IValidator<CreateHabitDto> validator)
     {
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(createHabitDto);
 
-        Habit habit = createHabitDto.ToEntity();
+        Habit habit = createHabitDto.ToEntity(userId);
 
         _dbContext.Habits.Add(habit);
 
@@ -113,7 +144,14 @@ public sealed class HabitsController(
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateHabit(string id, UpdateHabitDto updateHabitDto)
     {
-        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id);
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (habit is null)
         {
@@ -130,7 +168,14 @@ public sealed class HabitsController(
     [HttpPatch("{id}")]
     public async Task<IActionResult> PatchHabit(string id, JsonPatchDocument<HabitDto> patchDocument)
     {
-        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id);
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (habit is null)
         {
@@ -158,7 +203,14 @@ public sealed class HabitsController(
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteHabit(string id)
     {
-        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id);
+        string? userId = await _userContext.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        Habit? habit = await _dbContext.Habits.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (habit is null)
         {
