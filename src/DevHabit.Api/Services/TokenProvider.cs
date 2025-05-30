@@ -46,7 +46,8 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
 
     private static string GenerateRefreshToken()
     {
+        byte[] guidBytes = Encoding.UTF8.GetBytes(Guid.CreateVersion7().ToString());
         byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
-        return Convert.ToBase64String(randomBytes);
+        return Convert.ToBase64String([.. guidBytes, .. randomBytes]);
     }
 }
