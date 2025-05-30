@@ -14,12 +14,7 @@ public static class HateoasExtensions
     {
         ShapedResult? result = await resultTask;
 
-        if (result is null)
-        {
-            return null;
-        }
-
-        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
+        if (result is not null && HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
         {
             result.Item.TryAdd(HateoasPropertyNames.Links, links);
         }
