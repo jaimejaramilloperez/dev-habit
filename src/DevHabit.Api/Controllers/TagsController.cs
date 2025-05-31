@@ -105,7 +105,7 @@ public sealed class TagsController(
         Tag tag = createTagDto.ToEntity(userId);
 
         bool tagExists = await _dbContext.Tags
-            .AnyAsync(x => x.Name.ToLower() == createTagDto.Name.ToLower(), cancellationToken);
+            .AnyAsync(x => x.Name.ToLower() == createTagDto.Name.ToLower() && x.UserId == userId, cancellationToken);
 
         if (tagExists)
         {
@@ -151,7 +151,7 @@ public sealed class TagsController(
         }
 
         bool tagWithNameExists = await _dbContext.Tags
-            .AnyAsync(x => x.Id != id && x.Name.ToLower() == updateTagDto.Name.ToLower(), cancellationToken);
+            .AnyAsync(x => x.Id != id && x.Name.ToLower() == updateTagDto.Name.ToLower() && x.UserId == userId, cancellationToken);
 
         if (tagWithNameExists)
         {
