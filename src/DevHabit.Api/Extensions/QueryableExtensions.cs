@@ -66,9 +66,10 @@ public static class QueryableExtensions
 
     public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
-        string? fields)
+        string? fields,
+        CancellationToken cancellationToken = default)
     {
-        T? item = await query.FirstOrDefaultAsync();
+        T? item = await query.FirstOrDefaultAsync(cancellationToken);
 
         return item is null
             ? null
@@ -78,14 +79,15 @@ public static class QueryableExtensions
     public static async Task<PaginationResult<T>> ToPaginationResultAsync<T>(
         this IQueryable<T> query,
         int page,
-        int pageSize)
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        long totalCount = await query.LongCountAsync();
+        long totalCount = await query.LongCountAsync(cancellationToken);
 
         List<T> items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return new()
         {
@@ -100,14 +102,15 @@ public static class QueryableExtensions
         this IQueryable<T> query,
         int page,
         int pageSize,
-        string? fields)
+        string? fields,
+        CancellationToken cancellationToken = default)
     {
-        long totalCount = await query.LongCountAsync();
+        long totalCount = await query.LongCountAsync(cancellationToken);
 
         List<T> items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return new()
         {

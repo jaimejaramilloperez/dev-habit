@@ -33,9 +33,10 @@ public sealed class AuthController(
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         RegisterUserDto registerUserDto,
-        IValidator<RegisterUserDto> validator)
+        IValidator<RegisterUserDto> validator,
+        CancellationToken cancellationToken)
     {
-        await validator.ValidateAndThrowAsync(registerUserDto);
+        await validator.ValidateAndThrowAsync(registerUserDto, cancellationToken);
 
         bool emailIsTaken = await _userManager.FindByEmailAsync(registerUserDto.Email) is not null;
 
@@ -55,10 +56,10 @@ public sealed class AuthController(
                 statusCode: StatusCodes.Status409Conflict);
         }
 
-        using IDbContextTransaction transaction = await _identityDbContext.Database.BeginTransactionAsync();
+        using IDbContextTransaction transaction = await _identityDbContext.Database.BeginTransactionAsync(cancellationToken);
 
         _appDbContext.Database.SetDbConnection(_identityDbContext.Database.GetDbConnection());
-        await _appDbContext.Database.UseTransactionAsync(transaction.GetDbTransaction());
+        await _appDbContext.Database.UseTransactionAsync(transaction.GetDbTransaction(), cancellationToken);
 
         IdentityUser identityUser = new()
         {
@@ -86,7 +87,7 @@ public sealed class AuthController(
 
         _appDbContext.Users.Add(user);
 
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(cancellationToken);
 
         TokenRequestDto tokenRequest = new(identityUser.Id, identityUser.Email);
         AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
@@ -101,15 +102,17 @@ public sealed class AuthController(
 
         _identityDbContext.RefreshTokens.Add(refreshToken);
 
-        await _identityDbContext.SaveChangesAsync();
+        await _identityDbContext.SaveChangesAsync(cancellationToken);
 
-        await transaction.CommitAsync();
+        await transaction.CommitAsync(cancellationToken);
 
         return Ok(accessTokens);
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    public async Task<IActionResult> Login(
+        LoginUserDto loginUserDto,
+        CancellationToken cancellationToken)
     {
         IdentityUser? identityUser = await _userManager.FindByEmailAsync(loginUserDto.Email);
 
@@ -131,17 +134,19 @@ public sealed class AuthController(
 
         _identityDbContext.RefreshTokens.Add(refreshToken);
 
-        await _identityDbContext.SaveChangesAsync();
+        await _identityDbContext.SaveChangesAsync(cancellationToken);
 
         return Ok(accessTokens);
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(RefreshTokenDto refreshTokenDto)
+    public async Task<IActionResult> Refresh(
+        RefreshTokenDto refreshTokenDto,
+        CancellationToken cancellationToken)
     {
         RefreshToken? refreshToken = await _identityDbContext.RefreshTokens
             .Include(x => x.User)
-            .FirstOrDefaultAsync(x => x.Token == refreshTokenDto.RefreshToken);
+            .FirstOrDefaultAsync(x => x.Token == refreshTokenDto.RefreshToken, cancellationToken);
 
         if (refreshToken is null || refreshToken.ExpiresAtUtc < DateTime.UtcNow)
         {
@@ -154,7 +159,7 @@ public sealed class AuthController(
         refreshToken.Token = accessTokens.RefreshToken;
         refreshToken.ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtAuthOptions.RefreshTokenExpirationInDays);
 
-        await _identityDbContext.SaveChangesAsync();
+        await _identityDbContext.SaveChangesAsync(cancellationToken);
 
         return Ok(accessTokens);
     }

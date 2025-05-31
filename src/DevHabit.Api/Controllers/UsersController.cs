@@ -18,9 +18,9 @@ public sealed class UsersController(
     private readonly UserContext _userContext = userContext;
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetUserById(string id)
+    public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
@@ -35,15 +35,15 @@ public sealed class UsersController(
         UserDto? user = await _dbContext.Users.AsNoTracking()
             .Where(x => x.Id == userId)
             .Select(UserQueries.ProjectToDto())
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         return user is null ? NotFound() : Ok(user);
     }
 
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
@@ -53,7 +53,7 @@ public sealed class UsersController(
         UserDto? user = await _dbContext.Users.AsNoTracking()
             .Where(x => x.Id == userId)
             .Select(UserQueries.ProjectToDto())
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         return user is null ? NotFound() : Ok(user);
     }

@@ -29,16 +29,17 @@ public sealed class TagsController(
     [HttpGet]
     public async Task<IActionResult> GetTags(
         TagsParameters tagsParameters,
-        IValidator<TagsParameters> validator)
+        IValidator<TagsParameters> validator,
+        CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
             return Unauthorized();
         }
 
-        await validator.ValidateAndThrowAsync(tagsParameters);
+        await validator.ValidateAndThrowAsync(tagsParameters, cancellationToken);
 
         string? searchTerm = tagsParameters.SearchTerm?.Trim().ToLowerInvariant();
 
@@ -50,7 +51,7 @@ public sealed class TagsController(
                 x.Description != null && x.Description.ToLower().Contains(searchTerm))
             .SortByQueryString(tagsParameters.Sort, TagMappings.SortMapping.Mappings)
             .Select(TagQueries.ProjectToDto())
-            .ToShapedPaginationResultAsync(tagsParameters.Page, tagsParameters.PageSize, tagsParameters.Fields)
+            .ToShapedPaginationResultAsync(tagsParameters.Page, tagsParameters.PageSize, tagsParameters.Fields, cancellationToken)
             .WithHateoasAsync(new()
             {
                 ItemLinksFactory = x => CreateLinksForTag(x.Id, tagsParameters.Fields),
@@ -62,9 +63,12 @@ public sealed class TagsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetTag(string id, TagParameters tagParameters)
+    public async Task<IActionResult> GetTag(
+        string id,
+        TagParameters tagParameters,
+        CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
@@ -76,7 +80,7 @@ public sealed class TagsController(
         ShapedResult? result = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(TagQueries.ProjectToDto())
-            .ToShapedFirstOrDefaultAsync(fields)
+            .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
             .WithHateoasAsync(CreateLinksForTag(id, fields), tagParameters.Accept);
 
         return result is null ? NotFound() : Ok(result.Item);
@@ -86,21 +90,22 @@ public sealed class TagsController(
     public async Task<IActionResult> CreateTag(
         CreateTagDto createTagDto,
         AcceptHeaderDto acceptHeaderDto,
-        IValidator<CreateTagDto> validator)
+        IValidator<CreateTagDto> validator,
+        CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
             return Unauthorized();
         }
 
-        await validator.ValidateAndThrowAsync(createTagDto);
+        await validator.ValidateAndThrowAsync(createTagDto, cancellationToken);
 
         Tag tag = createTagDto.ToEntity(userId);
 
         bool tagExists = await _dbContext.Tags
-            .AnyAsync(x => x.Name.ToLower() == createTagDto.Name.ToLower());
+            .AnyAsync(x => x.Name.ToLower() == createTagDto.Name.ToLower(), cancellationToken);
 
         if (tagExists)
         {
@@ -111,7 +116,7 @@ public sealed class TagsController(
 
         _dbContext.Tags.Add(tag);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         TagDto tagDto = tag.ToDto();
 
@@ -125,16 +130,20 @@ public sealed class TagsController(
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTag(string id, UpdateTagDto updateTagDto)
+    public async Task<IActionResult> UpdateTag(
+        string id,
+        UpdateTagDto updateTagDto,
+        CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
             return Unauthorized();
         }
 
-        Tag? tag = await _dbContext.Tags.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        Tag? tag = await _dbContext.Tags
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
 
         if (tag is null)
         {
@@ -142,7 +151,7 @@ public sealed class TagsController(
         }
 
         bool tagWithNameExists = await _dbContext.Tags
-            .AnyAsync(x => x.Id != id && x.Name.ToLower() == updateTagDto.Name.ToLower());
+            .AnyAsync(x => x.Id != id && x.Name.ToLower() == updateTagDto.Name.ToLower(), cancellationToken);
 
         if (tagWithNameExists)
         {
@@ -153,22 +162,23 @@ public sealed class TagsController(
 
         tag.UpdateFromDto(updateTagDto);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTag(string id)
+    public async Task<IActionResult> DeleteTag(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(userId))
         {
             return Unauthorized();
         }
 
-        Tag? tag = await _dbContext.Tags.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        Tag? tag = await _dbContext.Tags
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
 
         if (tag is null)
         {
@@ -177,7 +187,7 @@ public sealed class TagsController(
 
         _dbContext.Tags.Remove(tag);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }
