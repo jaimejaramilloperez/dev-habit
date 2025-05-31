@@ -57,7 +57,7 @@ public sealed class TagsController(
                 ItemLinksFactory = x => CreateLinksForTag(x.Id, tagsParameters.Fields),
                 CollectionLinksFactory = x => CreateLinksForTags(tagsParameters, x.HasPreviousPage, x.HasNextPage),
                 AcceptHeader = tagsParameters.Accept,
-            });
+            }, cancellationToken);
 
         return Ok(result);
     }
@@ -81,7 +81,7 @@ public sealed class TagsController(
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(TagQueries.ProjectToDto())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
-            .WithHateoasAsync(CreateLinksForTag(id, fields), tagParameters.Accept);
+            .WithHateoasAsync(CreateLinksForTag(id, fields), tagParameters.Accept, cancellationToken);
 
         return result is null ? NotFound() : Ok(result.Item);
     }

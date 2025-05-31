@@ -10,9 +10,12 @@ public static class HateoasExtensions
     public static async Task<ShapedResult?> WithHateoasAsync(
         this Task<ShapedResult?> resultTask,
         ICollection<LinkDto> links,
-        string? acceptHeader)
+        string? acceptHeader,
+        CancellationToken cancellationToken = default)
     {
         ShapedResult? result = await resultTask;
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (result is not null && HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
         {
@@ -24,11 +27,14 @@ public static class HateoasExtensions
 
     public static async Task<ShapedPaginationResult<T>> WithHateoasAsync<T>(
         this Task<ShapedPaginationResult<T>> resultTask,
-        HateoasPaginationOptions<T> options)
+        HateoasPaginationOptions<T> options,
+        CancellationToken cancellationToken = default)
     {
         var (itemLinksFactory, collectionLinksFactory, acceptHeader) = options;
 
         ShapedPaginationResult<T> result = await resultTask;
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (!HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
         {

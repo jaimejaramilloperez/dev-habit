@@ -61,7 +61,7 @@ public sealed class HabitsController(
                 ItemLinksFactory = x => CreateLinksForHabit(x.Id, habitParams.Fields),
                 CollectionLinksFactory = x => CreateLinksForHabits(habitParams, x.HasPreviousPage, x.HasNextPage),
                 AcceptHeader = habitParams.Accept,
-            });
+            }, cancellationToken);
 
         return Ok(paginationResult);
     }
@@ -86,7 +86,7 @@ public sealed class HabitsController(
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTags())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
-            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
+            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept, cancellationToken);
 
         return result is null ? NotFound() : Ok(result.Item);
     }
@@ -111,7 +111,7 @@ public sealed class HabitsController(
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTagsV2())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
-            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept);
+            .WithHateoasAsync(CreateLinksForHabit(id, fields), habitParameters.Accept, cancellationToken);
 
         return result is null ? NotFound() : Ok(result.Item);
     }
