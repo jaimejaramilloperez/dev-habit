@@ -19,6 +19,12 @@ namespace DevHabit.Api.Controllers;
 [Route("api/habits")]
 [Authorize]
 [ApiVersion(1.0)]
+[Produces(
+    CustomMediaTypesNames.Application.JsonV1,
+    CustomMediaTypesNames.Application.JsonV2,
+    CustomMediaTypesNames.Application.HateoasJson,
+    CustomMediaTypesNames.Application.HateoasJsonV1,
+    CustomMediaTypesNames.Application.HateoasJsonV2)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
     LinkService linkService,

@@ -17,6 +17,7 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/tags")]
 [Authorize]
+[Produces(CustomMediaTypesNames.Application.HateoasJson)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,
     LinkService linkService,
