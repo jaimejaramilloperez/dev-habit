@@ -1,3 +1,4 @@
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Users;
 using DevHabit.Api.Services;
@@ -9,7 +10,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-[Authorize]
+[Authorize(Roles = Roles.Member)]
 public sealed class UsersController(
     ApplicationDbContext dbContext,
     UserContext userContext) : ControllerBase
@@ -18,6 +19,7 @@ public sealed class UsersController(
     private readonly UserContext _userContext = userContext;
 
     [HttpGet("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);

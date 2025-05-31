@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Dtos.Auth;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,7 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
         [
             new(JwtRegisteredClaimNames.Sub, tokenRequest.UserId),
             new(JwtRegisteredClaimNames.Email, tokenRequest.Email),
+            .. tokenRequest.Roles.Select(role => new Claim(JwtCustomClaimNames.Role, role)),
         ];
 
         SecurityTokenDescriptor tokenDescriptor = new()

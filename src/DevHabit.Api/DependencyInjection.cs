@@ -1,5 +1,6 @@
 using System.Text;
 using Asp.Versioning;
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
@@ -163,12 +165,16 @@ internal static class DependencyInjectionExtensions
         })
         .AddJwtBearer(options =>
         {
+            options.MapInboundClaims = false;
+
             options.TokenValidationParameters = new()
             {
                 ValidIssuer = jwtAuthOptions.Issuer,
                 ValidAudience = jwtAuthOptions.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtAuthOptions.Key)),
                 ValidateIssuerSigningKey = true,
+                NameClaimType = JwtRegisteredClaimNames.Email,
+                RoleClaimType = JwtCustomClaimNames.Role,
             };
         });
 
@@ -177,3 +183,4 @@ internal static class DependencyInjectionExtensions
         return builder;
     }
 }
+

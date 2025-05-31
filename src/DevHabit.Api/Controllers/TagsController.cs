@@ -1,3 +1,4 @@
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Database;
@@ -16,7 +17,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/tags")]
-[Authorize]
+[Authorize(Roles = Roles.Member)]
 [Produces(CustomMediaTypesNames.Application.HateoasJson)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,

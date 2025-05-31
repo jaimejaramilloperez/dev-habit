@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Database;
@@ -17,7 +18,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("api/habits")]
-[Authorize]
+[Authorize(Roles = Roles.Member)]
 [ApiVersion(1.0)]
 [Produces(
     CustomMediaTypesNames.Application.JsonV1,

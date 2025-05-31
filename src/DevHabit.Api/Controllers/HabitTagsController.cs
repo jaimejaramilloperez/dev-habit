@@ -1,3 +1,4 @@
+using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.HabitTags;
 using DevHabit.Api.Entities;
@@ -10,7 +11,7 @@ namespace DevHabit.Api.Controllers;
 
 [ApiController]
 [Route("/api/habits/{habitId}/tags")]
-[Authorize]
+[Authorize(Roles = Roles.Member)]
 public sealed class HabitTagsController(
     ApplicationDbContext dbContext,
     UserContext userContext) : ControllerBase
