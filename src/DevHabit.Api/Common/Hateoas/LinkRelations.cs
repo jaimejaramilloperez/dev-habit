@@ -11,4 +11,6 @@ internal static class LinkRelations
     public const string PreviousPage = "previous-page";
     public const string NextPage = "next-page";
     public const string UpsertTags = "upsert-tags";
+    public const string StoreToken = "store-token";
+    public const string RevokeToken = "revoke-token";
 }

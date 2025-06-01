@@ -1,0 +1,23 @@
+@basePath = api/github
+
+### Get User Profile
+GET {{devHabitApiHostAddress}}/{{basePath}}/profile
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
+### Store Token
+PUT {{devHabitApiHostAddress}}/{{basePath}}/personal-access-token
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "accessToken": "{{githubToken}}",
+  "expiresInDays": 30
+}
+
+### Revoke Token
+DELETE {{devHabitApiHostAddress}}/{{basePath}}/personal-access-token
+Authorization: Bearer {{token}}
+Accept: application/json

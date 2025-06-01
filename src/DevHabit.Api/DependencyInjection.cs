@@ -6,6 +6,7 @@ using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
+using DevHabit.Api.Services.GitHub;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -144,6 +145,17 @@ internal static class DependencyInjectionExtensions
         builder.Services.AddScoped<TokenProvider>();
 
         builder.Services.AddScoped<UserContext>();
+
+        builder.Services.AddScoped<GitHubService>();
+
+        builder.Services.AddScoped<GitHubAccessTokenService>();
+
+        builder.Services.AddHttpClient("github", client =>
+        {
+            client.BaseAddress = new("https://api.github.com");
+            client.DefaultRequestHeaders.Accept.Add(new("application/vnd.github+json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new("DevHabit", "1.0"));
+        });
 
         return builder;
     }

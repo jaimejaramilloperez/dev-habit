@@ -5,7 +5,8 @@
       "devHabitApiHostAddress": "https://localhost:5001"
     },
     "dev": {
-      "token": ""
+      "token": "",
+      "githubToken": ""
     }
   },
   "cSpell.words": [
