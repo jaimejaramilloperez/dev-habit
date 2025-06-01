@@ -16,4 +16,18 @@ public sealed record TagsParameters : AcceptHeaderDto
 
     [FromQuery(Name = "page_size")]
     public int PageSize { get; init; } = 10;
+
+    public void Deconstruct(
+        out string? searchTerm,
+        out string? sort,
+        out string? fields,
+        out int page,
+        out int pageSize)
+    {
+        searchTerm = SearchTerm;
+        sort = Sort;
+        fields = Fields;
+        page = Page;
+        pageSize = PageSize;
+    }
 }

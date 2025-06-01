@@ -21,4 +21,22 @@ public sealed record HabitsParameters : AcceptHeaderDto
 
     [FromQuery(Name = "page_size")]
     public int PageSize { get; init; } = 10;
+
+    public void Deconstruct(
+        out string? searchTerm,
+        out HabitType? type,
+        out HabitStatus? status,
+        out string? sort,
+        out string? fields,
+        out int page,
+        out int pageSize)
+    {
+        searchTerm = SearchTerm;
+        type = Type;
+        status = Status;
+        sort = Sort;
+        fields = Fields;
+        page = Page;
+        pageSize = PageSize;
+    }
 }

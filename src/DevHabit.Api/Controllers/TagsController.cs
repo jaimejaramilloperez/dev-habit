@@ -43,20 +43,22 @@ public sealed class TagsController(
 
         await validator.ValidateAndThrowAsync(tagsParameters, cancellationToken);
 
-        string? searchTerm = tagsParameters.SearchTerm?.Trim().ToLowerInvariant();
+        var (searchTerm, sort, fields, page, pageSize) = tagsParameters;
+
+        string? normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant();
 
         ShapedPaginationResult<TagDto> result = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.UserId == userId)
             .Where(x =>
-                searchTerm == null ||
-                x.Name.ToLower().Contains(searchTerm) ||
-                x.Description != null && x.Description.ToLower().Contains(searchTerm))
-            .SortByQueryString(tagsParameters.Sort, TagMappings.SortMapping.Mappings)
+                normalizedSearchTerm == null ||
+                x.Name.ToLower().Contains(normalizedSearchTerm) ||
+                x.Description != null && x.Description.ToLower().Contains(normalizedSearchTerm))
+            .SortByQueryString(sort, TagMappings.SortMapping.Mappings)
             .Select(TagQueries.ProjectToDto())
-            .ToShapedPaginationResultAsync(tagsParameters.Page, tagsParameters.PageSize, tagsParameters.Fields, cancellationToken)
+            .ToShapedPaginationResultAsync(page, pageSize, fields, cancellationToken)
             .WithHateoasAsync(new()
             {
-                ItemLinksFactory = x => CreateLinksForTag(x.Id, tagsParameters.Fields),
+                ItemLinksFactory = x => CreateLinksForTag(x.Id, fields),
                 CollectionLinksFactory = x => CreateLinksForTags(tagsParameters, x.HasPreviousPage, x.HasNextPage),
                 AcceptHeader = tagsParameters.Accept,
             }, cancellationToken);
@@ -107,7 +109,10 @@ public sealed class TagsController(
         Tag tag = createTagDto.ToEntity(userId);
 
         bool tagExists = await _dbContext.Tags
-            .AnyAsync(x => x.Name.ToLower() == createTagDto.Name.ToLower() && x.UserId == userId, cancellationToken);
+            .AnyAsync(x =>
+                x.Name.ToLower() == createTagDto.Name.ToLower() &&
+                x.UserId == userId,
+            cancellationToken);
 
         if (tagExists)
         {
@@ -153,7 +158,11 @@ public sealed class TagsController(
         }
 
         bool tagWithNameExists = await _dbContext.Tags
-            .AnyAsync(x => x.Id != id && x.Name.ToLower() == updateTagDto.Name.ToLower() && x.UserId == userId, cancellationToken);
+            .AnyAsync(x =>
+                x.Id != id &&
+                x.Name.ToLower() == updateTagDto.Name.ToLower()
+                && x.UserId == userId,
+            cancellationToken);
 
         if (tagWithNameExists)
         {

@@ -50,22 +50,24 @@ public sealed class HabitsController(
 
         await validator.ValidateAndThrowAsync(habitParams, cancellationToken);
 
-        string? searchTerm = habitParams.SearchTerm?.Trim().ToLowerInvariant();
+        var (searchTerm, type, status, sort, fields, page, pageSize) = habitParams;
+
+        string? normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant();
 
         ShapedPaginationResult<HabitDto> paginationResult = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.UserId == userId)
             .Where(x =>
-                searchTerm == null ||
-                x.Name.ToLower().Contains(searchTerm) ||
-                x.Description != null && x.Description.ToLower().Contains(searchTerm))
-            .Where(x => habitParams.Type == null || x.Type == habitParams.Type)
-            .Where(x => habitParams.Status == null || x.Status == habitParams.Status)
-            .SortByQueryString(habitParams.Sort, HabitMappings.SortMapping.Mappings)
+                normalizedSearchTerm == null ||
+                x.Name.ToLower().Contains(normalizedSearchTerm) ||
+                x.Description != null && x.Description.ToLower().Contains(normalizedSearchTerm))
+            .Where(x => type == null || x.Type == type)
+            .Where(x => status == null || x.Status == status)
+            .SortByQueryString(sort, HabitMappings.SortMapping.Mappings)
             .Select(HabitQueries.ProjectToDto())
-            .ToShapedPaginationResultAsync(habitParams.Page, habitParams.PageSize, habitParams.Fields, cancellationToken)
+            .ToShapedPaginationResultAsync(page, pageSize, fields, cancellationToken)
             .WithHateoasAsync(new()
             {
-                ItemLinksFactory = x => CreateLinksForHabit(x.Id, habitParams.Fields),
+                ItemLinksFactory = x => CreateLinksForHabit(x.Id, fields),
                 CollectionLinksFactory = x => CreateLinksForHabits(habitParams, x.HasPreviousPage, x.HasNextPage),
                 AcceptHeader = habitParams.Accept,
             }, cancellationToken);
