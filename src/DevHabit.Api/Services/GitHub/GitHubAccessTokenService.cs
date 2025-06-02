@@ -7,6 +7,12 @@ namespace DevHabit.Api.Services.GitHub;
 
 public sealed class GitHubAccessTokenService(ApplicationDbContext appDbContext)
 {
+    public async Task<string?> GetAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        GitHubAccessToken? gitHubAccessToken = await GetAccessTokenAsync(userId, cancellationToken);
+        return gitHubAccessToken?.Token;
+    }
+
     public async Task StoreAsync(
         string userId,
         StoreGithubAccessTokenDto accessTokenDto,
@@ -34,12 +40,6 @@ public sealed class GitHubAccessTokenService(ApplicationDbContext appDbContext)
         }
 
         await appDbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<string?> GetAsync(string userId, CancellationToken cancellationToken = default)
-    {
-        GitHubAccessToken? gitHubAccessToken = await GetAccessTokenAsync(userId, cancellationToken);
-        return gitHubAccessToken?.Token;
     }
 
     public async Task RevokeAsync(string userId, CancellationToken cancellationToken = default)
