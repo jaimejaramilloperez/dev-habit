@@ -157,6 +157,10 @@ internal static class DependencyInjectionExtensions
             client.DefaultRequestHeaders.UserAgent.Add(new("DevHabit", "1.0"));
         });
 
+        builder.Services.Configure<EncryptionOptions>(builder.Configuration.GetSection("Encryption"));
+
+        builder.Services.AddSingleton<EncryptionService>();
+
         return builder;
     }
 
