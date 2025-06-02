@@ -1,5 +1,6 @@
 using DevHabit.Api.Dtos.GitHub;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DevHabit.Api.Services.GitHub;
 
@@ -7,6 +8,14 @@ public sealed class GitHubService(
     IHttpClientFactory httpClientFactory,
     ILogger<GitHubService> logger)
 {
+    private static readonly JsonSerializerSettings JsonSettings = new()
+    {
+        ContractResolver = new DefaultContractResolver
+        {
+            NamingStrategy = new SnakeCaseNamingStrategy()
+        }
+    };
+
     public async Task<GitHubUserProfileDto?> GetUserProfileAsync(
         string accessToken,
         CancellationToken cancellationToken = default)
@@ -23,7 +32,7 @@ public sealed class GitHubService(
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        return JsonConvert.DeserializeObject<GitHubUserProfileDto>(content);
+        return JsonConvert.DeserializeObject<GitHubUserProfileDto>(content, JsonSettings);
     }
 
     public async Task<IReadOnlyList<GitHubEventDto>> GetUserEventsAsync(
@@ -45,7 +54,7 @@ public sealed class GitHubService(
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        return JsonConvert.DeserializeObject<List<GitHubEventDto>>(content) ?? [];
+        return JsonConvert.DeserializeObject<List<GitHubEventDto>>(content, JsonSettings) ?? [];
     }
 
     private HttpClient CreateGitHubClient(string accessToken)
