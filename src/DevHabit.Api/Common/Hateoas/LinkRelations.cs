@@ -13,4 +13,5 @@ internal static class LinkRelations
     public const string UpsertTags = "upsert-tags";
     public const string StoreToken = "store-token";
     public const string RevokeToken = "revoke-token";
+    public const string UpdateProfile = "update-profile";
 }

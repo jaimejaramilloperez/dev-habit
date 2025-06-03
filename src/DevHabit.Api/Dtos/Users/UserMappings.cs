@@ -15,4 +15,10 @@ public static class UserMappings
             CreatedAtUtc = DateTime.UtcNow,
         };
     }
+
+    public static void UpdateFromDto(this User user, UpdateProfileDto dto)
+    {
+        user.Name = dto.Name;
+        user.UpdatedAtUtc = DateTime.UtcNow;
+    }
 }
