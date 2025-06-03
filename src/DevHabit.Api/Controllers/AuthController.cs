@@ -128,8 +128,11 @@ public sealed class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         LoginUserDto loginUserDto,
+        IValidator<LoginUserDto> validator,
         CancellationToken cancellationToken)
     {
+        await validator.ValidateAndThrowAsync(loginUserDto, cancellationToken);
+
         IdentityUser? identityUser = await _userManager.FindByEmailAsync(loginUserDto.Email);
 
         if (identityUser is null || !await _userManager.CheckPasswordAsync(identityUser, loginUserDto.Password))
