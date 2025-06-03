@@ -7,19 +7,37 @@ namespace DevHabit.Api.Extensions;
 
 public static class HateoasExtensions
 {
-    public static async Task<ShapedResult?> WithHateoasAsync(
-        this Task<ShapedResult?> resultTask,
+    public static async Task<ShapedResult<T>?> WithHateoasAsync<T>(
+        this Task<ShapedResult<T>?> resultTask,
         ICollection<LinkDto> links,
         string? acceptHeader,
         CancellationToken cancellationToken = default)
     {
-        ShapedResult? result = await resultTask;
+        ShapedResult<T>? result = await resultTask;
 
         cancellationToken.ThrowIfCancellationRequested();
 
         if (result is not null && HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
         {
             result.Item.TryAdd(HateoasPropertyNames.Links, links);
+        }
+
+        return result;
+    }
+
+    public static async Task<ShapedResult<T>?> WithHateoasAsync<T>(
+        this Task<ShapedResult<T>?> resultTask,
+        Func<T, ICollection<LinkDto>> itemLinksFactory,
+        string? acceptHeader,
+        CancellationToken cancellationToken = default)
+    {
+        ShapedResult<T>? result = await resultTask;
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (result is not null && HateoasHelpers.ShouldIncludeHateoas(acceptHeader))
+        {
+            result.Item.TryAdd(HateoasPropertyNames.Links, itemLinksFactory(result.OriginalItem));
         }
 
         return result;

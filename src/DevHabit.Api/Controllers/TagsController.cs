@@ -21,12 +21,12 @@ namespace DevHabit.Api.Controllers;
 [Produces(CustomMediaTypesNames.Application.HateoasJson)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,
-    LinkService linkService,
-    UserContext userContext) : ControllerBase
+    UserContext userContext,
+    LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly LinkService _linkService = linkService;
     private readonly UserContext _userContext = userContext;
+    private readonly LinkService _linkService = linkService;
 
     [HttpGet]
     public async Task<IActionResult> GetTags(
@@ -81,7 +81,7 @@ public sealed class TagsController(
 
         string? fields = tagParameters.Fields;
 
-        ShapedResult? result = await _dbContext.Tags.AsNoTracking()
+        ShapedResult<TagDto>? result = await _dbContext.Tags.AsNoTracking()
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(TagQueries.ProjectToDto())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)

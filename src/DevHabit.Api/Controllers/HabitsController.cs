@@ -28,16 +28,16 @@ namespace DevHabit.Api.Controllers;
     CustomMediaTypesNames.Application.HateoasJsonV2)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
-    LinkService linkService,
-    UserContext userContext) : ControllerBase
+    UserContext userContext,
+    LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly LinkService _linkService = linkService;
     private readonly UserContext _userContext = userContext;
+    private readonly LinkService _linkService = linkService;
 
     [HttpGet]
     public async Task<IActionResult> GetHabits(
-        HabitsParameters habitParams,
+        HabitsParameters habitParameters,
         IValidator<HabitsParameters> validator,
         CancellationToken cancellationToken)
     {
@@ -48,9 +48,9 @@ public sealed class HabitsController(
             return Unauthorized();
         }
 
-        await validator.ValidateAndThrowAsync(habitParams, cancellationToken);
+        await validator.ValidateAndThrowAsync(habitParameters, cancellationToken);
 
-        var (searchTerm, type, status, sort, fields, page, pageSize) = habitParams;
+        var (searchTerm, type, status, sort, fields, page, pageSize) = habitParameters;
 
         string? normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant();
 
@@ -68,8 +68,8 @@ public sealed class HabitsController(
             .WithHateoasAsync(new()
             {
                 ItemLinksFactory = x => CreateLinksForHabit(x.Id, fields),
-                CollectionLinksFactory = x => CreateLinksForHabits(habitParams, x.HasPreviousPage, x.HasNextPage),
-                AcceptHeader = habitParams.Accept,
+                CollectionLinksFactory = x => CreateLinksForHabits(habitParameters, x.HasPreviousPage, x.HasNextPage),
+                AcceptHeader = habitParameters.Accept,
             }, cancellationToken);
 
         return Ok(paginationResult);
@@ -91,7 +91,7 @@ public sealed class HabitsController(
 
         string? fields = habitParameters.Fields;
 
-        ShapedResult? result = await _dbContext.Habits.AsNoTracking()
+        ShapedResult<HabitWithTagsDto>? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTags())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
@@ -116,7 +116,7 @@ public sealed class HabitsController(
 
         string? fields = habitParameters.Fields;
 
-        ShapedResult? result = await _dbContext.Habits.AsNoTracking()
+        ShapedResult<HabitWithTagsDtoV2>? result = await _dbContext.Habits.AsNoTracking()
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(HabitQueries.ProjectToDtoWithTagsV2())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)

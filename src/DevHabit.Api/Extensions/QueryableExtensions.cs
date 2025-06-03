@@ -64,7 +64,7 @@ public static class QueryableExtensions
             : query.OrderBy(orderQuery);
     }
 
-    public static async Task<ShapedResult?> ToShapedFirstOrDefaultAsync<T>(
+    public static async Task<ShapedResult<T>?> ToShapedFirstOrDefaultAsync<T>(
         this IQueryable<T> query,
         string? fields,
         CancellationToken cancellationToken = default)
@@ -73,7 +73,11 @@ public static class QueryableExtensions
 
         return item is null
             ? null
-            : new(DataShaper.ShapeData(item, fields));
+            : new()
+            {
+                Item = DataShaper.ShapeData(item, fields),
+                OriginalItem = item,
+            };
     }
 
     public static async Task<PaginationResult<T>> ToPaginationResultAsync<T>(
