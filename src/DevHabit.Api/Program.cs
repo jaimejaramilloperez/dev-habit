@@ -1,4 +1,5 @@
 using DevHabit.Api;
+using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
 using HealthChecks.UI.Client;
@@ -11,6 +12,7 @@ builder.AddDatabase();
 builder.AddObservability();
 builder.AddApplicationServices();
 builder.AddAuthenticationServices();
+builder.AddCorsPolicy();
 
 var app = builder.Build();
 
@@ -25,6 +27,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
+
+app.UseCors(CorsOptions.PolicyName);
 
 app.UseAuthentication();
 
