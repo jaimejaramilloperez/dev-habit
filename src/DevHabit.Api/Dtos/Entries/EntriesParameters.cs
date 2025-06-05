@@ -21,7 +21,7 @@ public sealed record EntriesParameters : AcceptHeaderDto
 
     public EntrySource? Source { get; init; }
 
-    [FromQuery(Name = "is-archive")]
+    [FromQuery(Name = "is_archive")]
     public bool? IsArchived { get; init; }
 
     public int Page { get; init; } = 1;
