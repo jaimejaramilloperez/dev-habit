@@ -223,6 +223,8 @@ internal static class DependencyInjectionExtensions
             });
         });
 
+        builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
         return builder;
     }
 
