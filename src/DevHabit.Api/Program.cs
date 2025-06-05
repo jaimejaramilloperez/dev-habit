@@ -12,6 +12,7 @@ builder.AddDatabase();
 builder.AddObservability();
 builder.AddApplicationServices();
 builder.AddAuthenticationServices();
+builder.AddBackgroundJobs();
 builder.AddCorsPolicy();
 
 var app = builder.Build();

@@ -4,6 +4,7 @@ using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
+using DevHabit.Api.Jobs;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
 using DevHabit.Api.Services.GitHub;
@@ -22,6 +23,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Quartz;
 
 namespace DevHabit.Api;
 
@@ -195,6 +197,31 @@ internal static class DependencyInjectionExtensions
         });
 
         builder.Services.AddAuthorization();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddBackgroundJobs(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddQuartz(configurator =>
+        {
+            configurator.AddJob<GitHubAutomationSchedulerJob>(options => options.WithIdentity("github-automation-scheduler"));
+
+            configurator.AddTrigger(options =>
+            {
+                options.ForJob("github-automation-scheduler")
+                    .WithIdentity("github-automation-scheduler-trigger")
+                    .WithSimpleSchedule(scheduleBuilder =>
+                    {
+                        GitHubAutomationOptions settings = builder.Configuration
+                            .GetSection(GitHubAutomationOptions.SectionName)
+                            .Get<GitHubAutomationOptions>()!;
+
+                        scheduleBuilder.WithIntervalInMinutes(settings.ScanIntervalInMinutes)
+                            .RepeatForever();
+                    });
+            });
+        });
 
         return builder;
     }
