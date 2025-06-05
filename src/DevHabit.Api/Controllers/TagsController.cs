@@ -59,7 +59,7 @@ public sealed class TagsController(
             .WithHateoasAsync(new()
             {
                 ItemLinksFactory = x => CreateLinksForTag(x.Id, fields),
-                CollectionLinksFactory = x => CreateLinksForTags(tagsParameters, x.HasPreviousPage, x.HasNextPage),
+                CollectionLinksFactory = x => CreateLinksForTags(tagsParameters, x.HasPreviousPage, x.HasNextPage, x.Data.Count),
                 AcceptHeader = tagsParameters.Accept,
             }, cancellationToken);
 
@@ -213,7 +213,8 @@ public sealed class TagsController(
     private ICollection<LinkDto> CreateLinksForTags(
         TagsParameters parameters,
         bool hasPreviousPage,
-        bool hasNextPage)
+        bool hasNextPage,
+        int tagsCount)
     {
         ICollection<LinkDto> links =
         [
@@ -225,7 +226,6 @@ public sealed class TagsController(
                 page = parameters.Page,
                 page_size = parameters.PageSize,
             }),
-            _linkService.Create(nameof(CreateTag), LinkRelations.Create, HttpMethods.Post),
         ];
 
         if (hasPreviousPage)
@@ -250,6 +250,11 @@ public sealed class TagsController(
                 page = parameters.Page + 1,
                 page_size = parameters.PageSize,
             }));
+        }
+
+        if (tagsCount < 5)
+        {
+            links.Add(_linkService.Create(nameof(CreateTag), LinkRelations.Create, HttpMethods.Post));
         }
 
         return links;
