@@ -1,0 +1,88 @@
+@basePath = api/entries
+@habitId = h_01972355-6f47-7227-9838-0ca60418594f
+@entryId = e_01974223-bff6-7f44-9ea9-ad4888936fde
+
+### Get Entries for a habit
+GET {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
+### Get entries for a habit by Id
+GET {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
+### Create an entry for a habit
+POST {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "habitId": "{{habitId}}",
+  "value": 1,
+  "notes": "This is a note",
+  "date": "2025-06-05"
+}
+
+### Create multiple entries for a habit at once
+POST {{devHabitApiHostAddress}}/{{basePath}}/batch
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+      "habitId": "{{habitId}}",
+      "value": 1,
+      "notes": "This is a note 2",
+      "date": "2025-06-05"
+    },
+    {
+      "habitId": "{{habitId}}",
+      "value": 2,
+      "notes": "This is a note 3",
+      "date": "2025-07-05"
+    },
+    {
+      "habitId": "{{habitId}}",
+      "value": 1,
+      "notes": "This is a note 4",
+      "date": "2025-08-05"
+    }
+  ]
+}
+
+### Update an entry for a habit
+PUT {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "value": 2,
+  "notes": "This is a note",
+}
+
+### Archive an entry for a habit
+PUT {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}/archive
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Unarchive an entry for a habit
+PUT {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}/un-archive
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Delete an entry for a habit
+DELETE {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get Stats
+GET {{devHabitApiHostAddress}}/{{basePath}}/stats
+Authorization: Bearer {{token}}
+Accept: application/json
