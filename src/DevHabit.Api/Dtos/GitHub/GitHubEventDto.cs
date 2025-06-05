@@ -22,5 +22,17 @@ public sealed record GitHubEventRepoDto(
     string Name,
     Uri Url);
 
-public sealed record GitHubEventPayloadDto(string Action);
+public sealed record GitHubEventPayloadDto(
+    string Action,
+    ICollection<Commit>? Commits);
 
+public record Commit(
+    string Sha,
+    Author Author,
+    string Message,
+    bool Distinct,
+    Uri Url);
+
+public record Author(
+    string Email,
+    string Name);

@@ -38,12 +38,14 @@ public sealed class GitHubService(
     public async Task<IReadOnlyList<GitHubEventDto>> GetUserEventsAsync(
         string username,
         string accessToken,
+        int page,
+        int perPage,
         CancellationToken cancellationToken = default)
     {
         HttpClient client = CreateGitHubClient(accessToken);
 
         HttpResponseMessage response = await client.GetAsync(
-            new Uri($"users/{username}/events?per_page=100", UriKind.Relative),
+            new Uri($"users/{username}/events?page={page}&per_page={perPage}", UriKind.Relative),
             cancellationToken);
 
         if (!response.IsSuccessStatusCode)

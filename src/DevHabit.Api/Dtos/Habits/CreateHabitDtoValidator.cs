@@ -60,6 +60,13 @@ public sealed class CreateHabitDtoValidator : AbstractValidator<CreateHabitDto>
                 .GreaterThan(0)
                 .WithMessage("Milestone target must be greater that 0");
         });
+
+        When(x => x.AutomationSource is not null, () =>
+        {
+            RuleFor(x => x.AutomationSource)
+                .IsInEnum()
+                .WithMessage("Invalid automation source type");
+        });
     }
 
     private static bool IsTargetUnitCompatibleWithType(HabitType type, string unit)

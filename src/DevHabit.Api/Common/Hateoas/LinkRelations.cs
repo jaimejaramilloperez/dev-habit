@@ -14,4 +14,8 @@ internal static class LinkRelations
     public const string StoreToken = "store-token";
     public const string RevokeToken = "revoke-token";
     public const string UpdateProfile = "update-profile";
+    public const string Archive = "archive";
+    public const string UnArchive = "un-archive";
+    public const string Stats = "stats";
+    public const string CreateBatch = "create-batch";
 }
