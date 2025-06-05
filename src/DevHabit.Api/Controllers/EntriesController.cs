@@ -126,9 +126,57 @@ public sealed class EntriesController(
     }
 
     [HttpPost("batch")]
-    public IActionResult CreateEntryBatch(CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateEntryBatch(
+        CreateEntryBatchDto createEntryBatchDto,
+        AcceptHeaderDto acceptHeaderDto,
+        IValidator<CreateEntryBatchDto> validator,
+        CancellationToken cancellationToken)
     {
-        return Ok();
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        await validator.ValidateAndThrowAsync(createEntryBatchDto, cancellationToken);
+
+        HashSet<string> habitIds = createEntryBatchDto.Entries
+            .Select(x => x.HabitId)
+            .ToHashSet();
+
+        List<Habit> existingHabits = await _dbContext.Habits
+            .AsNoTracking()
+            .Where(x => habitIds.Contains(x.Id) && x.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        if (existingHabits.Count != habitIds.Count)
+        {
+            return Problem(
+                detail: "One or more habit IDs are invalid",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        List<Entry> entries = createEntryBatchDto.Entries
+            .Select(x => x.ToEntity(userId))
+            .ToList();
+
+        _dbContext.Entries.AddRange(entries);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (HateoasHelpers.ShouldIncludeHateoas(acceptHeaderDto.Accept))
+        {
+            var result = entries.Select(x =>
+                DataShaper.ShapeData(x, CreateLinksForEntry(x.Id, null, x.IsArchived)))
+                .ToList();
+
+            return CreatedAtAction(nameof(GetEntries), result);
+        }
+
+        List<EntryDto> entryDtos = entries.Select(x => x.ToDto()).ToList();
+
+        return CreatedAtAction(nameof(GetEntries), entryDtos);
     }
 
     [HttpPut("{id}")]
