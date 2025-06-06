@@ -15,6 +15,12 @@ public static partial class MiddlewareExtensions
 
 public sealed class ETagMiddleware(RequestDelegate next)
 {
+    private static readonly string[] ConcurrencyCheckMethods =
+    [
+        HttpMethods.Patch,
+        HttpMethods.Put,
+    ];
+
     public async Task InvokeAsync(
         HttpContext context,
         RecyclableMemoryStreamManager streamManager)
@@ -28,6 +34,20 @@ public sealed class ETagMiddleware(RequestDelegate next)
         string resourceUri = context.Request.Path.Value ?? "/";
 
         string? clientETag = context.Request.Headers.IfNoneMatch.FirstOrDefault()?.Trim('"');
+
+        string? ifMatch = context.Request.Headers.IfMatch.FirstOrDefault()?.Trim('"');
+
+        if (ConcurrencyCheckMethods.Contains(context.Request.Method) && !string.IsNullOrWhiteSpace(ifMatch))
+        {
+            string currentETag = InMemoryETagStore.GetETag(new Uri(resourceUri, UriKind.Relative));
+
+            if (!string.IsNullOrWhiteSpace(currentETag) && ifMatch != currentETag)
+            {
+                context.Response.StatusCode = StatusCodes.Status412PreconditionFailed;
+                context.Response.ContentLength = 0;
+                return;
+            }
+        }
 
         Stream originalStream = context.Response.Body;
         using RecyclableMemoryStream memoryStream = streamManager.GetStream();
@@ -45,7 +65,7 @@ public sealed class ETagMiddleware(RequestDelegate next)
             InMemoryETagStore.SetETag(new Uri(resourceUri, UriKind.Relative), etag);
             context.Response.Headers.ETag = $"\"{etag}\"";
 
-            if (clientETag is not null && clientETag == etag)
+            if (context.Request.Method == HttpMethods.Get && clientETag is not null && clientETag == etag)
             {
                 context.Response.StatusCode = StatusCodes.Status304NotModified;
                 context.Response.Body = originalStream;

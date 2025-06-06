@@ -176,6 +176,10 @@ public sealed class TagsController(
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        Uri resourceUri = new Uri(Request.Path.Value!, UriKind.Relative);
+        InMemoryETagStore.SetETag(resourceUri, tag.ToDto());
+        Response.Headers.ETag = $"\"{InMemoryETagStore.GetETag(resourceUri)}\"";
+
         return NoContent();
     }
 

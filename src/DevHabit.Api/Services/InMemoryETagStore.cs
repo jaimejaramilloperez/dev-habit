@@ -1,4 +1,8 @@
 using System.Collections.Concurrent;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace DevHabit.Api.Services;
 
@@ -21,9 +25,19 @@ public static class InMemoryETagStore
         ETags.AddOrUpdate(resourceUri.ToString(), etag, (_, _) => etag);
     }
 
+    public static void SetETag(Uri resourceUri, object resource)
+    {
+        ETags.AddOrUpdate(resourceUri.ToString(), GenerateEtag(resource), (_, _) => GenerateEtag(resource));
+    }
+
     public static void SetETag(string resourceUri, string etag)
     {
         ETags.AddOrUpdate(resourceUri, etag, (_, _) => etag);
+    }
+
+    public static void SetETag(string resourceUri, object resource)
+    {
+        ETags.AddOrUpdate(resourceUri, GenerateEtag(resource), (_, _) => GenerateEtag(resource));
     }
 
     public static void RemoveETag(Uri resourceUri)
@@ -34,5 +48,13 @@ public static class InMemoryETagStore
     public static void RemoveETag(string resourceUri)
     {
         ETags.TryRemove(resourceUri, out _);
+    }
+
+    public static string GenerateEtag(object resource)
+    {
+        byte[] content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resource));
+        byte[] hash = SHA256.HashData(content);
+
+        return Convert.ToHexString(hash);
     }
 }
