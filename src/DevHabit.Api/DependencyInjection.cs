@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IO;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
 using OpenTelemetry;
@@ -76,6 +77,8 @@ internal static class DependencyInjectionExtensions
         .AddMvc();
 
         builder.Services.AddOpenApi();
+
+        builder.Services.AddResponseCaching();
 
         return builder;
     }
@@ -162,6 +165,8 @@ internal static class DependencyInjectionExtensions
         builder.Services.Configure<EncryptionOptions>(builder.Configuration.GetSection("Encryption"));
 
         builder.Services.AddSingleton<EncryptionService>();
+
+        builder.Services.AddSingleton<RecyclableMemoryStreamManager>();
 
         return builder;
     }

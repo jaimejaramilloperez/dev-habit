@@ -2,6 +2,7 @@ using DevHabit.Api;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
+using DevHabit.Api.Middlewares;
 using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,8 @@ app.UseCors(CorsOptions.PolicyName);
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseEtagCaching();
 
 app.MapHealthChecks("health", new()
 {
