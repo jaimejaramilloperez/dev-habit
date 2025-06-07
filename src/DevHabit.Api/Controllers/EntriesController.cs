@@ -113,7 +113,7 @@ public sealed class EntriesController(
             items.RemoveAt(items.Count - 1);
         }
 
-        List<LinkDto> links = [];
+        List<LinkDto> links = [.. paginationResult.Links];
 
         bool shouldIncludeHateoas = HateoasHelpers.ShouldIncludeHateoas(entriesParameters.Accept);
 
