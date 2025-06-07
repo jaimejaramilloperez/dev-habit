@@ -167,7 +167,13 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddRefitClient<IGitHubApi>(new()
         {
-            ContentSerializer = new NewtonsoftJsonContentSerializer(),
+            ContentSerializer = new NewtonsoftJsonContentSerializer(new()
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            }),
         })
         .ConfigureHttpClient(client => client.BaseAddress = new("https://api.github.com"));
 
