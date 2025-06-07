@@ -15,6 +15,7 @@ builder.AddApplicationServices();
 builder.AddAuthenticationServices();
 builder.AddBackgroundJobs();
 builder.AddCorsPolicy();
+builder.AddRateLimiting();
 
 var app = builder.Build();
 
@@ -35,6 +36,8 @@ app.UseCors(CorsOptions.PolicyName);
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.UseEtagCaching();
 

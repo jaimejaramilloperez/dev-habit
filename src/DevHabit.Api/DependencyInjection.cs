@@ -1,9 +1,11 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Asp.Versioning;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
+using DevHabit.Api.Extensions;
 using DevHabit.Api.Jobs;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -288,6 +291,58 @@ internal static class DependencyInjectionExtensions
                 policy.WithOrigins([.. corsOptions.AllowedOrigins])
                     .AllowAnyMethod()
                     .AllowAnyHeader();
+            });
+        });
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddRateLimiting(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.OnRejected = async (context, cancellationToken) =>
+            {
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
+                {
+                    context.HttpContext.Response.Headers.RetryAfter = $"{retryAfter.TotalSeconds}";
+
+                    ProblemDetailsFactory problemDetailsFactory = context.HttpContext.RequestServices
+                        .GetRequiredService<ProblemDetailsFactory>();
+
+                    Microsoft.AspNetCore.Mvc.ProblemDetails problemDetails = problemDetailsFactory.CreateProblemDetails(
+                        httpContext: context.HttpContext,
+                        statusCode: StatusCodes.Status429TooManyRequests,
+                        title: "Too Many Requests",
+                        detail: $"Too Many Requests. Please try again after {retryAfter.TotalSeconds} seconds");
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+                }
+            };
+
+            options.AddPolicy("default", httpContext =>
+            {
+                string? identityId = httpContext.User.GetIdentityId();
+
+                if (!string.IsNullOrWhiteSpace(identityId))
+                {
+                    return RateLimitPartition.GetTokenBucketLimiter(identityId, _ => new()
+                    {
+                        TokenLimit = 100,
+                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        TokensPerPeriod = 25,
+                        QueueLimit = 5,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    });
+                }
+
+                return RateLimitPartition.GetFixedWindowLimiter("anonymous", _ => new()
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(1),
+                });
             });
         });
 

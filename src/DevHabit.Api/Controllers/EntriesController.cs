@@ -11,6 +11,7 @@ using DevHabit.Api.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
@@ -18,6 +19,7 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/entries")]
 [Authorize(Roles = Roles.Member)]
+[EnableRateLimiting("default")]
 [Produces(CustomMediaTypesNames.Application.HateoasJson)]
 public sealed class EntriesController(
     ApplicationDbContext dbContext,
