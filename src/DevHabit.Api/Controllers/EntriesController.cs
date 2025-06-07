@@ -1,6 +1,7 @@
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Entries;
@@ -59,6 +60,79 @@ public sealed class EntriesController(
             }, cancellationToken);
 
         return Ok(paginationResult);
+    }
+
+    [HttpGet("cursor")]
+    public async Task<IActionResult> GetEntriesCursor(
+        EntriesCursorParameters entriesParameters,
+        CancellationToken cancellationToken)
+    {
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        var (habitId, fromDate, toDate, encodedCursor, fields, source, isArchived, limit) = entriesParameters;
+
+        IQueryable<Entry> entriesQuery = _dbContext.Entries.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .Where(x => habitId == null || x.HabitId == habitId)
+            .Where(x => fromDate == null || x.Date >= fromDate)
+            .Where(x => toDate == null || x.Date <= toDate)
+            .Where(x => source == null || x.Source == source)
+            .Where(x => isArchived == null || x.IsArchived == isArchived);
+
+        if (!string.IsNullOrWhiteSpace(encodedCursor))
+        {
+            EntryCursorDto? cursor = EntryCursorDto.Decode(encodedCursor);
+
+            if (cursor is not null)
+            {
+                entriesQuery = entriesQuery.Where(x =>
+                    x.Date < cursor.Date ||
+                    x.Date == cursor.Date && string.Compare(x.Id, cursor.Id) <= 0);
+            }
+        }
+
+        CollectionResult<EntryDto> paginationResult = await entriesQuery
+            .OrderByDescending(x => x.Date)
+            .ThenByDescending(x => x.Id)
+            .Select(EntryQueries.ProjectToDto())
+            .ToCursorPaginationResultAsync(limit, cancellationToken);
+
+        List<EntryDto> items = paginationResult.Data.ToList();
+        bool hasNextPage = paginationResult.Data.Count > limit;
+        string? nextCursor = null;
+
+        if (hasNextPage)
+        {
+            EntryDto lastItem = items[^1];
+            nextCursor = EntryCursorDto.Encode(lastItem.Id, lastItem.Date);
+            items.RemoveAt(items.Count - 1);
+        }
+
+        List<LinkDto> links = [];
+
+        bool shouldIncludeHateoas = HateoasHelpers.ShouldIncludeHateoas(entriesParameters.Accept);
+
+        if (shouldIncludeHateoas)
+        {
+            links.AddRange(CreateLinksForEntriesCursor(entriesParameters, nextCursor));
+        }
+
+        ShapedCollectionResult<EntryDto> shapedPaginationResult = new()
+        {
+            Data = DataShaper.ShapeCollectionData(
+                items,
+                fields,
+                shouldIncludeHateoas ? x => CreateLinksForEntry(x.Id, fields, x.IsArchived) : null),
+            OriginalData = items,
+            Links = links,
+        };
+
+        return Ok(shapedPaginationResult);
     }
 
     [HttpGet("{id}")]
@@ -428,6 +502,46 @@ public sealed class EntriesController(
                 is_archived = parameters.IsArchived,
                 page = parameters.Page + 1,
                 page_size = parameters.PageSize,
+            }));
+        }
+
+        return links;
+    }
+
+    private ICollection<LinkDto> CreateLinksForEntriesCursor(
+        EntriesCursorParameters parameters,
+        string? nextCursor)
+    {
+        ICollection<LinkDto> links =
+        [
+            _linkService.Create(nameof(GetEntriesCursor), LinkRelations.Self, HttpMethods.Get, new
+            {
+                habit_id = parameters.HabitId,
+                from_date = parameters.FromDate,
+                to_date = parameters.ToDate,
+                cursor = parameters.Cursor,
+                fields = parameters.Fields,
+                source = parameters.Source,
+                is_archived = parameters.IsArchived,
+                limit = parameters.Limit,
+            }),
+            _linkService.Create(nameof(GetStats), LinkRelations.Stats, HttpMethods.Get),
+            _linkService.Create(nameof(CreateEntry), LinkRelations.Create, HttpMethods.Post),
+            _linkService.Create(nameof(CreateEntryBatch), LinkRelations.CreateBatch, HttpMethods.Post),
+        ];
+
+        if (!string.IsNullOrWhiteSpace(nextCursor))
+        {
+            links.Add(_linkService.Create(nameof(GetEntriesCursor), LinkRelations.NextPage, HttpMethods.Get, new
+            {
+                habit_id = parameters.HabitId,
+                from_date = parameters.FromDate,
+                to_date = parameters.ToDate,
+                cursor = nextCursor,
+                fields = parameters.Fields,
+                source = parameters.Source,
+                is_archived = parameters.IsArchived,
+                limit = parameters.Limit,
             }));
         }
 

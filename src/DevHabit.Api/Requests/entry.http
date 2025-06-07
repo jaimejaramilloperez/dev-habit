@@ -8,6 +8,12 @@ Authorization: Bearer {{token}}
 Accept: application/vnd.dev-habit.hateoas+json
 # Accept: application/json
 
+### Get Entries for a habit (Cursor Pagination)
+GET {{devHabitApiHostAddress}}/{{basePath}}/cursor?limit=5
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
 ### Get entries for a habit by Id
 GET {{devHabitApiHostAddress}}/{{basePath}}/{{entryId}}
 Authorization: Bearer {{token}}

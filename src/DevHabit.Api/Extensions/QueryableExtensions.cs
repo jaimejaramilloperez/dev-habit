@@ -126,6 +126,21 @@ public static class QueryableExtensions
         };
     }
 
+    public static async Task<CollectionResult<T>> ToCursorPaginationResultAsync<T>(
+        this IQueryable<T> query,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        List<T> items = await query
+            .Take(limit + 1)
+            .ToListAsync(cancellationToken);
+
+        return new()
+        {
+            Data = items,
+        };
+    }
+
     private static IQueryable<T> ApplyDefaultOrder<T>(IQueryable<T> query, string? defaultOrderField)
     {
         return string.IsNullOrWhiteSpace(defaultOrderField)
