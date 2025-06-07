@@ -23,8 +23,8 @@ public sealed class EncryptionService(IOptions<EncryptionOptions> options)
             using MemoryStream memoryStream = new();
             memoryStream.Write(aes.IV, 0, IvSize);
 
-            using ICryptoTransform cryptoTransform = aes.CreateEncryptor();
-            using CryptoStream cryptoStream = new(memoryStream, cryptoTransform, CryptoStreamMode.Write);
+            using ICryptoTransform encryptor = aes.CreateEncryptor();
+            using CryptoStream cryptoStream = new(memoryStream, encryptor, CryptoStreamMode.Write);
             using (StreamWriter streamWriter = new(cryptoStream))
             {
                 streamWriter.Write(plainText);
@@ -64,8 +64,8 @@ public sealed class EncryptionService(IOptions<EncryptionOptions> options)
             aes.IV = iv;
 
             using MemoryStream memoryStream = new(encryptedData);
-            using ICryptoTransform cryptoTransform = aes.CreateDecryptor();
-            using CryptoStream cryptoStream = new(memoryStream, cryptoTransform, CryptoStreamMode.Read);
+            using ICryptoTransform decryptor = aes.CreateDecryptor();
+            using CryptoStream cryptoStream = new(memoryStream, decryptor, CryptoStreamMode.Read);
             using StreamReader streamReader = new(cryptoStream);
 
             return streamReader.ReadToEnd();
