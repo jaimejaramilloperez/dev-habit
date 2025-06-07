@@ -25,6 +25,7 @@ POST {{devHabitApiHostAddress}}/{{basePath}}
 Authorization: Bearer {{token}}
 Accept: application/json
 Content-Type: application/json
+Idempotency-Key: 7c748a4c-4277-4851-b128-be35a6e631d3
 
 {
   "habitId": "{{habitId}}",

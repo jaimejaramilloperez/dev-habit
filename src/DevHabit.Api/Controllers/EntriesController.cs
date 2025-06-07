@@ -1,6 +1,7 @@
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Common.Idempotency;
 using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
@@ -162,6 +163,7 @@ public sealed class EntriesController(
     }
 
     [HttpPost]
+    [IdempotentRequest]
     public async Task<ActionResult<EntryDto>> CreateEntry(
         CreateEntryDto createEntryDto,
         AcceptHeaderDto acceptHeaderDto,
