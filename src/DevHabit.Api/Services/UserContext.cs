@@ -6,8 +6,8 @@ using Microsoft.Extensions.Caching.Memory;
 namespace DevHabit.Api.Services;
 
 public class UserContext(
-    IHttpContextAccessor httpContextAccessor,
     ApplicationDbContext appDbContext,
+    IHttpContextAccessor httpContextAccessor,
     IMemoryCache memoryCache)
 {
     private const string CacheKeyPrefix = "users:id:";
