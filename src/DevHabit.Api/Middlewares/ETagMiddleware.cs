@@ -31,15 +31,15 @@ public sealed class ETagMiddleware(RequestDelegate next)
             return;
         }
 
-        string resourceUri = context.Request.Path.Value ?? "/";
+        string resourcePath = context.Request.Path.Value ?? "/";
+        Uri resourceUri = new(resourcePath, UriKind.Relative);
 
         string? clientETag = context.Request.Headers.IfNoneMatch.FirstOrDefault()?.Trim('"');
-
         string? ifMatch = context.Request.Headers.IfMatch.FirstOrDefault()?.Trim('"');
 
         if (ConcurrencyCheckMethods.Contains(context.Request.Method) && !string.IsNullOrWhiteSpace(ifMatch))
         {
-            string currentETag = InMemoryETagStore.GetETag(new Uri(resourceUri, UriKind.Relative));
+            string currentETag = InMemoryETagStore.GetETag(resourceUri);
 
             if (!string.IsNullOrWhiteSpace(currentETag) && ifMatch != currentETag)
             {
@@ -62,7 +62,7 @@ public sealed class ETagMiddleware(RequestDelegate next)
             ReadOnlySequence<byte> responseBody = memoryStream.GetReadOnlySequence();
             string etag = GenerateEtag(responseBody);
 
-            InMemoryETagStore.SetETag(new Uri(resourceUri, UriKind.Relative), etag);
+            InMemoryETagStore.SetETag(resourceUri, etag);
             context.Response.Headers.ETag = $"\"{etag}\"";
 
             if (context.Request.Method == HttpMethods.Get && clientETag is not null && clientETag == etag)
