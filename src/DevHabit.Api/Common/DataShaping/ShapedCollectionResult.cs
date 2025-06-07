@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace DevHabit.Api.Common.DataShaping;
 
-public sealed class ShapedCollectionResult<T> : IShapedCollectionResponse, ILinksResponse
+public sealed class ShapedCollectionResult<T> : IShapedCollectionResult, ILinksResponse
 {
     public required IReadOnlyCollection<ExpandoObject> Data { get; init; }
     [JsonIgnore] public required IReadOnlyCollection<T> OriginalData { get; init; }

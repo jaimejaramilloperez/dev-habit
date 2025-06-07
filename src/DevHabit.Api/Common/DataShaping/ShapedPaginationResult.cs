@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace DevHabit.Api.Common.DataShaping;
 
-public sealed record ShapedPaginationResult<T> : IShapedCollectionResponse, IPaginationResult, ILinksResponse
+public sealed record ShapedPaginationResult<T> : IShapedCollectionResult, IPaginationResult, ILinksResponse
 {
     public required IReadOnlyCollection<ExpandoObject> Data { get; init; }
     [JsonIgnore] public required IReadOnlyCollection<T> OriginalData { get; init; }

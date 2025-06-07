@@ -3,7 +3,7 @@ using DevHabit.Api.Dtos.Common;
 
 namespace DevHabit.Api.Common.Pagination;
 
-public sealed record PaginationResult<T> : ICollectionResponse<T>, IPaginationResult, ILinksResponse
+public sealed record PaginationResult<T> : ICollectionResult<T>, IPaginationResult, ILinksResponse
 {
     public required IReadOnlyCollection<T> Data { get; init; }
     public int Page { get; init; }
