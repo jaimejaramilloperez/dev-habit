@@ -6,7 +6,7 @@ namespace DevHabit.Api.Services.GitHub;
 
 public sealed class GitHubService(
     IHttpClientFactory httpClientFactory,
-    ILogger<GitHubService> logger)
+    ILogger<RefitGitHubService> logger)
 {
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
@@ -20,6 +20,8 @@ public sealed class GitHubService(
         string accessToken,
         CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(accessToken);
+
         HttpClient client = CreateGitHubClient(accessToken);
 
         HttpResponseMessage response = await client.GetAsync(new Uri("user", UriKind.Relative), cancellationToken);
@@ -42,6 +44,9 @@ public sealed class GitHubService(
         int perPage,
         CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(username);
+        ArgumentException.ThrowIfNullOrWhiteSpace(accessToken);
+
         HttpClient client = CreateGitHubClient(accessToken);
 
         HttpResponseMessage response = await client.GetAsync(

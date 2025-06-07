@@ -15,12 +15,12 @@ namespace DevHabit.Api.Controllers;
 [Route("api/github")]
 [Authorize(Roles = Roles.Member)]
 public sealed class GitHubController(
-    GitHubService gitHubService,
+    RefitGitHubService gitHubService,
     GitHubAccessTokenService gitHubAccessTokenService,
     UserContext userContext,
     LinkService linkService) : ControllerBase
 {
-    private readonly GitHubService _gitHubService = gitHubService;
+    private readonly RefitGitHubService _gitHubService = gitHubService;
     private readonly GitHubAccessTokenService _gitHubAccessTokenService = gitHubAccessTokenService;
     private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
