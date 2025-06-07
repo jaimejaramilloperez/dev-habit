@@ -64,22 +64,6 @@ public static class QueryableExtensions
             : query.OrderBy(orderQuery);
     }
 
-    public static async Task<ShapedResult<T>?> ToShapedFirstOrDefaultAsync<T>(
-        this IQueryable<T> query,
-        string? fields,
-        CancellationToken cancellationToken = default)
-    {
-        T? item = await query.FirstOrDefaultAsync(cancellationToken);
-
-        return item is null
-            ? null
-            : new()
-            {
-                Item = DataShaper.ShapeData(item, fields),
-                OriginalItem = item,
-            };
-    }
-
     public static async Task<PaginationResult<T>> ToPaginationResultAsync<T>(
         this IQueryable<T> query,
         int page,
@@ -100,6 +84,37 @@ public static class QueryableExtensions
             PageSize = pageSize,
             TotalCount = totalCount,
         };
+    }
+
+    public static async Task<CollectionResult<T>> ToCursorPaginationResultAsync<T>(
+        this IQueryable<T> query,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        List<T> items = await query
+            .Take(limit + 1)
+            .ToListAsync(cancellationToken);
+
+        return new()
+        {
+            Data = items,
+        };
+    }
+
+    public static async Task<ShapedResult<T>?> ToShapedFirstOrDefaultAsync<T>(
+        this IQueryable<T> query,
+        string? fields,
+        CancellationToken cancellationToken = default)
+    {
+        T? item = await query.FirstOrDefaultAsync(cancellationToken);
+
+        return item is null
+            ? null
+            : new()
+            {
+                Item = DataShaper.ShapeData(item, fields),
+                OriginalItem = item,
+            };
     }
 
     public static async Task<ShapedPaginationResult<T>> ToShapedPaginationResultAsync<T>(
@@ -123,21 +138,6 @@ public static class QueryableExtensions
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount,
-        };
-    }
-
-    public static async Task<CollectionResult<T>> ToCursorPaginationResultAsync<T>(
-        this IQueryable<T> query,
-        int limit,
-        CancellationToken cancellationToken = default)
-    {
-        List<T> items = await query
-            .Take(limit + 1)
-            .ToListAsync(cancellationToken);
-
-        return new()
-        {
-            Data = items,
         };
     }
 
