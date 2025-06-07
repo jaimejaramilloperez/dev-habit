@@ -103,14 +103,14 @@ public sealed class EntriesController(
             .ToCursorPaginationResultAsync(limit, cancellationToken);
 
         List<EntryDto> items = paginationResult.Data.ToList();
-        bool hasNextPage = paginationResult.Data.Count > limit;
+        bool hasNextPage = items.Count > limit;
         string? nextCursor = null;
 
         if (hasNextPage)
         {
             EntryDto lastItem = items[^1];
-            nextCursor = EntryCursorDto.Encode(lastItem.Id, lastItem.Date);
             items.RemoveAt(items.Count - 1);
+            nextCursor = EntryCursorDto.Encode(lastItem.Id, lastItem.Date);
         }
 
         List<LinkDto> links = [.. paginationResult.Links];
