@@ -152,11 +152,16 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddScoped<UserContext>();
 
+        // builder.Services.AddTransient<DelayHandler>();
+
         builder.Services.AddScoped<GitHubService>();
 
         builder.Services.AddScoped<RefitGitHubService>();
 
         builder.Services.AddScoped<GitHubAccessTokenService>();
+
+        builder.Services.AddHttpClient()
+            .ConfigureHttpClientDefaults(options => options.AddStandardHedgingHandler());
 
         builder.Services.AddHttpClient("github", client =>
         {
@@ -176,6 +181,30 @@ internal static class DependencyInjectionExtensions
             }),
         })
         .ConfigureHttpClient(client => client.BaseAddress = new("https://api.github.com"));
+        // .AddHttpMessageHandler<DelayHandler>();
+        // .InternalRemoveAllResilienceHandlers()
+        // .AddResilienceHandler("custom", pipeline =>
+        // {
+        //     pipeline.AddTimeout(TimeSpan.FromSeconds(5));
+
+        //     pipeline.AddRetry(new()
+        //     {
+        //         MaxRetryAttempts = 3,
+        //         BackoffType = DelayBackoffType.Exponential,
+        //         UseJitter = true,
+        //         Delay = TimeSpan.FromMilliseconds(500),
+        //     });
+
+        //     pipeline.AddCircuitBreaker(new()
+        //     {
+        //         SamplingDuration = TimeSpan.FromSeconds(10),
+        //         FailureRatio = 0.9,
+        //         MinimumThroughput = 5,
+        //         BreakDuration = TimeSpan.FromSeconds(5),
+        //     });
+
+        //     pipeline.AddTimeout(TimeSpan.FromSeconds(1));
+        // });
 
         builder.Services.Configure<EncryptionOptions>(builder.Configuration.GetSection("Encryption"));
 
