@@ -6,7 +6,7 @@ using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
-using DevHabit.Api.Jobs;
+using DevHabit.Api.Jobs.GitHub;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
 using DevHabit.Api.Services.GitHub;

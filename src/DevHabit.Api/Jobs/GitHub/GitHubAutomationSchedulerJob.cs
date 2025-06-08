@@ -3,7 +3,7 @@ using DevHabit.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 
-namespace DevHabit.Api.Jobs;
+namespace DevHabit.Api.Jobs.GitHub;
 
 [DisallowConcurrentExecution]
 public sealed class GitHubAutomationSchedulerJob(

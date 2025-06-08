@@ -5,7 +5,7 @@ using DevHabit.Api.Services.GitHub;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 
-namespace DevHabit.Api.Jobs;
+namespace DevHabit.Api.Jobs.GitHub;
 
 [DisallowConcurrentExecution]
 public sealed class GitHubHabitProcessorJob(
