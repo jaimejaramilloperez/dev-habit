@@ -164,7 +164,7 @@ internal static class DependencyInjectionExtensions
         builder.Services.AddScoped<GitHubAccessTokenService>();
 
         builder.Services.AddHttpClient()
-            .ConfigureHttpClientDefaults(options => options.AddStandardHedgingHandler());
+            .ConfigureHttpClientDefaults(options => options.AddStandardResilienceHandler());
 
         builder.Services.AddHttpClient("github", client =>
         {
