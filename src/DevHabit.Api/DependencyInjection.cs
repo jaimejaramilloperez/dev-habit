@@ -6,6 +6,7 @@ using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
+using DevHabit.Api.Jobs.EntryImport;
 using DevHabit.Api.Jobs.GitHub;
 using DevHabit.Api.Middlewares;
 using DevHabit.Api.Services;
@@ -257,6 +258,7 @@ internal static class DependencyInjectionExtensions
     {
         builder.Services.AddQuartz(configurator =>
         {
+            // GitHub automation scheduler
             configurator.AddJob<GitHubAutomationSchedulerJob>(options => options.WithIdentity("github-automation-scheduler"));
 
             configurator.AddTrigger(options =>
@@ -272,6 +274,16 @@ internal static class DependencyInjectionExtensions
                         scheduleBuilder.WithIntervalInMinutes(settings.ScanIntervalInMinutes)
                             .RepeatForever();
                     });
+            });
+
+            // Entry import clean up - runs daily at 3 AM UTC
+            configurator.AddJob<CleanUpEntryImportJob>(options => options.WithIdentity("cleanup-entry-imports"));
+
+            configurator.AddTrigger(options =>
+            {
+                options.ForJob("cleanup-entry-imports")
+                    .WithIdentity("cleanup-entry-imports-trigger")
+                    .WithCronSchedule("0 0 3 * * ?", x => x.InTimeZone(TimeZoneInfo.Utc));
             });
         });
 

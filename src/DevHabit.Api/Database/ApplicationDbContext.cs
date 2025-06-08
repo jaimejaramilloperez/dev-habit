@@ -13,6 +13,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<HabitTag> HabitTags => Set<HabitTag>();
     public DbSet<User> Users => Set<User>();
     public DbSet<GitHubAccessToken> GitHubAccessTokens => Set<GitHubAccessToken>();
+    public DbSet<EntryImportJob> EntryImportJobs => Set<EntryImportJob>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,5 +25,6 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         modelBuilder.ApplyConfiguration(new HabitTagConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new GitHubAccessTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new EntryImportJobConfiguration());
     }
 }
