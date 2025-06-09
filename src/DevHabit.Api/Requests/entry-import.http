@@ -1,0 +1,26 @@
+@basePath = api/entries/imports
+@entryImportId = ei_01975691-6ac0-71c4-99f7-78f2bee62544
+
+### Get Entry Imports
+GET {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
+### Get Entry Import by Id
+GET {{devHabitApiHostAddress}}/{{basePath}}/{{entryImportId}}
+Authorization: Bearer {{token}}
+Accept: application/vnd.dev-habit.hateoas+json
+# Accept: application/json
+
+### Create an entry import
+POST {{devHabitApiHostAddress}}/{{basePath}}
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=xxx
+
+--xxx
+Content-Disposition: form-data; name="file"; filename="imports.csv"
+
+< ./Resources/imports.csv
+--xxx--
