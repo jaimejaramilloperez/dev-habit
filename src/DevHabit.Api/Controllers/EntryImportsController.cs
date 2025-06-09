@@ -45,8 +45,9 @@ public sealed class EntryImportsController(
 
         var (page, pageSize) = entryImportsParameters;
 
-        ShapedPaginationResult<EntryImportJob> paginationResult = await _dbContext.EntryImportJobs.AsNoTracking()
+        ShapedPaginationResult<EntryImportJobDto> paginationResult = await _dbContext.EntryImportJobs.AsNoTracking()
             .Where(x => x.UserId == userId)
+            .Select(EntryImportQueries.ProjectToDto())
             .OrderByDescending(x => x.CreatedAtUtc)
             .ToShapedPaginationResultAsync(page, pageSize, null, cancellationToken)
             .WithHateoasAsync(new()
@@ -72,8 +73,9 @@ public sealed class EntryImportsController(
             return Unauthorized();
         }
 
-        ShapedResult<EntryImportJob>? result = await _dbContext.EntryImportJobs
+        ShapedResult<EntryImportJobDto>? result = await _dbContext.EntryImportJobs
             .Where(x => x.Id == id && x.UserId == userId)
+            .Select(EntryImportQueries.ProjectToDto())
             .ToShapedFirstOrDefaultAsync(null, cancellationToken)
             .WithHateoasAsync(x => CreateLinksForImportJob(x.Id), acceptHeaderDto.Accept, cancellationToken);
 
@@ -123,10 +125,10 @@ public sealed class EntryImportsController(
         if (HateoasHelpers.ShouldIncludeHateoas(acceptHeaderDto.Accept))
         {
             var result = DataShaper.ShapeData(importJobDto, CreateLinksForImportJob(importJob.Id));
-            return CreatedAtAction(nameof(GetImportJobs), new { id = importJobDto.Id }, result);
+            return CreatedAtAction(nameof(GetImportJob), new { id = importJobDto.Id }, result);
         }
 
-        return CreatedAtAction(nameof(GetImportJobs), new { id = importJobDto.Id }, importJobDto);
+        return CreatedAtAction(nameof(GetImportJob), new { id = importJobDto.Id }, importJobDto);
     }
 
     private ICollection<LinkDto> CreateLinksForImportJob(string id)

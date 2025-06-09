@@ -25,7 +25,6 @@ public static class EntryImportJobMappings
             UserId = entryImportJob.UserId,
             Status = entryImportJob.Status,
             FileName = entryImportJob.FileName,
-            FileContent = entryImportJob.FileContent,
             CreatedAtUtc = entryImportJob.CreatedAtUtc,
         };
     }
