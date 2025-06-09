@@ -10,4 +10,8 @@
     <Project Path="src/DevHabit.Api/DevHabit.Api.csproj" />
   </Folder>
 
+  <Folder Name="/test/">
+    <Project Path="test/DevHabit.UnitTests/DevHabit.UnitTests.csproj" />
+  </Folder>
+
 </Solution>
