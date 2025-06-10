@@ -9,7 +9,7 @@ public static class UserMappings
     {
         return new()
         {
-            Id = $"u_{Guid.CreateVersion7()}",
+            Id = User.CreateNewId(),
             Name = dto.Name,
             Email = dto.Email,
             CreatedAtUtc = DateTime.UtcNow,

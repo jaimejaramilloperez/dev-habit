@@ -20,7 +20,7 @@ internal static class TagMappings
     {
         return new()
         {
-            Id = $"t_{Guid.CreateVersion7()}",
+            Id = Tag.CreateNewId(),
             UserId = userId,
             Name = dto.Name,
             Description = dto.Description,

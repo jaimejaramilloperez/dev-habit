@@ -95,7 +95,7 @@ public sealed class GitHubHabitProcessorJob(
 
                 Entry entry = new()
                 {
-                    Id = $"e_{Guid.CreateVersion7()}",
+                    Id = Entry.CreateNewId(),
                     HabitId = habitId,
                     UserId = habit.UserId,
                     Value = 1, // each push counts as 1

@@ -41,7 +41,7 @@ public sealed class GitHubAccessTokenService(
         {
             GitHubAccessToken newGitHubAccessToken = new()
             {
-                Id = $"gh_{Guid.CreateVersion7()}",
+                Id = GitHubAccessToken.CreateNewId(),
                 UserId = userId,
                 Token = encryptedToken,
                 CreatedAtUtc = DateTime.UtcNow,

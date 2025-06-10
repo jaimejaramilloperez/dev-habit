@@ -8,7 +8,7 @@ public static class EntryImportJobMappings
     {
         return new()
         {
-            Id = $"ei_{Guid.CreateVersion7()}",
+            Id = EntryImportJob.CreateNewId(),
             UserId = userId,
             Status = EntryImportStatus.Pending,
             FileName = dto.File.FileName,

@@ -54,7 +54,7 @@ public sealed class ProcessEntryImportJob(
 
                     Entry entry = new()
                     {
-                        Id = $"e_{Guid.CreateVersion7()}",
+                        Id = Entry.CreateNewId(),
                         HabitId = record.HabitId,
                         UserId = importJob.UserId,
                         Value = habit.Target.Value,
