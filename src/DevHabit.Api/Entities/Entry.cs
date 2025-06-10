@@ -14,6 +14,8 @@ public sealed class Entry
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
     public Habit Habit { get; set; } = null!;
+
+    public static string CreateNewId() => $"e_{Guid.CreateVersion7()}";
 }
 
 public enum EntrySource

@@ -21,6 +21,8 @@ public sealed class Habit
     // Navigation Properties
     public List<HabitTag> HabitTags { get; } = [];
     public List<Tag> Tags { get; } = [];
+
+    public static string CreateNewId() => $"h_{Guid.CreateVersion7()}";
 }
 
 public enum HabitType
