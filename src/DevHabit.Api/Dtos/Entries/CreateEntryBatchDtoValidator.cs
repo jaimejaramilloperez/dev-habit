@@ -4,7 +4,7 @@ namespace DevHabit.Api.Dtos.Entries;
 
 public sealed class CreateEntryBatchDtoValidator : AbstractValidator<CreateEntryBatchDto>
 {
-    public CreateEntryBatchDtoValidator(/*CreateEntryValidator entryValidator*/)
+    public CreateEntryBatchDtoValidator(CreateEntryDtoValidator entryValidator)
     {
         RuleFor(x => x.Entries)
             .NotEmpty()
@@ -12,7 +12,7 @@ public sealed class CreateEntryBatchDtoValidator : AbstractValidator<CreateEntry
             .Must(entries => entries.Count <= 20)
             .WithMessage("Maximum of 20 entries per batch");
 
-        // RuleForEach(x => x.Entries)
-        //     .SetValidator(entryValidator);
+        RuleForEach(x => x.Entries)
+            .SetValidator(entryValidator);
     }
 }

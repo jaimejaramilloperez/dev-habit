@@ -167,6 +167,7 @@ public sealed class EntriesController(
     public async Task<ActionResult<EntryDto>> CreateEntry(
         CreateEntryDto createEntryDto,
         AcceptHeaderDto acceptHeaderDto,
+        IValidator<CreateEntryDto> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -175,6 +176,8 @@ public sealed class EntriesController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(createEntryDto, cancellationToken);
 
         Habit? habit = await _dbContext.Habits
             .FirstOrDefaultAsync(x => x.Id == createEntryDto.HabitId && x.UserId == userId, cancellationToken);
