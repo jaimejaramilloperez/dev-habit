@@ -105,7 +105,13 @@ public sealed class AuthController(
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        TokenRequestDto tokenRequest = new(identityUser.Id, identityUser.Email, [Roles.Member]);
+        TokenRequestDto tokenRequest = new()
+        {
+            UserId = identityUser.Id,
+            Email = identityUser.Email,
+            Roles = [Roles.Member],
+        };
+
         AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
 
         RefreshToken refreshToken = new()
@@ -142,7 +148,13 @@ public sealed class AuthController(
 
         IList<string> roles = await _userManager.GetRolesAsync(identityUser);
 
-        TokenRequestDto tokenRequest = new(identityUser.Id, identityUser.Email!, roles);
+        TokenRequestDto tokenRequest = new()
+        {
+            UserId = identityUser.Id,
+            Email = identityUser.Email!,
+            Roles = [.. roles],
+        };
+
         AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
 
         RefreshToken refreshToken = new()
@@ -176,7 +188,13 @@ public sealed class AuthController(
 
         IList<string> roles = await _userManager.GetRolesAsync(refreshToken.User);
 
-        TokenRequestDto tokenRequest = new(refreshToken.User.Id, refreshToken.User.Email!, roles);
+        TokenRequestDto tokenRequest = new()
+        {
+            UserId = refreshToken.UserId,
+            Email = refreshToken.User.Email!,
+            Roles = [.. roles],
+        };
+
         AccessTokensDto accessTokens = _tokenProvider.Create(tokenRequest);
 
         refreshToken.Token = accessTokens.RefreshToken;
