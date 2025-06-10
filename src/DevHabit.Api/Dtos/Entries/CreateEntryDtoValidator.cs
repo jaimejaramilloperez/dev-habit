@@ -23,7 +23,7 @@ public sealed class CreateEntryDtoValidator : AbstractValidator<CreateEntryDto>
         RuleFor(x => x.Date)
             .NotEmpty()
             .WithMessage("Date must not be empty")
-            .Must(date => date < DateOnly.FromDateTime(DateTime.UtcNow))
+            .Must(date => date <= DateOnly.FromDateTime(DateTime.UtcNow))
             .WithMessage("Date can not be in the future");
     }
 }
