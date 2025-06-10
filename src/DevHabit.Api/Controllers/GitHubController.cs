@@ -81,7 +81,7 @@ public sealed class GitHubController(
 
         await validator.ValidateAndThrowAsync(storeGithubAccessTokenDto, cancellationToken);
 
-        await _gitHubAccessTokenService.UpsertAsync(userId, storeGithubAccessTokenDto, cancellationToken);
+        await _gitHubAccessTokenService.StoreAsync(userId, storeGithubAccessTokenDto, cancellationToken);
 
         return NoContent();
     }

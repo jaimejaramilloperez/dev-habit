@@ -23,7 +23,7 @@ public sealed class GitHubAccessTokenService(
         return decryptedToken;
     }
 
-    public async Task UpsertAsync(
+    public async Task StoreAsync(
         string userId,
         StoreGithubAccessTokenDto accessTokenDto,
         CancellationToken cancellationToken = default)
