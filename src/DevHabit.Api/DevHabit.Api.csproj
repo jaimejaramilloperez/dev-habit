@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="DevHabit.UnitTests" />
+    <InternalsVisibleTo Include="DevHabit.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>
