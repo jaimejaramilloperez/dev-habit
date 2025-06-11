@@ -28,6 +28,7 @@
     "dotenv",
     "dotnet",
     "dpage",
+    "dtos",
     "Dtos",
     "encryptor",
     "Encryptor",

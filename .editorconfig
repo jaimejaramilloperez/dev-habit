@@ -475,3 +475,7 @@ dotnet_diagnostic.S6605.severity = suggestion
 
 # S6966: Awaitable method should be used
 dotnet_diagnostic.S6966.severity = suggestion
+
+[test/**/*.cs]
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = silent
