@@ -57,6 +57,7 @@ public sealed class GitHubAccessTokenServiceTests : IDisposable
 
         // Assert
         GitHubAccessToken? token = await _dbContext.GitHubAccessTokens.FirstOrDefaultAsync(x => x.UserId == userId);
+
         Assert.NotNull(token);
         Assert.Equal(userId, token.UserId);
         Assert.NotEqual(dto.AccessToken, token.Token);
@@ -93,6 +94,7 @@ public sealed class GitHubAccessTokenServiceTests : IDisposable
 
         // Assert
         GitHubAccessToken? token = await _dbContext.GitHubAccessTokens.FirstOrDefaultAsync(x => x.UserId == userId);
+
         Assert.NotNull(token);
         Assert.Equal(existingToken.Id, token.Id);
         Assert.Equal(existingToken.UserId, token.UserId);
@@ -129,7 +131,7 @@ public sealed class GitHubAccessTokenServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAsync_ShouldNotReturnNull_WhenTokenDoesNotExist()
+    public async Task GetAsync_ShouldReturnNull_WhenTokenDoesNotExist()
     {
         // Arrange
         string userId = User.CreateNewId();
@@ -169,7 +171,7 @@ public sealed class GitHubAccessTokenServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task RevokeAsync_ShouldNotThrow_WhenTokenDoesNotExists()
+    public async Task RevokeAsync_ShouldNotThrow_WhenTokenDoesNotExist()
     {
         // Arrange
         string userId = User.CreateNewId();

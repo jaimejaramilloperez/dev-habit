@@ -141,12 +141,21 @@ public sealed class DataShaperTests
                 Description = "Description",
                 Value = 33,
             },
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Test2",
+                Description = "Description2",
+                Value = 42,
+            },
         ];
 
         // Act
         IReadOnlyCollection<ExpandoObject> result = DataShaper.ShapeCollectionData(dtos, "id,name");
 
         // Assert
+        Assert.Equal(2, result.Count);
+
         IDictionary<string, object?> firstItem = result.ElementAt(0);
 
         Assert.Equal(2, firstItem.Count);
@@ -169,12 +178,21 @@ public sealed class DataShaperTests
                 Description = "Description",
                 Value = 33,
             },
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Test2",
+                Description = "Description2",
+                Value = 42,
+            },
         ];
 
         // Act
         IReadOnlyCollection<ExpandoObject> result = DataShaper.ShapeCollectionData(dtos, "ID,NAME");
 
         // Assert
+        Assert.Equal(2, result.Count);
+
         IDictionary<string, object?> firstItem = result.ElementAt(0);
 
         Assert.Equal(2, firstItem.Count);
@@ -197,6 +215,13 @@ public sealed class DataShaperTests
                 Description = "Description",
                 Value = 33,
             },
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Test2",
+                Description = "Description2",
+                Value = 42,
+            },
         ];
 
         static List<LinkDto> CreateLinks(TestDto dto) =>
@@ -208,6 +233,8 @@ public sealed class DataShaperTests
         IReadOnlyCollection<ExpandoObject> result = DataShaper.ShapeCollectionData(dtos, null, CreateLinks);
 
         // Assert
+        Assert.Equal(2, result.Count);
+
         IDictionary<string, object?> firstItem = result.ElementAt(0);
         Assert.True(firstItem.ContainsKey(HateoasPropertyNames.Links));
 

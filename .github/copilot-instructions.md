@@ -32,7 +32,7 @@
 
 ### Testing
 
-* Do not emit "Act", "Arrange" or "Assert" comments.
+* Emit "Act", "Arrange" or "Assert" comments.
 * We use xUnit for tests.
 * Use NSubstitute for mocking in tests.
 * Copy existing style in nearby files for test method names and capitalization.
