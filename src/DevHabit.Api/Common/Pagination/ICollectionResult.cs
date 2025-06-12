@@ -2,5 +2,5 @@ namespace DevHabit.Api.Common.Pagination;
 
 public interface ICollectionResult<T>
 {
-    public IReadOnlyCollection<T> Data { get; init; }
+    public ICollection<T> Data { get; init; }
 }

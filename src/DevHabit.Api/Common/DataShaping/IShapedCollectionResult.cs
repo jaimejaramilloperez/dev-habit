@@ -4,5 +4,5 @@ namespace DevHabit.Api.Common.DataShaping;
 
 public interface IShapedCollectionResult
 {
-    public IReadOnlyCollection<ExpandoObject> Data { get; init; }
+    public ICollection<ExpandoObject> Data { get; init; }
 }

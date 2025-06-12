@@ -63,8 +63,8 @@ public static class DataShaper
         return (ExpandoObject)shapedObject;
     }
 
-    public static IReadOnlyCollection<ExpandoObject> ShapeCollectionData<T>(
-        IReadOnlyCollection<T> entities,
+    public static ICollection<ExpandoObject> ShapeCollectionData<T>(
+        ICollection<T> entities,
         string? fields = null,
         Func<T, ICollection<LinkDto>>? linksFactory = null)
     {

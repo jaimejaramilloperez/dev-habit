@@ -5,7 +5,7 @@ namespace DevHabit.Api.Common.Pagination;
 
 public sealed record PaginationResult<T> : ICollectionResult<T>, IPaginationResult, ILinksResponse
 {
-    public required IReadOnlyCollection<T> Data { get; init; }
+    public required ICollection<T> Data { get; init; }
     public int Page { get; init; }
     public int PageSize { get; init; }
     public long TotalCount { get; init; }
