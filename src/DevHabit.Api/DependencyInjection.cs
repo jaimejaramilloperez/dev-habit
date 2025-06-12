@@ -61,11 +61,11 @@ internal static class DependencyInjectionExtensions
                 .OfType<NewtonsoftJsonOutputFormatter>()
                 .First();
 
-            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.JsonV1);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.JsonV2);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.HateoasJson);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.HateoasJsonV1);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypesNames.Application.HateoasJsonV2);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.JsonV1);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.JsonV2);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJson);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJsonV1);
+            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJsonV2);
         });
 
         builder.Services.AddApiVersioning(options =>
@@ -180,8 +180,8 @@ internal static class DependencyInjectionExtensions
             {
                 ContractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new SnakeCaseNamingStrategy()
-                }
+                    NamingStrategy = new SnakeCaseNamingStrategy(),
+                },
             }),
         })
         .ConfigureHttpClient(client =>

@@ -19,7 +19,7 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/entries/imports")]
 [Authorize(Roles = Roles.Member)]
-[Produces(CustomMediaTypesNames.Application.HateoasJson)]
+[Produces(CustomMediaTypeNames.Application.HateoasJson)]
 public sealed class EntryImportsController(
     ApplicationDbContext dbContext,
     UserContext userContext,

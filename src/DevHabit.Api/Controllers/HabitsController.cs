@@ -21,11 +21,11 @@ namespace DevHabit.Api.Controllers;
 [Authorize(Roles = Roles.Member)]
 [ApiVersion(1.0)]
 [Produces(
-    CustomMediaTypesNames.Application.JsonV1,
-    CustomMediaTypesNames.Application.JsonV2,
-    CustomMediaTypesNames.Application.HateoasJson,
-    CustomMediaTypesNames.Application.HateoasJsonV1,
-    CustomMediaTypesNames.Application.HateoasJsonV2)]
+    CustomMediaTypeNames.Application.JsonV1,
+    CustomMediaTypeNames.Application.JsonV2,
+    CustomMediaTypeNames.Application.HateoasJson,
+    CustomMediaTypeNames.Application.HateoasJsonV1,
+    CustomMediaTypeNames.Application.HateoasJsonV2)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
     UserContext userContext,

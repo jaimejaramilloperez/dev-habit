@@ -21,7 +21,7 @@ namespace DevHabit.Api.Controllers;
 [Route("api/entries")]
 [Authorize(Roles = Roles.Member)]
 [EnableRateLimiting("default")]
-[Produces(CustomMediaTypesNames.Application.HateoasJson)]
+[Produces(CustomMediaTypeNames.Application.HateoasJson)]
 public sealed class EntriesController(
     ApplicationDbContext dbContext,
     UserContext userContext,

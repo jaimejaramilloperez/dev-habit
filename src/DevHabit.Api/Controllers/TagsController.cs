@@ -19,7 +19,7 @@ namespace DevHabit.Api.Controllers;
 [Route("api/tags")]
 [Authorize(Roles = Roles.Member)]
 [ResponseCache(Duration = 120, VaryByHeader = "Accept")]
-[Produces(CustomMediaTypesNames.Application.HateoasJson)]
+[Produces(CustomMediaTypeNames.Application.HateoasJson)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,
     UserContext userContext,

@@ -1,6 +1,6 @@
 namespace DevHabit.Api.Common.Hateoas;
 
-internal static class CustomMediaTypesNames
+internal static class CustomMediaTypeNames
 {
     internal static class Application
     {
@@ -14,7 +14,7 @@ internal static class CustomMediaTypesNames
         {
             HateoasJson,
             HateoasJsonV1,
-            HateoasJsonV2
+            HateoasJsonV2,
         };
     }
 }

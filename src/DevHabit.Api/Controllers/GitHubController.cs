@@ -26,7 +26,7 @@ public sealed class GitHubController(
     private readonly LinkService _linkService = linkService;
 
     [HttpGet("profile")]
-    [Produces(CustomMediaTypesNames.Application.HateoasJson)]
+    [Produces(CustomMediaTypeNames.Application.HateoasJson)]
     public async Task<IActionResult> GetUserProfile(
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
