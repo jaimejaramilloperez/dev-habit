@@ -1,3 +1,3 @@
 namespace DevHabit.Api;
 
-internal interface IApiMarker;
+public interface IApiMarker;
