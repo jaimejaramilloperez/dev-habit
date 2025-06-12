@@ -12,8 +12,8 @@ public sealed class GitHubService(
     {
         ContractResolver = new DefaultContractResolver
         {
-            NamingStrategy = new SnakeCaseNamingStrategy()
-        }
+            NamingStrategy = new SnakeCaseNamingStrategy(),
+        },
     };
 
     public async Task<GitHubUserProfileDto?> GetUserProfileAsync(

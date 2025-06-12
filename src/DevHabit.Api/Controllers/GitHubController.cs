@@ -66,6 +66,43 @@ public sealed class GitHubController(
         return Ok(userProfile);
     }
 
+    [HttpGet("events")]
+    public async Task<IActionResult> GetUserEvents(
+        [FromQuery] int page,
+        [FromQuery(Name = "per_page")] int perPage,
+        CancellationToken cancellationToken)
+    {
+        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        string? accessToken = await _gitHubAccessTokenService.GetAsync(userId, cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return Unauthorized();
+        }
+
+        GitHubUserProfileDto? profile = await _gitHubService.GetUserProfileAsync(accessToken, cancellationToken);
+
+        if (profile is null)
+        {
+            return NotFound();
+        }
+
+        IReadOnlyList<GitHubEventDto> events = await _gitHubService.GetUserEventsAsync(
+            profile.Login,
+            accessToken,
+            page,
+            perPage,
+            cancellationToken);
+
+        return Ok(events);
+    }
+
     [HttpPut("personal-access-token")]
     public async Task<IActionResult> StoreAccessToken(
         StoreGithubAccessTokenDto storeGithubAccessTokenDto,
