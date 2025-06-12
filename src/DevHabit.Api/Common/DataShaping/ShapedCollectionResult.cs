@@ -7,7 +7,7 @@ namespace DevHabit.Api.Common.DataShaping;
 
 public sealed class ShapedCollectionResult<T> : IShapedCollectionResult, ILinksResponse
 {
-    public required ICollection<ExpandoObject> Data { get; init; }
-    [JsonIgnore] public ICollection<T> OriginalData { get; init; } = [];
+    public required IReadOnlyCollection<ExpandoObject> Data { get; init; }
+    [JsonIgnore] public required IReadOnlyCollection<T> OriginalData { get; init; }
     public IReadOnlyCollection<LinkDto> Links { get; init; } = [];
 }

@@ -8,8 +8,8 @@ namespace DevHabit.Api.Common.DataShaping;
 
 public sealed record ShapedPaginationResult<T> : IShapedCollectionResult, IPaginationResult, ILinksResponse
 {
-    public required ICollection<ExpandoObject> Data { get; init; }
-    [JsonIgnore] public ICollection<T> OriginalData { get; init; } = [];
+    public required IReadOnlyCollection<ExpandoObject> Data { get; init; }
+    [JsonIgnore] public required IReadOnlyCollection<T> OriginalData { get; init; }
     public int Page { get; init; }
     public int PageSize { get; init; }
     public long TotalCount { get; init; }
