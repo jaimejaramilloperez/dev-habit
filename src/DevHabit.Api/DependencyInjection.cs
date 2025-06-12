@@ -169,7 +169,7 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddHttpClient("github", client =>
         {
-            client.BaseAddress = new("https://api.github.com");
+            client.BaseAddress = new(builder.Configuration.GetValue<string>("GitHub:BaseUrl")!);
             client.DefaultRequestHeaders.Accept.Add(new("application/vnd.github+json"));
             client.DefaultRequestHeaders.UserAgent.Add(new("DevHabit", "1.0"));
         });
@@ -184,7 +184,10 @@ internal static class DependencyInjectionExtensions
                 }
             }),
         })
-        .ConfigureHttpClient(client => client.BaseAddress = new("https://api.github.com"));
+        .ConfigureHttpClient(client =>
+        {
+            client.BaseAddress = new(builder.Configuration.GetValue<string>("GitHub:BaseUrl")!);
+        });
         // .AddHttpMessageHandler<DelayHandler>();
         // .InternalRemoveAllResilienceHandlers()
         // .AddResilienceHandler("custom", pipeline =>
