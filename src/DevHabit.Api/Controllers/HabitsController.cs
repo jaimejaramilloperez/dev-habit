@@ -162,6 +162,7 @@ public sealed class HabitsController(
     public async Task<IActionResult> UpdateHabit(
         string id,
         UpdateHabitDto updateHabitDto,
+        IValidator<UpdateHabitDto> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -170,6 +171,8 @@ public sealed class HabitsController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(updateHabitDto, cancellationToken);
 
         Habit? habit = await _dbContext.Habits
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
