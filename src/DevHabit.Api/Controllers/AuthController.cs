@@ -74,7 +74,10 @@ public sealed class AuthController(
         {
             Dictionary<string, object?> extensions = new()
             {
-                { "errors", createUserResult.Errors.ToDictionary(x => x.Code, x => x.Description) }
+                {
+                    "errors",
+                    createUserResult.Errors.ToDictionary(x => x.Code, x => new[] { x.Description })
+                }
             };
 
             return Problem(
@@ -89,7 +92,10 @@ public sealed class AuthController(
         {
             Dictionary<string, object?> extensions = new()
             {
-                { "errors", addToRoleResult.Errors.ToDictionary(x => x.Code, x => x.Description) }
+                {
+                    "errors",
+                    createUserResult.Errors.ToDictionary(x => x.Code, x => new[] { x.Description })
+                }
             };
 
             return Problem(
@@ -175,8 +181,11 @@ public sealed class AuthController(
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(
         RefreshTokenDto refreshTokenDto,
+        IValidator<RefreshTokenDto> validator,
         CancellationToken cancellationToken)
     {
+        await validator.ValidateAndThrowAsync(refreshTokenDto, cancellationToken);
+
         RefreshToken? refreshToken = await _identityDbContext.RefreshTokens
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Token == refreshTokenDto.RefreshToken, cancellationToken);
