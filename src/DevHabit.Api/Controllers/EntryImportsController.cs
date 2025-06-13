@@ -43,13 +43,13 @@ public sealed class EntryImportsController(
             return Unauthorized();
         }
 
-        var (page, pageSize) = entryImportsParameters;
+        var (fields, page, pageSize) = entryImportsParameters;
 
         ShapedPaginationResult<EntryImportJobDto> paginationResult = await _dbContext.EntryImportJobs.AsNoTracking()
             .Where(x => x.UserId == userId)
             .Select(EntryImportQueries.ProjectToDto())
             .OrderByDescending(x => x.CreatedAtUtc)
-            .ToShapedPaginationResultAsync(page, pageSize, null, cancellationToken)
+            .ToShapedPaginationResultAsync(page, pageSize, fields, cancellationToken)
             .WithHateoasAsync(new()
             {
                 ItemLinksFactory = x => CreateLinksForImportJob(x.Id),
