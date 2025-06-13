@@ -21,6 +21,12 @@ public static class Routes
         public const string Delete = $"{Base}/habits";
     }
 
+    public static class UserRoutes
+    {
+        public const string CurrentUser = $"{Base}/users/me";
+        public const string UpdateProfile = $"{Base}/users/me/profile";
+    }
+
     public static class GitHubRoutes
     {
         public const string GetProfile = $"{Base}/github/profile";
