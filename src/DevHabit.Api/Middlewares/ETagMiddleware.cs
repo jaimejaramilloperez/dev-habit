@@ -51,32 +51,41 @@ public sealed class ETagMiddleware(RequestDelegate next)
 
         Stream originalStream = context.Response.Body;
         using RecyclableMemoryStream memoryStream = streamManager.GetStream();
-        context.Response.Body = memoryStream;
 
-        await next(context);
-
-        if (IsETaggableResponse(context))
+        try
         {
-            memoryStream.Position = 0;
+            context.Response.Body = memoryStream;
 
-            ReadOnlySequence<byte> responseBody = memoryStream.GetReadOnlySequence();
-            string etag = GenerateEtag(responseBody);
+            await next(context);
 
-            InMemoryETagStore.SetETag(resourceUri, etag);
-            context.Response.Headers.ETag = $"\"{etag}\"";
-
-            if (context.Request.Method == HttpMethods.Get && clientETag is not null && clientETag == etag)
+            if (IsETaggableResponse(context))
             {
-                context.Response.StatusCode = StatusCodes.Status304NotModified;
-                context.Response.Body = originalStream;
-                context.Response.ContentLength = 0;
-                return;
-            }
-        }
+                memoryStream.Position = 0;
 
-        context.Response.Body = originalStream;
-        memoryStream.Position = 0;
-        await memoryStream.CopyToAsync(originalStream);
+                ReadOnlySequence<byte> responseBody = memoryStream.GetReadOnlySequence();
+                string etag = GenerateEtag(responseBody);
+
+                InMemoryETagStore.SetETag(resourceUri, etag);
+                context.Response.Headers.ETag = $"\"{etag}\"";
+
+                if (context.Request.Method == HttpMethods.Get && clientETag is not null && clientETag == etag)
+                {
+                    context.Response.StatusCode = StatusCodes.Status304NotModified;
+                    context.Response.Body = originalStream;
+                    context.Response.ContentLength = 0;
+                    return;
+                }
+            }
+
+            context.Response.Body = originalStream;
+            memoryStream.Position = 0;
+            await memoryStream.CopyToAsync(originalStream);
+        }
+        catch
+        {
+            context.Response.Body = originalStream;
+            throw;
+        }
     }
 
     private static bool CanSkipETag(HttpContext context)
