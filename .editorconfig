@@ -400,6 +400,9 @@ dotnet_diagnostic.CA1034.severity = silent
 # CA1040: Avoid empty interfaces
 dotnet_diagnostic.CA1040.severity = suggestion
 
+# CA1056: URI-like properties should not be strings
+dotnet_diagnostic.CA1056.severity = suggestion
+
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = suggestion
 
@@ -432,6 +435,9 @@ dotnet_diagnostic.CA1311.severity = suggestion
 
 # CA1515: Consider making public types internal
 dotnet_diagnostic.CA1515.severity = suggestion
+
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = suggestion
 
 # CA1862: Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
 dotnet_diagnostic.CA1862.severity = suggestion
