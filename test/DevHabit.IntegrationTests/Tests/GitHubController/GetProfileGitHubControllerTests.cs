@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace DevHabit.IntegrationTests.Tests.GitHubController;
 
 public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFactory)
-    : IntegrationTestFixture(appFactory)
+    : IntegrationTestFixture(appFactory), IAsyncLifetime
 {
     private const string EndpointRoute = Routes.GitHubRoutes.GetProfile;
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() => await CleanUpDatabaseAsync();
 
     [Fact]
     public async Task GetProfile_ShouldSucceed_WhenAccessTokenIsValid()

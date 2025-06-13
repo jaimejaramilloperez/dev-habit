@@ -7,9 +7,13 @@ using DevHabit.IntegrationTests.Services;
 namespace DevHabit.IntegrationTests.Tests.GitHubController;
 
 public sealed class RevokeAccessTokenGitHubControllerTests(DevHabitWebAppFactory appFactory)
-    : IntegrationTestFixture(appFactory)
+    : IntegrationTestFixture(appFactory), IAsyncLifetime
 {
     private const string EndpointRoute = Routes.GitHubRoutes.RevokePersonalAccessToken;
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() => await CleanUpDatabaseAsync();
 
     [Fact]
     public async Task RevokeAccessToken_ShouldSucceed_WhenAccessTokenExists()
