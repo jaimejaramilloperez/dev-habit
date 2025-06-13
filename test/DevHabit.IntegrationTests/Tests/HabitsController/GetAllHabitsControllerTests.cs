@@ -2,7 +2,6 @@ using System.Dynamic;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Dtos.Habits;
 using DevHabit.Api.Entities;
