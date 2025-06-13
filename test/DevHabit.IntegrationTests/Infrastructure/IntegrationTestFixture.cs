@@ -17,9 +17,11 @@ public abstract class IntegrationTestFixture(DevHabitWebAppFactory appFactory)
 
     public async Task<HttpClient> CreateAuthenticatedClientAsync(
         string email = $"test-user@example.com",
-        string password = "StrongPass12345!")
+        string password = "StrongPass12345!",
+        string name = "test-user",
+        bool forceNewClient = false)
     {
-        if (_authenticatedClient is not null)
+        if (_authenticatedClient is not null && !forceNewClient)
         {
             return _authenticatedClient;
         }
@@ -40,7 +42,7 @@ public abstract class IntegrationTestFixture(DevHabitWebAppFactory appFactory)
                 Routes.AuthRoutes.Register,
                 new RegisterUserDto()
                 {
-                    Name = email,
+                    Name = name,
                     Email = email,
                     Password = password,
                     ConfirmationPassword = password,
@@ -68,7 +70,7 @@ public abstract class IntegrationTestFixture(DevHabitWebAppFactory appFactory)
 
         _authenticatedClient = client;
 
-        return _authenticatedClient;
+        return client;
     }
 
     public async Task CleanUpDatabaseAsync()
