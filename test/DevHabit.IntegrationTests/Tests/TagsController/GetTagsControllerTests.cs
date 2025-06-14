@@ -68,7 +68,7 @@ public sealed class GetTagControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetTags_ShouldSupportDataShaping_WhenFieldsAreValid()
+    public async Task GetTag_ShouldSupportDataShaping_WhenFieldsAreValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();

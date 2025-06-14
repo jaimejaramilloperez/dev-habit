@@ -153,7 +153,7 @@ public sealed class GetAllTagsControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetTags_SupportPagination_WhenPaginationParametersAreProvided()
+    public async Task GetTags_ShouldSupportPagination_WhenPaginationParametersAreProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();

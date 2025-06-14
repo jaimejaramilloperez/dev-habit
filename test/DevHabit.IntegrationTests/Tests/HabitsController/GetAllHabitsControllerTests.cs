@@ -184,7 +184,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task GetHabits_SupportPagination_WhenPaginationParametersAreProvided()
+    public async Task GetHabits_ShouldSupportPagination_WhenPaginationParametersAreProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
