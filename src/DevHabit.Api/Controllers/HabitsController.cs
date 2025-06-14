@@ -216,7 +216,15 @@ public sealed class HabitsController(
 
         if (!TryValidateModel(habitDto))
         {
-            return ValidationProblem(ModelState);
+            Dictionary<string, string[]> errors = ModelState.Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+
+            return Problem(
+                detail: "One or more validation errors occurred.",
+                statusCode: StatusCodes.Status400BadRequest,
+                extensions: new Dictionary<string, object?>([new("errors", errors)]));
         }
 
         habit.Name = habitDto.Name;
