@@ -15,10 +15,12 @@ public sealed class CreateEntryImportJobDtoValidator : AbstractValidator<CreateE
 
         RuleFor(x => x.File.Length)
             .LessThanOrEqualTo(MaxFileSizeInBytes)
-            .WithMessage($"File size must be less than {MaxFileSizeInMegabytes}MB");
+            .WithMessage($"File size must be less than {MaxFileSizeInMegabytes}MB")
+            .When(x => x.File is not null);
 
         RuleFor(x => x.File.FileName)
             .Must(fileName => fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
-            .WithMessage("File must be a CSV file");
+            .WithMessage("File must be a CSV file")
+            .When(x => x.File is not null);
     }
 }
