@@ -22,13 +22,13 @@ public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFac
     {
         HttpClient client = await CreateAuthenticatedClientAsync();
 
-        StoreGithubAccessTokenDto dto = new()
+        StoreGithubAccessTokenDto storeDto = new()
         {
             AccessToken = GitHubConstants.ValidGitHubAccessToken,
             ExpiresInDays = 30,
         };
 
-        await client.PutAsJsonAsync(Routes.GitHubRoutes.StorePersonalAccessToken, dto);
+        await client.PutAsJsonAsync(Routes.GitHubRoutes.StorePersonalAccessToken, storeDto);
 
         // Act
         HttpResponseMessage response = await client.GetAsync(new Uri(EndpointRoute, UriKind.Relative));
@@ -42,13 +42,13 @@ public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFac
     {
         HttpClient client = await CreateAuthenticatedClientAsync();
 
-        StoreGithubAccessTokenDto dto = new()
+        StoreGithubAccessTokenDto storeDto = new()
         {
             AccessToken = GitHubConstants.ValidGitHubAccessToken,
             ExpiresInDays = 30,
         };
 
-        await client.PutAsJsonAsync(Routes.GitHubRoutes.StorePersonalAccessToken, dto);
+        await client.PutAsJsonAsync(Routes.GitHubRoutes.StorePersonalAccessToken, storeDto);
 
         // Act
         HttpResponseMessage response = await client.GetAsync(new Uri(EndpointRoute, UriKind.Relative));
@@ -60,7 +60,7 @@ public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFac
     }
 
     [Fact]
-    public async Task GetProfile_ShouldFail_WhenAccessTokenDoesNotExist()
+    public async Task GetProfile_ShouldReturnNotFound_WhenAccessTokenDoesNotExist()
     {
         HttpClient client = await CreateAuthenticatedClientAsync();
 
