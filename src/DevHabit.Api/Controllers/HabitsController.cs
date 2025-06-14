@@ -9,6 +9,7 @@ using DevHabit.Api.Entities;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Services;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -216,15 +217,13 @@ public sealed class HabitsController(
 
         if (!TryValidateModel(habitDto))
         {
-            Dictionary<string, string[]> errors = ModelState.Where(x => x.Value?.Errors.Count > 0)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
-
-            return Problem(
-                detail: "One or more validation errors occurred.",
-                statusCode: StatusCodes.Status400BadRequest,
-                extensions: new Dictionary<string, object?>([new("errors", errors)]));
+            throw new ValidationException(
+            [
+                ..ModelState
+                    .Where(ms => ms.Value?.Errors.Count > 0)
+                    .SelectMany(ms => ms.Value!.Errors.Select(error => new ValidationFailure(ms.Key, error.ErrorMessage)))
+                    .ToList()
+            ]);
         }
 
         habit.Name = habitDto.Name;
