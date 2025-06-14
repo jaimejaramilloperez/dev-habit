@@ -141,6 +141,7 @@ public sealed class TagsController(
     public async Task<IActionResult> UpdateTag(
         string id,
         UpdateTagDto updateTagDto,
+        IValidator<UpdateTagDto> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -149,6 +150,8 @@ public sealed class TagsController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(updateTagDto, cancellationToken);
 
         Tag? tag = await _dbContext.Tags
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
@@ -168,7 +171,7 @@ public sealed class TagsController(
         if (tagWithNameExists)
         {
             return Problem(
-                title: $"The tag '{updateTagDto.Name}' already exists",
+                detail: $"The tag '{updateTagDto.Name}' already exists",
                 statusCode: StatusCodes.Status409Conflict);
         }
 
