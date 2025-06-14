@@ -120,7 +120,7 @@ public sealed class GetAllTagsControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetTags_ShouldShouldSupportDataShaping_WhenFieldsAreValid()
+    public async Task GetTags_ShouldSupportDataShaping_WhenFieldsAreValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -150,5 +150,39 @@ public sealed class GetAllTagsControllerTests(DevHabitWebAppFactory appFactory)
         Assert.True(item.ContainsKey("name"));
         Assert.False(item.ContainsKey("description"));
         Assert.False(item.ContainsKey("createdAtUtc"));
+    }
+
+    [Fact]
+    public async Task GetTags_SupportPagination_WhenPaginationParametersAreProvided()
+    {
+        // Arrange
+        HttpClient client = await CreateAuthenticatedClientAsync();
+
+        // Create tags first
+        CreateTagDto[] tags =
+        [
+            TagsTestData.ValidCreateTagDto with { Name = "Programming" },
+            TagsTestData.ValidCreateTagDto with { Name = "Reading" },
+            TagsTestData.ValidCreateTagDto with { Name = "Fitness" }
+        ];
+
+        await Task.WhenAll(tags.Select(Tag => client.PostAsJsonAsync(Routes.TagRoutes.Create, Tag)));
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(
+            new Uri($"{EndpointRoute}?page=1&page_size=2", UriKind.Relative));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        PaginationResult<TagDto>? result = await response.Content.ReadFromJsonAsync<PaginationResult<TagDto>>();
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Data.Count);
+        Assert.Equal(1, result.Page);
+        Assert.Equal(2, result.PageSize);
+        Assert.Equal(3, result.TotalCount);
+        Assert.Equal(2, result.TotalPages);
+        Assert.True(result.HasNextPage);
     }
 }

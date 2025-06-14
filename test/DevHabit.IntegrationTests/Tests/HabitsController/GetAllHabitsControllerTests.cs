@@ -21,7 +21,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     public async Task DisposeAsync() => await CleanUpDatabaseAsync();
 
     [Fact]
-    public async Task GetHabits_ShouldShouldReturnEmptyList_WhenNoHabitsExist()
+    public async Task GetHabits_ShouldReturnEmptyList_WhenNoHabitsExist()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -39,7 +39,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldReturnHabits_WhenHabitsExists()
+    public async Task GetHabits_ShouldReturnHabits_WhenHabitsExists()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -90,7 +90,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldSupportFiltering_WhenOneFilterParameterIsProvided()
+    public async Task GetHabits_ShouldSupportFiltering_WhenOneFilterParameterIsProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -117,7 +117,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldSupportSorting_WhenSortParameterIsProvided()
+    public async Task GetHabits_ShouldSupportSorting_WhenSortParameterIsProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -149,7 +149,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldSupportDataShaping_WhenFieldsAreValid()
+    public async Task GetHabits_ShouldSupportDataShaping_WhenFieldsAreValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -181,5 +181,39 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
         Assert.False(item.ContainsKey("description"));
         Assert.False(item.ContainsKey("status"));
         Assert.False(item.ContainsKey("createdAtUtc"));
+    }
+
+    [Fact]
+    public async Task GetHabits_SupportPagination_WhenPaginationParametersAreProvided()
+    {
+        // Arrange
+        HttpClient client = await CreateAuthenticatedClientAsync();
+
+        // Create habits first
+        CreateHabitDto[] habits =
+        [
+            HabitsTestData.ValidCreateHabitDto with { Name = "Read Books" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Exercise Daily" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Meditate" },
+        ];
+
+        await Task.WhenAll(habits.Select(habit => client.PostAsJsonAsync(Routes.HabitRoutes.Create, habit)));
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(
+            new Uri($"{EndpointRoute}?page=1&page_size=2", UriKind.Relative));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        PaginationResult<HabitDto>? result = await response.Content.ReadFromJsonAsync<PaginationResult<HabitDto>>();
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Data.Count);
+        Assert.Equal(1, result.Page);
+        Assert.Equal(2, result.PageSize);
+        Assert.Equal(3, result.TotalCount);
+        Assert.Equal(2, result.TotalPages);
+        Assert.True(result.HasNextPage);
     }
 }

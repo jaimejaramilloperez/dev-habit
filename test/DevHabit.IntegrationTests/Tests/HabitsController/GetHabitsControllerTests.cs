@@ -21,7 +21,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
     public async Task DisposeAsync() => await CleanUpDatabaseAsync();
 
     [Fact]
-    public async Task GetHabit_ShouldShouldReturnHabit_WhenHabitExists()
+    public async Task GetHabit_ShouldReturnHabit_WhenHabitExists()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -48,7 +48,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetHabit_ShouldShouldReturnNotFound_WhenHabitDoesNotExist()
+    public async Task GetHabit_ShouldReturnNotFound_WhenHabitDoesNotExist()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -69,7 +69,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetHabit_ShouldShouldSupportVersioning()
+    public async Task GetHabit_ShouldSupportVersioning()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -95,7 +95,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task GetHabit_ShouldShouldSupportDataShaping_WhenFieldsAreValid()
+    public async Task GetHabit_ShouldSupportDataShaping_WhenFieldsAreValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();

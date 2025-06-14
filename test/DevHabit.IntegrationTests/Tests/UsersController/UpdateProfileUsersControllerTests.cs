@@ -23,10 +23,7 @@ public sealed class UpdateProfileUsersControllerTests(DevHabitWebAppFactory appF
         const string name = "test-user";
         HttpClient client = await CreateAuthenticatedClientAsync(name: name);
 
-        UpdateProfileDto dto = new()
-        {
-            Name = "update-test-user",
-        };
+        UpdateProfileDto dto = new() { Name = "update-test-user" };
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(EndpointRoute, dto);
@@ -41,11 +38,7 @@ public sealed class UpdateProfileUsersControllerTests(DevHabitWebAppFactory appF
         // Arrange
         const string name = "test-user";
         HttpClient client = await CreateAuthenticatedClientAsync(name: name);
-
-        UpdateProfileDto dto = new()
-        {
-            Name = "update-test-user",
-        };
+        UpdateProfileDto dto = new() { Name = "update-test-user" };
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(EndpointRoute, dto);
@@ -67,11 +60,7 @@ public sealed class UpdateProfileUsersControllerTests(DevHabitWebAppFactory appF
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
-
-        UpdateProfileDto dto = new()
-        {
-            Name = name,
-        };
+        UpdateProfileDto dto = new() { Name = name };
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(EndpointRoute, dto);
