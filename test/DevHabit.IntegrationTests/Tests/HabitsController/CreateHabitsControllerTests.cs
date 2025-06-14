@@ -22,10 +22,10 @@ public sealed class CreateHabitsControllerTests(DevHabitWebAppFactory appFactory
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
-        CreateHabitDto dto = HabitsTestData.ValidCreateHabitDto;
+        CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
 
         // Act
-        HttpResponseMessage response = await client.PostAsJsonAsync(EndpointRoute, dto);
+        HttpResponseMessage response = await client.PostAsJsonAsync(EndpointRoute, createDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -33,10 +33,11 @@ public sealed class CreateHabitsControllerTests(DevHabitWebAppFactory appFactory
         Uri? locationHeader = response.Headers.Location;
         Assert.NotNull(locationHeader);
 
-        HabitDto? habitDto = await response.Content.ReadFromJsonAsync<HabitDto>();
+        HabitDto? result = await response.Content.ReadFromJsonAsync<HabitDto>();
 
-        Assert.NotNull(habitDto);
-        Assert.Equal($"/{EndpointRoute}/{habitDto.Id}", locationHeader.AbsolutePath);
+        Assert.NotNull(result);
+        Assert.Equal($"/{EndpointRoute}/{result.Id}", locationHeader.AbsolutePath);
+        Assert.NotEmpty(result.Id);
     }
 
     [Fact]
@@ -44,10 +45,10 @@ public sealed class CreateHabitsControllerTests(DevHabitWebAppFactory appFactory
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
-        CreateHabitDto dto = HabitsTestData.InValidCreateHabitDto;
+        CreateHabitDto createDto = HabitsTestData.InValidCreateHabitDto;
 
         // Act
-        HttpResponseMessage response = await client.PostAsJsonAsync(EndpointRoute, dto);
+        HttpResponseMessage response = await client.PostAsJsonAsync(EndpointRoute, createDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

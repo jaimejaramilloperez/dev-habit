@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using DevHabit.Api.Dtos.Habits;
+using DevHabit.Api.Entities;
 using DevHabit.IntegrationTests.Infrastructure;
 using DevHabit.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();
@@ -34,8 +36,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(
-            new Uri($"{EndpointRoute}/{createdHabit.Id}", UriKind.Relative),
-            updateDto);
+            new Uri($"{EndpointRoute}/{createdHabit.Id}", UriKind.Relative), updateDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -43,23 +44,25 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.HabitRoutes.Get}/{createdHabit.Id}", UriKind.Relative));
 
-        HabitWithTagsDto? updatedHabit = await getResponse.Content.ReadFromJsonAsync<HabitWithTagsDto>();
+        HabitWithTagsDto? result = await getResponse.Content.ReadFromJsonAsync<HabitWithTagsDto>();
 
-        Assert.NotNull(updatedHabit);
-        Assert.Equal(updateDto.Name, updatedHabit.Name);
-        Assert.Equal(updateDto.Description, updatedHabit.Description);
-        Assert.Equal(updateDto.Frequency.Type, updatedHabit.Frequency.Type);
-        Assert.Equal(updateDto.Frequency.TimesPerPeriod, updatedHabit.Frequency.TimesPerPeriod);
-        Assert.Equal(updateDto.Target.Value, updatedHabit.Target.Value);
-        Assert.Equal(updateDto.Target.Unit, updatedHabit.Target.Unit);
+        Assert.NotNull(result);
+        Assert.Equal(createdHabit.Id, result.Id);
+        Assert.Equal(updateDto.Name, result.Name);
+        Assert.Equal(updateDto.Description, result.Description);
+        Assert.Equal(updateDto.Frequency.Type, result.Frequency.Type);
+        Assert.Equal(updateDto.Frequency.TimesPerPeriod, result.Frequency.TimesPerPeriod);
+        Assert.Equal(updateDto.Target.Value, result.Target.Value);
+        Assert.Equal(updateDto.Target.Unit, result.Target.Unit);
     }
 
     [Fact]
-    public async Task UpdateHabit_ShouldReturnError_WhenParametersAreInValid()
+    public async Task UpdateHabit_ShouldReturnNotFound_WhenParametersAreInValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();
@@ -71,8 +74,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(
-            new Uri($"{EndpointRoute}/{createdHabit.Id}", UriKind.Relative),
-            updateDto);
+            new Uri($"{EndpointRoute}/{createdHabit.Id}", UriKind.Relative), updateDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -83,5 +85,27 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
         Assert.Equal(StatusCodes.Status400BadRequest, problem.Status);
         Assert.Equal("Bad Request", problem.Title);
         Assert.Equal(2, problem.Errors.Count);
+    }
+
+    [Fact]
+    public async Task UpdateHabit_ShouldReturnNotFound_WhenHabitDoesNotExist()
+    {
+        // Arrange
+        HttpClient client = await CreateAuthenticatedClientAsync();
+        UpdateHabitDto updateDto = HabitsTestData.ValidUpdateHabitDto;
+
+        // Act
+        HttpResponseMessage response = await client.PutAsJsonAsync(
+            new Uri($"{EndpointRoute}/{Habit.CreateNewId()}", UriKind.Relative), updateDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        ValidationProblemDetails? problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(problem);
+        Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
+        Assert.Equal("Not Found", problem.Title);
+        Assert.Empty(problem.Errors);
     }
 }

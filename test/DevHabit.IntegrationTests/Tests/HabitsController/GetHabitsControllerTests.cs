@@ -26,6 +26,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();
@@ -64,6 +65,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
         Assert.NotNull(problem);
         Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
         Assert.Equal("Not Found", problem.Title);
+        Assert.Empty(problem.Errors);
     }
 
     [Fact]
@@ -72,6 +74,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();
@@ -97,6 +100,7 @@ public sealed class GetHabitsControllerTests(DevHabitWebAppFactory appFactory)
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();

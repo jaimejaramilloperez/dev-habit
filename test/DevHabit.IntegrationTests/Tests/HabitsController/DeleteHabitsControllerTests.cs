@@ -24,6 +24,7 @@ public sealed class DeleteHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto createDto = HabitsTestData.ValidCreateHabitDto;
         HttpResponseMessage createResponse = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, createDto);
         createResponse.EnsureSuccessStatusCode();
@@ -38,6 +39,7 @@ public sealed class DeleteHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
+        // Verify habit was deleted by trying to fetch it
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.HabitRoutes.Get}/{createdHabit.Id}", UriKind.Relative));
 
@@ -62,5 +64,6 @@ public sealed class DeleteHabitsControllerTests(DevHabitWebAppFactory appFactory
         Assert.NotNull(problem);
         Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
         Assert.Equal("Not Found", problem.Title);
+        Assert.Empty(problem.Errors);
     }
 }

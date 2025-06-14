@@ -57,15 +57,45 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
 
         Assert.NotNull(result);
         Assert.Single(result.Data);
-        Assert.Equal(createDto.Name, result.Data.ElementAt(0).Name);
+        Assert.Equal(createDto.Name, result.Data.First().Name);
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldSupportFiltering_WhenParametersAreValid()
+    public async Task GetHabits_ShouldSupportSearching_WhenSearchTermIsProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create habits first
+        CreateHabitDto[] habits =
+        [
+            HabitsTestData.ValidCreateHabitDto with { Name = "Read Books", Description = "A Great description" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Exercise Daily", Description = "A Great description" }
+        ];
+
+        await Task.WhenAll(habits.Select(habit => client.PostAsJsonAsync(Routes.HabitRoutes.Create, habit)));
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(
+            new Uri($"{EndpointRoute}?q=read", UriKind.Relative));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        PaginationResult<HabitDto>? result = await response.Content.ReadFromJsonAsync<PaginationResult<HabitDto>>();
+
+        Assert.NotNull(result);
+        Assert.Single(result.Data);
+        Assert.Equal("Read Books", result.Data.First().Name);
+    }
+
+    [Fact]
+    public async Task GetHabits_ShouldShouldSupportFiltering_WhenOneFilterParameterIsProvided()
+    {
+        // Arrange
+        HttpClient client = await CreateAuthenticatedClientAsync();
+
+        // Create habits first
         CreateHabitDto measurableHabit = HabitsTestData.ValidCreateHabitDto;
         CreateHabitDto binaryHabit = measurableHabit with { Type = HabitType.Binary };
 
@@ -83,20 +113,21 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
 
         Assert.NotNull(result);
         Assert.Single(result.Data);
-        Assert.Equal(HabitType.Measurable, result.Data.ElementAt(0).Type);
+        Assert.Equal(HabitType.Measurable, result.Data.First().Type);
     }
 
     [Fact]
-    public async Task GetHabits_ShouldShouldSupportSorting_WhenParametersAreValid()
+    public async Task GetHabits_ShouldShouldSupportSorting_WhenSortParameterIsProvided()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create habits first
         CreateHabitDto[] habits =
         [
-            HabitsTestData.ValidCreateHabitDto with { Name = "M Habit" },
-            HabitsTestData.ValidCreateHabitDto with { Name = "A Habit" },
-            HabitsTestData.ValidCreateHabitDto with { Name = "Z Habit" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Read Books" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Exercise Daily" },
+            HabitsTestData.ValidCreateHabitDto with { Name = "Meditate" },
         ];
 
         await Task.WhenAll(habits.Select(habit => client.PostAsJsonAsync(Routes.HabitRoutes.Create, habit)));
@@ -112,9 +143,9 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
 
         Assert.NotNull(result);
         Assert.Equal(3, result.Data.Count);
-        Assert.Equal("A Habit", result.Data.ElementAt(0).Name);
-        Assert.Equal("M Habit", result.Data.ElementAt(1).Name);
-        Assert.Equal("Z Habit", result.Data.ElementAt(2).Name);
+        Assert.Equal("Exercise Daily", result.Data.ElementAt(0).Name);
+        Assert.Equal("Meditate", result.Data.ElementAt(1).Name);
+        Assert.Equal("Read Books", result.Data.ElementAt(2).Name);
     }
 
     [Fact]
@@ -123,6 +154,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
+        // Create a habit first
         CreateHabitDto habit = HabitsTestData.ValidCreateHabitDto;
         await client.PostAsJsonAsync(Routes.HabitRoutes.Create, habit);
 
@@ -138,7 +170,7 @@ public sealed class GetAllHabitsControllerTests(DevHabitWebAppFactory appFactory
         Assert.NotNull(result);
         Assert.Single(result.Data);
 
-        string json = JsonSerializer.Serialize(result.Data.ElementAt(0));
+        string json = JsonSerializer.Serialize(result.Data.First());
         Dictionary<string, object?>? item = JsonSerializer.Deserialize<Dictionary<string, object?>>(json);
 
         Assert.NotNull(item);
