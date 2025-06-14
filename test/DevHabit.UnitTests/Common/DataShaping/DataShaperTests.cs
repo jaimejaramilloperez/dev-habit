@@ -119,7 +119,7 @@ public sealed class DataShaperTests
         // Assert
         Assert.Equal(2, result.Count);
 
-        IDictionary<string, object?> firstItem = result.ElementAt(0);
+        IDictionary<string, object?> firstItem = result.First();
 
         Assert.Equal(4, firstItem.Count);
         Assert.Equal(dtos[0].Id, firstItem["Id"]);
@@ -156,7 +156,7 @@ public sealed class DataShaperTests
         // Assert
         Assert.Equal(2, result.Count);
 
-        IDictionary<string, object?> firstItem = result.ElementAt(0);
+        IDictionary<string, object?> firstItem = result.First();
 
         Assert.Equal(2, firstItem.Count);
         Assert.Equal(dtos[0].Id, firstItem["Id"]);
@@ -193,7 +193,7 @@ public sealed class DataShaperTests
         // Assert
         Assert.Equal(2, result.Count);
 
-        IDictionary<string, object?> firstItem = result.ElementAt(0);
+        IDictionary<string, object?> firstItem = result.First();
 
         Assert.Equal(2, firstItem.Count);
         Assert.Equal(dtos[0].Id, firstItem["Id"]);
@@ -235,7 +235,7 @@ public sealed class DataShaperTests
         // Assert
         Assert.Equal(2, result.Count);
 
-        IDictionary<string, object?> firstItem = result.ElementAt(0);
+        IDictionary<string, object?> firstItem = result.First();
         Assert.True(firstItem.ContainsKey(HateoasPropertyNames.Links));
 
         List<LinkDto>? links = (List<LinkDto>)firstItem[HateoasPropertyNames.Links]!;
