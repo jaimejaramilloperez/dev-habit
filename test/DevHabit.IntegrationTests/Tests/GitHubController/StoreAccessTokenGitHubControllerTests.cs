@@ -38,7 +38,7 @@ public sealed class StoreAccessTokenGitHubControllerTests(DevHabitWebAppFactory 
     [Theory]
     [InlineData("", 5)]
     [InlineData("token", 0)]
-    public async Task StoreAccessToken_ShouldFail_WhenParametersAreNotValid(
+    public async Task StoreAccessToken_ShouldFail_WhenParametersAreInValid(
         string accessToken,
         int expiresInDays)
     {

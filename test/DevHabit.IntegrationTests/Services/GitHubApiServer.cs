@@ -58,6 +58,30 @@ public sealed class GitHubApiServer : IDisposable
         _server.Given(request).RespondWith(response);
     }
 
+    public void SetUpValidEvent()
+    {
+        if (_server is null)
+        {
+            throw new InvalidOperationException("Server not started");
+        }
+
+        var request = Request.Create()
+            .WithPath($"/users/{GitHubConstants.ValidGitHubUser}/events")
+            .WithHeader("Authorization", $"Bearer {GitHubConstants.ValidGitHubAccessToken}")
+            .UsingGet();
+
+        GitHubEventDto userEvent = GenerateGitHubUserEvent(GitHubConstants.ValidGitHubUser);
+        List<GitHubEventDto> events = [userEvent];
+        string userResponse = JsonSerializer.Serialize(events, SerializerOptions);
+
+        var response = Response.Create()
+            .WithBody(userResponse)
+            .WithHeader("Content-Type", MediaTypeNames.Application.Json)
+            .WithStatusCode(StatusCodes.Status200OK);
+
+        _server.Given(request).RespondWith(response);
+    }
+
     private static GitHubUserProfileDto GenerateGitHubUserProfile(string username) => new(
         Login: username,
         Id: 1,
@@ -105,38 +129,38 @@ public sealed class GitHubApiServer : IDisposable
         )
     );
 
-    // private static readonly GitHubEventDto TestEvent = new(
-    //     Id: "1234567890",
-    //     Type: "PushEvent",
-    //     Actor: new(
-    //         Id: 1001,
-    //         Login: "TestUser",
-    //         DisplayLogin: "TestUser",
-    //         GravatarId: "",
-    //         Url: new("https://api.github.com/users/TestUser"),
-    //         AvatarUrl: new("https://avatars.githubusercontent.com/u/1?v=4")
-    //     ),
-    //     Repo: new(
-    //         Id: 2001,
-    //         Name: "TestUser/TestRepo",
-    //         Url: new("https://api.github.com/repos/TestUser/TestRepo")
-    //     ),
-    //     Payload: new(
-    //         Action: "pushed",
-    //         Commits:
-    //         [
-    //             new(
-    //                 Sha: "abcdef1234567890",
-    //                 Author: new(Email: "testuser@example.com", Name: "Test User"),
-    //                 Message: "Initial commit",
-    //                 Distinct: true,
-    //                 Url: new("https://github.com/TestUser/TestRepo/commit/abcdef1234567890")
-    //             )
-    //         ]
-    //     ),
-    //     Public: true,
-    //     CreatedAt: DateTime.Parse("2025-01-01T00:00:00Z", CultureInfo.InvariantCulture)
-    // );
+    private static GitHubEventDto GenerateGitHubUserEvent(string username) => new(
+        Id: "1234567890",
+        Type: "PushEvent",
+        Actor: new(
+            Id: 1001,
+            Login: username,
+            DisplayLogin: username,
+            GravatarId: "",
+            Url: new($"https://api.github.com/users/{username}"),
+            AvatarUrl: new("https://avatars.githubusercontent.com/u/1?v=4")
+        ),
+        Repo: new(
+            Id: 2001,
+            Name: $"{username}/TestRepo",
+            Url: new($"https://api.github.com/repos/{username}/TestRepo")
+        ),
+        Payload: new(
+            Action: "pushed",
+            Commits:
+            [
+                new(
+                    Sha: "abcdef1234567890",
+                    Author: new(Email: $"{username}@example.com", Name: username),
+                    Message: "Initial commit",
+                    Distinct: true,
+                    Url: new($"https://github.com/{username}/TestRepo/commit/abcdef1234567890")
+                )
+            ]
+        ),
+        Public: true,
+        CreatedAt: DateTime.Parse("2025-01-01T00:00:00Z", CultureInfo.InvariantCulture)
+    );
 
     public void Dispose()
     {

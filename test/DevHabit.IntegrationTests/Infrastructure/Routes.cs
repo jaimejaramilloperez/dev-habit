@@ -20,8 +20,8 @@ public static class Routes
 
     public static class GitHubRoutes
     {
-        public const string GetProfile = $"{Base}/github/profile";
-        public const string GetEvents = $"{Base}/github/events";
+        public const string GetUserProfile = $"{Base}/github/profile";
+        public const string GetUserEvents = $"{Base}/github/events";
         public const string StorePersonalAccessToken = $"{Base}/github/personal-access-token";
         public const string RevokePersonalAccessToken = $"{Base}/github/personal-access-token";
     }

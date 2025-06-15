@@ -24,6 +24,7 @@ public sealed class DevHabitWebAppFactory : WebApplicationFactory<IApiMarker>, I
         await _postgreSqlContainer.StartAsync();
         _gitHubApiServer.Start();
         _gitHubApiServer.SetUpValidUser();
+        _gitHubApiServer.SetUpValidEvent();
     }
 
     public new async Task DisposeAsync()

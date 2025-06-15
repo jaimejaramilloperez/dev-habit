@@ -8,18 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevHabit.IntegrationTests.Tests.GitHubController;
 
-public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFactory)
+public sealed class GetUserProfileGitHubControllerTests(DevHabitWebAppFactory appFactory)
     : IntegrationTestFixture(appFactory), IAsyncLifetime
 {
-    private const string EndpointRoute = Routes.GitHubRoutes.GetProfile;
+    private const string EndpointRoute = Routes.GitHubRoutes.GetUserProfile;
 
     public Task InitializeAsync() => Task.CompletedTask;
 
     public async Task DisposeAsync() => await CleanUpDatabaseAsync();
 
     [Fact]
-    public async Task GetProfile_ShouldSucceed_WhenAccessTokenIsValid()
+    public async Task GetUserProfile_ShouldSucceed_WhenAccessTokenIsValid()
     {
+        // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
         StoreGithubAccessTokenDto storeDto = new()
@@ -38,8 +39,9 @@ public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFac
     }
 
     [Fact]
-    public async Task GetProfile_ShouldReturnUserProfile_WhenAccessTokenIsValid()
+    public async Task GetUserProfile_ShouldReturnUserProfile_WhenAccessTokenIsValid()
     {
+        // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
         StoreGithubAccessTokenDto storeDto = new()
@@ -55,13 +57,14 @@ public sealed class GetProfileGitHubControllerTests(DevHabitWebAppFactory appFac
         response.EnsureSuccessStatusCode();
 
         // Assert
-        GitHubUserProfileDto? profile = await response.Content.ReadFromJsonAsync<GitHubUserProfileDto>();
-        Assert.NotNull(profile);
+        GitHubUserProfileDto? result = await response.Content.ReadFromJsonAsync<GitHubUserProfileDto>();
+        Assert.NotNull(result);
     }
 
     [Fact]
-    public async Task GetProfile_ShouldReturnNotFound_WhenAccessTokenDoesNotExist()
+    public async Task GetUserProfile_ShouldReturnNotFound_WhenAccessTokenDoesNotExist()
     {
+        // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
 
         // Act
