@@ -36,6 +36,12 @@ public static class Routes
         public const string Delete = $"{Base}/habits";
     }
 
+    public static class HabitTagsRoutes
+    {
+        public static string Upsert(string habitId) => $"{Base}/habits/{habitId}/tags";
+        public static string Delete(string habitId, string tagId) => $"{Base}/habits/{habitId}/tags/{tagId}";
+    }
+
     public static class TagRoutes
     {
         public const string GetAll = $"{Base}/tags";
