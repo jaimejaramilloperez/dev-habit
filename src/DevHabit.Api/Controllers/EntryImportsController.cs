@@ -63,6 +63,7 @@ public sealed class EntryImportsController(
     [HttpGet("{id}")]
     public async Task<IActionResult> GetImportJob(
         string id,
+        string? fields,
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
     {
@@ -76,7 +77,7 @@ public sealed class EntryImportsController(
         ShapedResult<EntryImportJobDto>? result = await _dbContext.EntryImportJobs
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(EntryImportQueries.ProjectToDto())
-            .ToShapedFirstOrDefaultAsync(null, cancellationToken)
+            .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
             .WithHateoasAsync(x => CreateLinksForImportJob(x.Id), acceptHeaderDto.Accept, cancellationToken);
 
         return result is null ? NotFound() : Ok(result.Item);
