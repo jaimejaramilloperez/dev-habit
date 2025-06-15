@@ -3,9 +3,7 @@ using DevHabit.Api;
 using DevHabit.IntegrationTests.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Testcontainers.PostgreSql;
 
 namespace DevHabit.IntegrationTests.Infrastructure;
@@ -43,9 +41,6 @@ public sealed class DevHabitWebAppFactory : WebApplicationFactory<IApiMarker>, I
         builder.UseSetting("Encryption:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
         builder.UseSetting("GitHub:BaseUrl", _gitHubApiServer.Url);
 
-        builder.ConfigureTestServices(services =>
-        {
-            services.RemoveAll<IHostedService>();
-        });
+        Quartz.Logging.LogContext.SetCurrentLogProvider(NullLoggerFactory.Instance);
     }
 }
