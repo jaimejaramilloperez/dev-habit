@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevHabit.Api.Dtos.Entries.ImportJob;
 
-public sealed record EntryImportsParameters : AcceptHeaderDto
+public sealed record EntryImportJobsParameters : AcceptHeaderDto
 {
     public string? Fields { get; init; }
 

@@ -33,7 +33,8 @@ public sealed class EntryImportsController(
 
     [HttpGet]
     public async Task<IActionResult> GetImportJobs(
-        EntryImportsParameters entryImportsParameters,
+        EntryImportJobsParameters entryImportsParameters,
+        IValidator<EntryImportJobsParameters> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -42,6 +43,8 @@ public sealed class EntryImportsController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(entryImportsParameters, cancellationToken);
 
         var (fields, page, pageSize) = entryImportsParameters;
 
@@ -63,8 +66,7 @@ public sealed class EntryImportsController(
     [HttpGet("{id}")]
     public async Task<IActionResult> GetImportJob(
         string id,
-        string? fields,
-        AcceptHeaderDto acceptHeaderDto,
+        EntryImportJobParameters entryImportJobParameters,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -74,11 +76,13 @@ public sealed class EntryImportsController(
             return Unauthorized();
         }
 
+        string? fields = entryImportJobParameters.Fields;
+
         ShapedResult<EntryImportJobDto>? result = await _dbContext.EntryImportJobs
             .Where(x => x.Id == id && x.UserId == userId)
             .Select(EntryImportQueries.ProjectToDto())
             .ToShapedFirstOrDefaultAsync(fields, cancellationToken)
-            .WithHateoasAsync(x => CreateLinksForImportJob(x.Id), acceptHeaderDto.Accept, cancellationToken);
+            .WithHateoasAsync(x => CreateLinksForImportJob(x.Id), entryImportJobParameters.Accept, cancellationToken);
 
         return result is null ? NotFound() : Ok(result.Item);
     }
