@@ -15,8 +15,10 @@ public sealed class CrossCuttingTests(DevHabitWebAppFactory appFactory)
     public static TheoryData<string> ProtectedEndpoints =>
     [
         Routes.HabitRoutes.GetAll,
-        Routes.GitHubRoutes.GetProfile,
-        Routes.GitHubRoutes.GetEvents,
+        Routes.TagRoutes.GetAll,
+        Routes.UserRoutes.CurrentUser,
+        Routes.GitHubRoutes.GetUserProfile,
+        Routes.GitHubRoutes.GetUserEvents,
     ];
 
     public static TheoryData<string> MediaTypes =>
