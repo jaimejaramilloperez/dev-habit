@@ -43,7 +43,7 @@ jobs:
         run: dotnet build DevHabit.slnx -c Release --no-restore --nologo
 
       - name: Test
-        run: dotnet test DevHabit.slnx -c Release --no-restore --no-build --nologo
+        run: dotnet test DevHabit.slnx -c Release --no-restore --no-build --nologo --verbosity quiet
 
       - name: Publish
         run: dotnet publish DevHabit.slnx -c Release --no-restore --no-build --nologo -p:PublishDir=publish -p:DebugType=None -p:DebugSymbols=false
