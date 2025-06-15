@@ -85,7 +85,7 @@ public sealed class GitHubController(
 
         if (string.IsNullOrWhiteSpace(accessToken))
         {
-            return Unauthorized();
+            return NotFound();
         }
 
         GitHubUserProfileDto? profile = await _gitHubService.GetUserProfileAsync(accessToken, cancellationToken);
