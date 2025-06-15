@@ -68,8 +68,8 @@ public sealed class GitHubController(
 
     [HttpGet("events")]
     public async Task<IActionResult> GetUserEvents(
-        [FromQuery] int page,
-        [FromQuery(Name = "per_page")] int perPage,
+        UserEventsParameters eventsParameters,
+        IValidator<UserEventsParameters> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -78,6 +78,8 @@ public sealed class GitHubController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(eventsParameters, cancellationToken);
 
         string? accessToken = await _gitHubAccessTokenService.GetAsync(userId, cancellationToken);
 
@@ -93,11 +95,13 @@ public sealed class GitHubController(
             return NotFound();
         }
 
+        var (page, pageSize) = eventsParameters;
+
         IReadOnlyList<GitHubEventDto> events = await _gitHubService.GetUserEventsAsync(
             profile.Login,
             accessToken,
             page,
-            perPage,
+            pageSize,
             cancellationToken);
 
         return Ok(events);
