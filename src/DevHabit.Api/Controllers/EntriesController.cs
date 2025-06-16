@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
@@ -21,7 +22,8 @@ namespace DevHabit.Api.Controllers;
 [Route("api/entries")]
 [Authorize(Roles = Roles.Member)]
 [EnableRateLimiting("default")]
-[Produces(CustomMediaTypeNames.Application.HateoasJson)]
+[Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class EntriesController(
     ApplicationDbContext dbContext,
     UserContext userContext,
