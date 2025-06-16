@@ -27,9 +27,9 @@ public sealed class IdempotentRequestAttribute : Attribute, IAsyncActionFilter
 
             ProblemDetails problemDetails = problemDetailsFactory.CreateProblemDetails(
                 httpContext: context.HttpContext,
-                statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: $"Invalid or missing {IdempotencyKeyHeader} header");
+                detail: $"Invalid or missing {IdempotencyKeyHeader} header",
+                statusCode: StatusCodes.Status400BadRequest);
 
             context.Result = new BadRequestObjectResult(problemDetails);
 
