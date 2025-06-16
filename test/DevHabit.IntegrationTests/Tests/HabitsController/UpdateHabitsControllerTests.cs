@@ -41,6 +41,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
+        // Verify habit was updated
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.HabitRoutes.Get}/{createdHabit.Id}", UriKind.Relative));
 
@@ -57,7 +58,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
     }
 
     [Fact]
-    public async Task UpdateHabit_ShouldReturnNotFound_WhenParametersAreInValid()
+    public async Task UpdateHabit_ShouldFail_WhenParametersAreInValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -70,7 +71,7 @@ public sealed class UpdateHabitsControllerTests(DevHabitWebAppFactory appFactory
         HabitDto? createdHabit = await createResponse.Content.ReadFromJsonAsync<HabitDto>();
         Assert.NotNull(createdHabit);
 
-        UpdateHabitDto updateDto = HabitsTestData.InValidUpdateHabitDto;
+        UpdateHabitDto updateDto = HabitsTestData.InvalidUpdateHabitDto;
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(

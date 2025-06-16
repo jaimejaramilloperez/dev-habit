@@ -22,7 +22,7 @@ public static class HabitsTestData
         },
     };
 
-    public static readonly CreateHabitDto InValidCreateHabitDto = new()
+    public static readonly CreateHabitDto InvalidCreateHabitDto = new()
     {
         Name = "Read books",
         Description = "Read technical books to improve skills",
@@ -56,7 +56,7 @@ public static class HabitsTestData
         },
     };
 
-    public static readonly UpdateHabitDto InValidUpdateHabitDto = new()
+    public static readonly UpdateHabitDto InvalidUpdateHabitDto = new()
     {
         Name = "Updated Habit",
         Description = "Updated Description",

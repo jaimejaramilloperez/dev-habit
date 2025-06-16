@@ -41,6 +41,7 @@ public sealed class UpdateTagControllerTests(DevHabitWebAppFactory appFactory)
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
+        // Verify tag was updated
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.TagRoutes.Get}/{createdTag.Id}", UriKind.Relative));
 
@@ -53,7 +54,7 @@ public sealed class UpdateTagControllerTests(DevHabitWebAppFactory appFactory)
     }
 
     [Fact]
-    public async Task UpdateTag_ShouldReturnNotFound_WhenParametersAreInValid()
+    public async Task UpdateTag_ShouldFail_WhenParametersAreInValid()
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
@@ -66,7 +67,7 @@ public sealed class UpdateTagControllerTests(DevHabitWebAppFactory appFactory)
         TagDto? createdTag = await createResponse.Content.ReadFromJsonAsync<TagDto>();
         Assert.NotNull(createdTag);
 
-        UpdateTagDto updateDto = TagsTestData.InValidUpdateTagDto;
+        UpdateTagDto updateDto = TagsTestData.InvalidUpdateTagDto;
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync(

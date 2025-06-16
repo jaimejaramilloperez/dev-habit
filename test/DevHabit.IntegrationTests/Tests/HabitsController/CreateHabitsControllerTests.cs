@@ -45,7 +45,7 @@ public sealed class CreateHabitsControllerTests(DevHabitWebAppFactory appFactory
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
-        CreateHabitDto createDto = HabitsTestData.InValidCreateHabitDto;
+        CreateHabitDto createDto = HabitsTestData.InvalidCreateHabitDto;
 
         // Act
         HttpResponseMessage response = await client.PostAsJsonAsync(EndpointRoute, createDto);

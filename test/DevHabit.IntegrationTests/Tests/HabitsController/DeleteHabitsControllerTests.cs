@@ -39,7 +39,7 @@ public sealed class DeleteHabitsControllerTests(DevHabitWebAppFactory appFactory
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // Verify habit was deleted by trying to fetch it
+        // Verify habit was deleted
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.HabitRoutes.Get}/{createdHabit.Id}", UriKind.Relative));
 

@@ -22,7 +22,7 @@ public static class TagsTestData
         Description = "Updated tag description"
     };
 
-    public static readonly UpdateTagDto InValidUpdateTagDto = new()
+    public static readonly UpdateTagDto InvalidUpdateTagDto = new()
     {
         Name = "",
         Description = "Updated tag description"

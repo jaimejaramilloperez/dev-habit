@@ -39,7 +39,7 @@ public sealed class DeleteTagControllerTests(DevHabitWebAppFactory appFactory)
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // Verify tag was deleted by trying to fetch it
+        // Verify tag was deleted
         HttpResponseMessage getResponse = await client.GetAsync(
             new Uri($"{Routes.TagRoutes.Get}/{createdTag.Id}", UriKind.Relative));
 
