@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
@@ -18,6 +19,9 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/auth")]
 [AllowAnonymous]
+[Consumes(MediaTypeNames.Application.Json)]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
 public sealed class AuthController(
     UserManager<IdentityUser> userManager,
     ApplicationDbContext appDbContext,
@@ -32,6 +36,10 @@ public sealed class AuthController(
     private readonly JwtAuthOptions _jwtAuthOptions = options.Value;
 
     [HttpPost("register")]
+    [EndpointSummary("Register a new user")]
+    [EndpointDescription("Creates a new user account with the provided registration details and returns access tokens for immediate authentication.")]
+    [ProducesResponseType<AccessTokensDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register(
         RegisterUserDto registerUserDto,
         IValidator<RegisterUserDto> validator,
@@ -138,6 +146,10 @@ public sealed class AuthController(
     }
 
     [HttpPost("login")]
+    [EndpointSummary("Authenticate user")]
+    [EndpointDescription("Authenticates a user with their email and password, returning access and refresh tokens upon successful login.")]
+    [ProducesResponseType<AccessTokensDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login(
         LoginUserDto loginUserDto,
         IValidator<LoginUserDto> validator,
@@ -179,6 +191,10 @@ public sealed class AuthController(
     }
 
     [HttpPost("refresh")]
+    [EndpointSummary("Refresh authentication tokens")]
+    [EndpointDescription("Issues new access and refresh tokens using a valid refresh token, extending the user's authenticated session.")]
+    [ProducesResponseType<AccessTokensDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Refresh(
         RefreshTokenDto refreshTokenDto,
         IValidator<RefreshTokenDto> validator,
