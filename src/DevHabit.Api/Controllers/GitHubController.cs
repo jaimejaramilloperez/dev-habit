@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
@@ -14,6 +15,8 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/github")]
 [Authorize(Roles = Roles.Member)]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class GitHubController(
     RefitGitHubService gitHubService,
     GitHubAccessTokenService gitHubAccessTokenService,
@@ -26,7 +29,11 @@ public sealed class GitHubController(
     private readonly LinkService _linkService = linkService;
 
     [HttpGet("profile")]
+    [EndpointSummary("Get GitHub user profile")]
+    [EndpointDescription("Retrieves the authenticated user's GitHub profile information if a valid access token exists.")]
     [Produces(CustomMediaTypeNames.Application.HateoasJson)]
+    [ProducesResponseType<GitHubUserProfileDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserProfile(
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
@@ -67,6 +74,11 @@ public sealed class GitHubController(
     }
 
     [HttpGet("events")]
+    [EndpointSummary("Get GitHub user events")]
+    [EndpointDescription("Retrieves a paginated list of GitHub events for the authenticated user.")]
+    [ProducesResponseType<IReadOnlyList<GitHubEventDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserEvents(
         UserEventsParameters eventsParameters,
         IValidator<UserEventsParameters> validator,
@@ -108,6 +120,11 @@ public sealed class GitHubController(
     }
 
     [HttpPut("personal-access-token")]
+    [EndpointSummary("Store GitHub personal access token")]
+    [EndpointDescription("Stores or updates the GitHub personal access token for the authenticated user.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> StoreAccessToken(
         StoreGithubAccessTokenDto storeGithubAccessTokenDto,
         IValidator<StoreGithubAccessTokenDto> validator,
@@ -128,6 +145,10 @@ public sealed class GitHubController(
     }
 
     [HttpDelete("personal-access-token")]
+    [EndpointSummary("Revoke GitHub personal access token")]
+    [EndpointDescription("Permanently removes the stored GitHub personal access token for the authenticated user.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RevokeAccessToken(CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
