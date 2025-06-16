@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.HabitTags;
@@ -12,6 +13,10 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("/api/habits/{habitId}/tags")]
 [Authorize(Roles = Roles.Member)]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(StatusCodes.Status204NoContent)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
 public sealed class HabitTagsController(
     ApplicationDbContext dbContext,
     UserContext userContext) : ControllerBase
@@ -23,6 +28,10 @@ public sealed class HabitTagsController(
     private readonly UserContext _userContext = userContext;
 
     [HttpPut]
+    [EndpointSummary("Update habit tags")]
+    [EndpointDescription("Updates the tags associated with a habit by replacing the existing tag collection with the provided one.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpsertHabitTags(
         string habitId,
         UpsertHabitTagsDto upsertHabitTagsDto,
@@ -80,6 +89,8 @@ public sealed class HabitTagsController(
     }
 
     [HttpDelete("{tagId}")]
+    [EndpointSummary("Remove a tag from a habit")]
+    [EndpointDescription("Removes the association between a specific tag and habit, identified by their respective IDs.")]
     public async Task<IActionResult> DeleteHabitTag(
         string habitId,
         string tagId,
