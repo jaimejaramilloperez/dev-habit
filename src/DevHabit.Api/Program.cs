@@ -4,6 +4,7 @@ using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Middlewares;
 using HealthChecks.UI.Client;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.MapScalarApiReference();
 
     await app.ApplyMigrationsAsync<ApplicationDbContext>();
     await app.ApplyMigrationsAsync<ApplicationIdentityDbContext>();

@@ -1,10 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <InternalsVisibleTo Include="DevHabit.UnitTests" />
     <InternalsVisibleTo Include="DevHabit.IntegrationTests" />
@@ -39,6 +34,7 @@
     <PackageReference Include="Quartz.AspNetCore" />
     <PackageReference Include="Refit.HttpClientFactory" />
     <PackageReference Include="Refit.Newtonsoft.Json" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="System.Linq.Dynamic.Core" />
   </ItemGroup>
