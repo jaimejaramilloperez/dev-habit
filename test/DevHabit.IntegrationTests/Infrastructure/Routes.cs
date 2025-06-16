@@ -11,6 +11,19 @@ public static class Routes
         public const string Refresh = $"{Base}/auth/refresh";
     }
 
+    public static class EntryRoutes
+    {
+        public const string GetAll = $"{Base}/entries";
+        public const string GetAllCursor = $"{Base}/entries/cursor";
+        public const string Get = $"{Base}/entries";
+        public const string Create = $"{Base}/entries";
+        public const string CreateBatch = $"{Base}/entries/batch";
+        public const string Update = $"{Base}/entries";
+        public static string Archive(string entryId) => $"{Base}/entries/{entryId}/archive";
+        public static string UnArchive(string entryId) => $"{Base}/entries/{entryId}/un-archive";
+        public const string Delete = $"{Base}/entries";
+    }
+
     public static class EntryImportJobRoutes
     {
         public const string GetAll = $"{Base}/entries/imports";
