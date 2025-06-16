@@ -1,7 +1,9 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
@@ -21,12 +23,8 @@ namespace DevHabit.Api.Controllers;
 [Route("api/habits")]
 [Authorize(Roles = Roles.Member)]
 [ApiVersion(1.0)]
-[Produces(
-    CustomMediaTypeNames.Application.JsonV1,
-    CustomMediaTypeNames.Application.JsonV2,
-    CustomMediaTypeNames.Application.HateoasJson,
-    CustomMediaTypeNames.Application.HateoasJsonV1,
-    CustomMediaTypeNames.Application.HateoasJsonV2)]
+[Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
     UserContext userContext,
@@ -37,6 +35,10 @@ public sealed class HabitsController(
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
+    [EndpointSummary("Get all habits")]
+    [EndpointDescription("Retrieves a paginated list of habits with optional filtering by type, status, sorting, and field selection.")]
+    [ProducesResponseType<PaginationResult<HabitDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParameters,
         IValidator<HabitsParameters> validator,
@@ -78,6 +80,11 @@ public sealed class HabitsController(
 
     [HttpGet("{id}")]
     [MapToApiVersion(1.0)]
+    [EndpointSummary("Get a habit by ID")]
+    [EndpointDescription("Retrieves a specific habit by its unique identifier with optional field selection.")]
+    [Produces(CustomMediaTypeNames.Application.JsonV1, CustomMediaTypeNames.Application.HateoasJsonV1)]
+    [ProducesResponseType<HabitWithTagsDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHabit(
         string id,
         HabitParameters habitParameters,
@@ -103,6 +110,11 @@ public sealed class HabitsController(
 
     [HttpGet("{id}")]
     [ApiVersion(2.0)]
+    [EndpointSummary("Get a habit by ID")]
+    [EndpointDescription("Retrieves a specific habit by its unique identifier with optional field selection.")]
+    [Produces(CustomMediaTypeNames.Application.JsonV2, CustomMediaTypeNames.Application.HateoasJsonV2)]
+    [ProducesResponseType<HabitWithTagsDtoV2>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHabitV2(
         string id,
         HabitParameters habitParameters,
@@ -127,6 +139,11 @@ public sealed class HabitsController(
     }
 
     [HttpPost]
+    [EndpointSummary("Create a new habit")]
+    [EndpointDescription("Creates a new habit with the provided details.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType<HabitDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<HabitDto>> CreateHabit(
         CreateHabitDto createHabitDto,
         AcceptHeaderDto acceptHeaderDto,
@@ -160,6 +177,12 @@ public sealed class HabitsController(
     }
 
     [HttpPut("{id}")]
+    [EndpointSummary("Update a habit")]
+    [EndpointDescription("Updates an existing habit's details with the provided information.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateHabit(
         string id,
         UpdateHabitDto updateHabitDto,
@@ -191,6 +214,12 @@ public sealed class HabitsController(
     }
 
     [HttpPatch("{id}")]
+    [EndpointSummary("Patch a habit")]
+    [EndpointDescription("Partially updates a habit's details using JSON Patch document.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PatchHabit(
         string id,
         JsonPatchDocument<HabitDto> patchDocument,
@@ -236,7 +265,13 @@ public sealed class HabitsController(
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteHabit(string id, CancellationToken cancellationToken)
+    [EndpointSummary("Delete a habit")]
+    [EndpointDescription("Permanently removes a habit from the system by its unique identifier.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteHabit(
+        string id,
+        CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
