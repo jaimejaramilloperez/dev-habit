@@ -54,6 +54,7 @@
     "protobuf",
     "Qube",
     "slnx",
+    "Swashbuckle",
     "Testcontainers",
     "toolstarget",
     "vsdbg",

@@ -21,7 +21,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    // app.MapOpenApi();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
     await app.ApplyMigrationsAsync<ApplicationDbContext>();
     await app.ApplyMigrationsAsync<ApplicationIdentityDbContext>();
     await app.SeedInitialDataAsync();

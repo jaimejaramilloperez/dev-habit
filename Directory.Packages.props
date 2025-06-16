@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
@@ -21,6 +22,7 @@
     <PackageVersion Include="Quartz.AspNetCore" Version="3.14.0" />
     <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageVersion Include="Refit.Newtonsoft.Json" Version="8.0.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.1" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.6" />
     <!-- EntityFramework -->
     <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />

@@ -4,6 +4,7 @@ using Asp.Versioning;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
+using DevHabit.Api.Configurations.Swagger;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Jobs.EntryImport;
@@ -79,9 +80,14 @@ internal static class DependencyInjectionExtensions
                     .Template("application/vnd.dev-habit.hateoas.v{version}+json")
                     .Build());
         })
-        .AddMvc();
+        .AddMvc()
+        .AddApiExplorer();
 
-        builder.Services.AddOpenApi();
+        // builder.Services.AddOpenApi();
+
+        builder.Services.AddSwaggerGen();
+        builder.Services.ConfigureOptions<ConfigureSwaggerGenOptions>();
+        builder.Services.ConfigureOptions<ConfigureSwaggerUIOptions>();
 
         builder.Services.AddResponseCaching();
 
