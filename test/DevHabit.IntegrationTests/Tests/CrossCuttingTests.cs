@@ -16,6 +16,8 @@ public sealed class CrossCuttingTests(DevHabitWebAppFactory appFactory)
     [
         Routes.HabitRoutes.GetAll,
         Routes.TagRoutes.GetAll,
+        Routes.EntryRoutes.GetAll,
+        Routes.EntryImportJobRoutes.GetAll,
         Routes.UserRoutes.CurrentUser,
         Routes.GitHubRoutes.GetUserProfile,
         Routes.GitHubRoutes.GetUserEvents,
@@ -90,7 +92,7 @@ public sealed class CrossCuttingTests(DevHabitWebAppFactory appFactory)
     {
         // Arrange
         HttpClient client = await CreateAuthenticatedClientAsync();
-        CreateHabitDto dto = HabitsTestData.InValidCreateHabitDto;
+        CreateHabitDto dto = HabitsTestData.InvalidCreateHabitDto;
 
         // Act
         HttpResponseMessage response = await client.PostAsJsonAsync(Routes.HabitRoutes.Create, dto);
