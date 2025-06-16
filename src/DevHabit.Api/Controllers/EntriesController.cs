@@ -264,6 +264,7 @@ public sealed class EntriesController(
     public async Task<IActionResult> UpdateEntry(
         string id,
         UpdateEntryDto updateEntryDto,
+        IValidator<UpdateEntryDto> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -272,6 +273,8 @@ public sealed class EntriesController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(updateEntryDto, cancellationToken);
 
         Entry? entry = await _dbContext.Entries
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
