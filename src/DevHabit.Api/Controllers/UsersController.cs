@@ -32,7 +32,7 @@ public sealed class UsersController(
     [HttpGet("{id}")]
     [Authorize(Roles = Roles.Admin)]
     [EndpointSummary("Get a user by ID")]
-    [EndpointDescription("Get a user by their unique identifier. This endpoint requires Admin role permissions.")]
+    [EndpointDescription("Retrieves a user by their unique identifier. This endpoint requires Admin role permissions.")]
     [ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
@@ -59,7 +59,7 @@ public sealed class UsersController(
 
     [HttpGet("me")]
     [EndpointSummary("Get current user's profile")]
-    [EndpointDescription("Get the profile information for the currently authenticated user.")]
+    [EndpointDescription("Retrieves the profile information for the currently authenticated user.")]
     [Produces(CustomMediaTypeNames.Application.HateoasJson)]
     [ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCurrentUser(
