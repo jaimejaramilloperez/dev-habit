@@ -1,6 +1,8 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Entries.ImportJob;
@@ -19,7 +21,8 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/entries/imports")]
 [Authorize(Roles = Roles.Member)]
-[Produces(CustomMediaTypeNames.Application.HateoasJson)]
+[Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class EntryImportsController(
     ApplicationDbContext dbContext,
     UserContext userContext,
@@ -32,6 +35,10 @@ public sealed class EntryImportsController(
     private readonly ISchedulerFactory _schedulerFactory = schedulerFactory;
 
     [HttpGet]
+    [EndpointSummary("Get all import jobs")]
+    [EndpointDescription("Retrieves a paginated list of entry import jobs with optional field selection.")]
+    [ProducesResponseType<PaginationResult<EntryImportJobDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetImportJobs(
         EntryImportJobsParameters entryImportsParameters,
         IValidator<EntryImportJobsParameters> validator,
@@ -64,6 +71,10 @@ public sealed class EntryImportsController(
     }
 
     [HttpGet("{id}")]
+    [EndpointSummary("Get an import job by ID")]
+    [EndpointDescription("Retrieves a specific entry import job by its unique identifier with optional field selection.")]
+    [ProducesResponseType<ShapedResult<EntryImportJobDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetImportJob(
         string id,
         EntryImportJobParameters entryImportJobParameters,
@@ -88,6 +99,11 @@ public sealed class EntryImportsController(
     }
 
     [HttpPost]
+    [EndpointSummary("Create a new import job")]
+    [EndpointDescription("Creates a new entry import job by processing and importing data from an uploaded file.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType<EntryImportJobDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateImportJob(
         CreateEntryImportJobDto createImportJob,
         AcceptHeaderDto acceptHeaderDto,
