@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
@@ -16,6 +17,9 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/users")]
 [Authorize(Roles = Roles.Member)]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
 public sealed class UsersController(
     ApplicationDbContext dbContext,
     UserContext userContext,
@@ -27,6 +31,10 @@ public sealed class UsersController(
 
     [HttpGet("{id}")]
     [Authorize(Roles = Roles.Admin)]
+    [EndpointSummary("Get a user by ID")]
+    [EndpointDescription("Get a user by their unique identifier. This endpoint requires Admin role permissions.")]
+    [ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -50,6 +58,10 @@ public sealed class UsersController(
     }
 
     [HttpGet("me")]
+    [EndpointSummary("Get current user's profile")]
+    [EndpointDescription("Get the profile information for the currently authenticated user.")]
+    [Produces(CustomMediaTypeNames.Application.HateoasJson)]
+    [ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCurrentUser(
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
@@ -81,6 +93,11 @@ public sealed class UsersController(
     }
 
     [HttpPut("me/profile")]
+    [EndpointSummary("Update current user's profile")]
+    [EndpointDescription("Updates the profile information for the currently authenticated user.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateProfile(
         UpdateProfileDto updateProfileDto,
         IValidator<UpdateProfileDto> validator,
