@@ -1,6 +1,8 @@
+using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
+using DevHabit.Api.Common.Pagination;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
@@ -19,7 +21,8 @@ namespace DevHabit.Api.Controllers;
 [Route("api/tags")]
 [Authorize(Roles = Roles.Member)]
 [ResponseCache(Duration = 120, VaryByHeader = "Accept")]
-[Produces(CustomMediaTypeNames.Application.HateoasJson)]
+[Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,
     UserContext userContext,
@@ -30,6 +33,10 @@ public sealed class TagsController(
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
+    [EndpointSummary("Get all tags")]
+    [EndpointDescription("Retrieves a paginated list of tags with optional filtering, sorting, and field selection.")]
+    [ProducesResponseType<PaginationResult<TagDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetTags(
         TagsParameters tagsParameters,
         IValidator<TagsParameters> validator,
@@ -68,6 +75,10 @@ public sealed class TagsController(
     }
 
     [HttpGet("{id}")]
+    [EndpointSummary("Get a tag by ID")]
+    [EndpointDescription("Retrieves a specific tag by its unique identifier with optional field selection.")]
+    [ProducesResponseType<TagDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTag(
         string id,
         TagParameters tagParameters,
@@ -92,6 +103,12 @@ public sealed class TagsController(
     }
 
     [HttpPost]
+    [EndpointSummary("Create a new tag")]
+    [EndpointDescription("Creates a new tag with the provided details. Tag names must be unique per user.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType<TagDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateTag(
         CreateTagDto createTagDto,
         AcceptHeaderDto acceptHeaderDto,
@@ -138,6 +155,13 @@ public sealed class TagsController(
     }
 
     [HttpPut("{id}")]
+    [EndpointSummary("Update a tag")]
+    [EndpointDescription("Updates an existing tag's details. Tag names must remain unique per user.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateTag(
         string id,
         UpdateTagDto updateTagDto,
@@ -187,7 +211,13 @@ public sealed class TagsController(
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTag(string id, CancellationToken cancellationToken)
+    [EndpointSummary("Delete a tag")]
+    [EndpointDescription("Permanently removes a tag from the system by its unique identifier.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteTag(
+        string id,
+        CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
 
