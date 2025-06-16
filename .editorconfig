@@ -451,7 +451,7 @@ dotnet_diagnostic.CA5394.severity = warning
 # IDE Code Analyzers rules
 
 # IDE0005: Remove unnecessary using directives
-dotnet_diagnostic.IDE0005.severity = suggestion
+dotnet_diagnostic.IDE0005.severity = warning
 
 # IDE0130: Namespace does not match folder structure
 dotnet_diagnostic.IDE0130.severity = warning
