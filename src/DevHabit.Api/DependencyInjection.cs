@@ -4,6 +4,7 @@ using Asp.Versioning;
 using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
+using DevHabit.Api.Configurations.Scalar;
 using DevHabit.Api.Configurations.Swagger;
 using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
@@ -88,6 +89,8 @@ internal static class DependencyInjectionExtensions
         builder.Services.AddSwaggerGen();
         builder.Services.ConfigureOptions<ConfigureSwaggerGenOptions>();
         builder.Services.ConfigureOptions<ConfigureSwaggerUIOptions>();
+
+        builder.Services.ConfigureOptions<ConfigureScalarOptions>();
 
         builder.Services.AddResponseCaching();
 

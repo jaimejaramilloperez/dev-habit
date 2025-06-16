@@ -16,7 +16,7 @@ public sealed class ConfigureSwaggerGenOptions(IApiVersionDescriptionProvider ap
         {
             OpenApiInfo openApiInfo = new()
             {
-                Title = $"DevHabit.Api v{description.ApiVersion}",
+                Title = $"DevHabit Api v{description.ApiVersion}",
                 Version = description.ApiVersion.ToString(),
             };
 
