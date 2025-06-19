@@ -34,6 +34,10 @@ public sealed class EntriesController(
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
+    [EndpointSummary("Get all entries")]
+    [EndpointDescription("Retrieves a paginated list of entries with optional filtering by habit, date range, source, archive status, sorting, and field selection.")]
+    [ProducesResponseType<PaginationResult<EntryDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetEntries(
         EntriesParameters entriesParameters,
         CancellationToken cancellationToken)
@@ -68,6 +72,10 @@ public sealed class EntriesController(
     }
 
     [HttpGet("cursor")]
+    [EndpointSummary("Get entries using cursor pagination")]
+    [EndpointDescription("Retrieves a list of entries using cursor-based pagination for efficient navigation through large datasets.")]
+    [ProducesResponseType<CollectionResult<EntryDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetEntriesCursor(
         EntriesCursorParameters entriesParameters,
         CancellationToken cancellationToken)
@@ -141,6 +149,10 @@ public sealed class EntriesController(
     }
 
     [HttpGet("{id}")]
+    [EndpointSummary("Get an entry by ID")]
+    [EndpointDescription("Retrieves a specific entry by its unique identifier with optional field selection.")]
+    [ProducesResponseType<EntryDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEntry(
         string id,
         EntryParameters entryParameters,
@@ -166,6 +178,11 @@ public sealed class EntriesController(
 
     [HttpPost]
     [IdempotentRequest]
+    [EndpointSummary("Create a new entry")]
+    [EndpointDescription("Creates a new entry for a specific habit with the provided details.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType<EntryDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EntryDto>> CreateEntry(
         CreateEntryDto createEntryDto,
         AcceptHeaderDto acceptHeaderDto,
@@ -209,6 +226,11 @@ public sealed class EntriesController(
     }
 
     [HttpPost("batch")]
+    [EndpointSummary("Create multiple entries")]
+    [EndpointDescription("Creates multiple entries in a single request. All entries must be valid and reference existing habits.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType<IEnumerable<EntryDto>>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEntryBatch(
         CreateEntryBatchDto createEntryBatchDto,
         AcceptHeaderDto acceptHeaderDto,
@@ -263,6 +285,12 @@ public sealed class EntriesController(
     }
 
     [HttpPut("{id}")]
+    [EndpointSummary("Update an entry")]
+    [EndpointDescription("Updates an existing entry's details with the provided information.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEntry(
         string id,
         UpdateEntryDto updateEntryDto,
@@ -294,6 +322,10 @@ public sealed class EntriesController(
     }
 
     [HttpPut("{id}/archive")]
+    [EndpointSummary("Archive an entry")]
+    [EndpointDescription("Marks an entry as archived, preserving it but removing it from active view.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ArchiveEntry(string id, CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -320,6 +352,10 @@ public sealed class EntriesController(
     }
 
     [HttpPut("{id}/un-archive")]
+    [EndpointSummary("Unarchive an entry")]
+    [EndpointDescription("Restores an archived entry to active status.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UnArchiveEntry(string id, CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -346,6 +382,10 @@ public sealed class EntriesController(
     }
 
     [HttpDelete("{id}")]
+    [EndpointSummary("Delete an entry")]
+    [EndpointDescription("Permanently removes an entry from the system by its unique identifier.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEntry(string id, CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -371,6 +411,9 @@ public sealed class EntriesController(
     }
 
     [HttpGet("stats")]
+    [EndpointSummary("Get entry statistics")]
+    [EndpointDescription("Retrieves statistical information about user's entries.")]
+    [ProducesResponseType<EntryStatsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStats(CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
