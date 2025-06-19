@@ -13,6 +13,10 @@ public static class EntryImportQueries
             UserId = entry.UserId,
             Status = entry.Status,
             FileName = entry.FileName,
+            TotalRecords = entry.TotalRecords,
+            ProcessedRecords = entry.ProcessedRecords,
+            SuccessfulRecords = entry.SuccessfulRecords,
+            FailedRecords = entry.FailedRecords,
             CreatedAtUtc = entry.CreatedAtUtc,
         };
     }

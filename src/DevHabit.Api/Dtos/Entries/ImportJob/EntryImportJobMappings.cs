@@ -13,6 +13,10 @@ public static class EntryImportJobMappings
             Status = EntryImportStatus.Pending,
             FileName = dto.File.FileName,
             FileContent = fileContent,
+            TotalRecords = 0,
+            ProcessedRecords = 0,
+            SuccessfulRecords = 0,
+            FailedRecords = 0,
             CreatedAtUtc = DateTime.UtcNow,
         };
     }
@@ -25,6 +29,10 @@ public static class EntryImportJobMappings
             UserId = entryImportJob.UserId,
             Status = entryImportJob.Status,
             FileName = entryImportJob.FileName,
+            TotalRecords = entryImportJob.TotalRecords,
+            ProcessedRecords = entryImportJob.ProcessedRecords,
+            SuccessfulRecords = entryImportJob.SuccessfulRecords,
+            FailedRecords = entryImportJob.FailedRecords,
             CreatedAtUtc = entryImportJob.CreatedAtUtc,
         };
     }
