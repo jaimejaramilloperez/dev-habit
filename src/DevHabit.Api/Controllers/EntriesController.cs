@@ -40,6 +40,7 @@ public sealed class EntriesController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetEntries(
         EntriesParameters entriesParameters,
+        IValidator<EntriesParameters> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -48,6 +49,8 @@ public sealed class EntriesController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(entriesParameters, cancellationToken);
 
         var (habitId, fromDate, toDate, sort, fields, source, isArchived, page, pageSize) = entriesParameters;
 
@@ -78,6 +81,7 @@ public sealed class EntriesController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetEntriesCursor(
         EntriesCursorParameters entriesParameters,
+        IValidator<EntriesCursorParameters> validator,
         CancellationToken cancellationToken)
     {
         string? userId = await _userContext.GetUserIdAsync(cancellationToken);
@@ -86,6 +90,8 @@ public sealed class EntriesController(
         {
             return Unauthorized();
         }
+
+        await validator.ValidateAndThrowAsync(entriesParameters, cancellationToken);
 
         var (habitId, fromDate, toDate, encodedCursor, fields, source, isArchived, limit) = entriesParameters;
 
@@ -428,7 +434,7 @@ public sealed class EntriesController(
             .Select(x => new { x.Date })
             .ToListAsync(cancellationToken);
 
-        if (!entries.Any())
+        if (entries.Count == 0)
         {
             return Ok(new EntryStatsDto
             {
