@@ -1,5 +1,6 @@
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using DevHabit.Api.Database;
 using DevHabit.Api.Entities;
@@ -14,6 +15,11 @@ public sealed class ProcessEntryImportJob(
     RecyclableMemoryStreamManager streamManager,
     ILogger<ProcessEntryImportJob> logger) : IJob
 {
+    private static readonly CsvConfiguration CsvConfig = new(CultureInfo.InvariantCulture)
+    {
+        TrimOptions = TrimOptions.Trim,
+    };
+
     public async Task Execute(IJobExecutionContext context)
     {
         string importJobId = context.MergedJobDataMap.GetString("importJobId")!;
@@ -34,7 +40,7 @@ public sealed class ProcessEntryImportJob(
 
             using RecyclableMemoryStream memoryStream = streamManager.GetStream(importJob.FileContent.ToArray());
             using StreamReader streamReader = new(memoryStream);
-            using CsvReader csv = new(streamReader, CultureInfo.InvariantCulture);
+            using CsvReader csv = new(streamReader, CsvConfig);
 
             List<CsvEntryRecord> records = csv.GetRecords<CsvEntryRecord>().ToList();
             importJob.TotalRecords = records.Count;
