@@ -101,7 +101,7 @@ public sealed class EntryImportsController(
     [HttpPost]
     [EndpointSummary("Create a new import job")]
     [EndpointDescription("Creates a new entry import job by processing and importing data from an uploaded file.")]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Multipart.FormData)]
     [ProducesResponseType<EntryImportJobDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateImportJob(
