@@ -387,17 +387,17 @@ public sealed class EntriesController(
 
         if (!entries.Any())
         {
-            return Ok(new
+            return Ok(new EntryStatsDto
             {
-                DailyStats = Enumerable.Empty<string>(),
+                DailyStats = [],
                 TotalEntries = 0,
                 CurrentStreak = 0,
                 LongestStreak = 0,
             });
         }
 
-        var dailyStats = entries.GroupBy(x => x.Date)
-            .Select(x => new
+        List<EntryDailyStatDto> dailyStats = entries.GroupBy(x => x.Date)
+            .Select(x => new EntryDailyStatDto
             {
                 Date = x.Key,
                 Count = x.Count(),
@@ -441,7 +441,7 @@ public sealed class EntriesController(
             }
         }
 
-        return Ok(new
+        return Ok(new EntryStatsDto
         {
             DailyStats = dailyStats,
             TotalEntries = entries.Count,
