@@ -1,6 +1,7 @@
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using DevHabit.Api.Common.Pagination;
@@ -62,7 +63,7 @@ public sealed class GetAllEntryImportsControllerTests(DevHabitWebAppFactory appF
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-        file.Headers.ContentType = new("text/csv");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
         content.Add(file, "file", "entries.csv");
 
         HttpResponseMessage createResponse = await client.PostAsync(
@@ -105,7 +106,7 @@ public sealed class GetAllEntryImportsControllerTests(DevHabitWebAppFactory appF
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-        file.Headers.ContentType = new("text/csv");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
         content.Add(file, "file", "entries.csv");
 
         HttpResponseMessage createResponse = await client.PostAsync(
@@ -166,7 +167,7 @@ public sealed class GetAllEntryImportsControllerTests(DevHabitWebAppFactory appF
         {
             using MultipartFormDataContent content = [];
             using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-            file.Headers.ContentType = new("text/csv");
+            file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
             content.Add(file, "file", "entries.csv");
 
             HttpResponseMessage createResponse = await client.PostAsync(

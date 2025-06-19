@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using DevHabit.Api.Dtos.Entries.ImportJob;
 using FluentValidation.TestHelper;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ public sealed class CreateEntryImportJobDtoValidatorTests
         // Arrange
         CreateEntryImportJobDto dto = new()
         {
-            File = CreateFormFile("test.csv", "text/csv", 1024),
+            File = CreateFormFile("test.csv", MediaTypeNames.Text.Csv, 1024),
         };
 
         // Act
@@ -31,7 +32,7 @@ public sealed class CreateEntryImportJobDtoValidatorTests
         // Arrange
         CreateEntryImportJobDto dto = new()
         {
-            File = CreateFormFile("test.txt", "text/plain", 1024),
+            File = CreateFormFile("test.txt", MediaTypeNames.Text.Plain, 1024),
         };
 
         // Act
@@ -47,7 +48,7 @@ public sealed class CreateEntryImportJobDtoValidatorTests
         // Arrange
         CreateEntryImportJobDto dto = new()
         {
-            File = CreateFormFile("test.csv", "text/csv", 11 * 1024 * 1024), // 11MB
+            File = CreateFormFile("test.csv", MediaTypeNames.Text.Csv, 11 * 1024 * 1024), // 11MB
         };
 
         // Act

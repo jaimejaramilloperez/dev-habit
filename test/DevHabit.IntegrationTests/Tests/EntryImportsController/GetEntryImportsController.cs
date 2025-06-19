@@ -1,6 +1,7 @@
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Mime;
 using System.Text;
 using DevHabit.Api.Dtos.Entries.ImportJob;
 using DevHabit.Api.Dtos.Habits;
@@ -44,7 +45,7 @@ public sealed class GetEntryImportsControllerTests(DevHabitWebAppFactory appFact
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-        file.Headers.ContentType = new("text/csv");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
         content.Add(file, "file", "entries.csv");
 
         HttpResponseMessage createResponse = await client.PostAsync(
@@ -112,7 +113,7 @@ public sealed class GetEntryImportsControllerTests(DevHabitWebAppFactory appFact
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-        file.Headers.ContentType = new("text/csv");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
         content.Add(file, "file", "entries.csv");
 
         HttpResponseMessage createResponse = await client.PostAsync(

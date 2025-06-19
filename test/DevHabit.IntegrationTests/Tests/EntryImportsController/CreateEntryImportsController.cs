@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Mime;
 using System.Text;
 using DevHabit.Api.Dtos.Entries.ImportJob;
 using DevHabit.Api.Dtos.Habits;
@@ -43,7 +44,7 @@ public sealed class CreateEntryImportsControllerTests(DevHabitWebAppFactory appF
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new(Encoding.UTF8.GetBytes(csvContent));
-        file.Headers.ContentType = new("text/csv");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Csv);
         content.Add(file, "file", "entries.csv");
 
         // Act
@@ -71,7 +72,7 @@ public sealed class CreateEntryImportsControllerTests(DevHabitWebAppFactory appF
 
         using MultipartFormDataContent content = [];
         using ByteArrayContent file = new("Invalid Content"u8.ToArray());
-        file.Headers.ContentType = new("text/txt");
+        file.Headers.ContentType = new(MediaTypeNames.Text.Plain);
         content.Add(file, "file", "entries.txt");
 
         // Act
