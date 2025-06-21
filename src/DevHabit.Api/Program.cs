@@ -22,17 +22,18 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    // app.MapOpenApi();
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-    app.MapScalarApiReference();
-
     await app.ApplyMigrationsAsync<ApplicationDbContext>();
     await app.ApplyMigrationsAsync<ApplicationIdentityDbContext>();
     await app.SeedInitialDataAsync();
 }
+
+
+// app.MapOpenApi();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
