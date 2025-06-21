@@ -63,6 +63,7 @@
     "Testcontainers",
     "toolstarget",
     "vsdbg",
+    "webapps",
     "xunit"
   ],
   "yaml.schemas": {
