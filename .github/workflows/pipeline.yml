@@ -77,7 +77,9 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Install EF Core CLI
-        run: dotnet tool install -g dotnet-ef
+        run: |
+          dotnet tool install -g dotnet-ef
+          dotnet tool restore
 
       - name: Create migration bundle
         run: |
