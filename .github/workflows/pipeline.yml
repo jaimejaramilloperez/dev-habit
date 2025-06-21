@@ -71,13 +71,18 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Install EF Core CLI
         run: dotnet tool install -g dotnet-ef
 
       - name: Create migration bundle
         run: |
-          dotnet ef migrations bundle --startup-project src/DevHabit.Api --project src/DevHabit.Api --context ApplicationDbContext --output app-bundle.exe
-          dotnet ef migrations bundle --startup-project src/DevHabit.Api --project src/DevHabit.Api --context ApplicationIdentityDbContext --output identity-bundle.exe
+          dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationDbContext -o app-bundle.exe
+          dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationIdentityDbContext -o identity-bundle.exe
 
       - name: Apply app migrations
         run: ./app-bundle.exe --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
