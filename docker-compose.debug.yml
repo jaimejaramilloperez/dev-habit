@@ -64,7 +64,7 @@ services:
 
   devhabit.seq:
     container_name: devhabit.seq
-    image: datalust/seq:2025.1
+    image: datalust/seq:2025.2
     restart: unless-stopped
     ports:
       - 7080:80
