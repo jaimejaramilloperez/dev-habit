@@ -1,6 +1,5 @@
 using DevHabit.Api;
 using DevHabit.Api.Configurations;
-using DevHabit.Api.Database;
 using DevHabit.Api.Extensions;
 using DevHabit.Api.Middlewares;
 using HealthChecks.UI.Client;
@@ -22,11 +21,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    await app.ApplyMigrationsAsync<ApplicationDbContext>();
-    await app.ApplyMigrationsAsync<ApplicationIdentityDbContext>();
+    await app.ApplyMigrationsAsync();
     await app.SeedInitialDataAsync();
 }
-
 
 // app.MapOpenApi();
 

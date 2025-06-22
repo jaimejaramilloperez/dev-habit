@@ -1,4 +1,5 @@
 using DevHabit.Api.Common.Auth;
+using DevHabit.Api.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,40 +7,10 @@ namespace DevHabit.Api.Extensions;
 
 public static class DatabaseExtensions
 {
-    public static void ApplyMigrations<TDbContext>(this WebApplication app)
-        where TDbContext : DbContext
+    public static async Task ApplyMigrationsAsync(this WebApplication app)
     {
-        using IServiceScope scope = app.Services.CreateScope();
-        using TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
-
-        try
-        {
-            dbContext.Database.Migrate();
-            app.Logger.LogInformation("Database migrations for {DbContext} applied successfully", typeof(TDbContext).Name);
-        }
-        catch (Exception ex)
-        {
-            app.Logger.LogError(ex, "An error occurred while applying database migrations for {DbContext}", typeof(TDbContext).Name);
-            throw;
-        }
-    }
-
-    public static async Task ApplyMigrationsAsync<TDbContext>(this WebApplication app)
-        where TDbContext : DbContext
-    {
-        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
-        using TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
-
-        try
-        {
-            await dbContext.Database.MigrateAsync();
-            app.Logger.LogInformation("Database migrations for {DbContext} applied successfully", typeof(TDbContext).Name);
-        }
-        catch (Exception ex)
-        {
-            app.Logger.LogError(ex, "An error occurred while applying database migrations for {DbContext}", typeof(TDbContext).Name);
-            throw;
-        }
+        await app.ApplyMigrationsAsync<ApplicationDbContext>();
+        await app.ApplyMigrationsAsync<ApplicationIdentityDbContext>();
     }
 
     public static async Task SeedInitialDataAsync(this WebApplication app)
@@ -64,6 +35,24 @@ public static class DatabaseExtensions
         catch (Exception ex)
         {
             app.Logger.LogError(ex, "An error occurred while seeding initial data");
+            throw;
+        }
+    }
+
+    private static async Task ApplyMigrationsAsync<TDbContext>(this WebApplication app)
+        where TDbContext : DbContext
+    {
+        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
+        using TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
+
+        try
+        {
+            await dbContext.Database.MigrateAsync();
+            app.Logger.LogInformation("Database migrations for {DbContext} applied successfully", typeof(TDbContext).Name);
+        }
+        catch (Exception ex)
+        {
+            app.Logger.LogError(ex, "An error occurred while applying database migrations for {DbContext}", typeof(TDbContext).Name);
             throw;
         }
     }
