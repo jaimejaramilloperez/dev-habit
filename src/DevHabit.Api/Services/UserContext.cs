@@ -11,7 +11,7 @@ public class UserContext(
     IMemoryCache memoryCache)
 {
     private const string CacheKeyPrefix = "users:id:";
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
     public async Task<string?> GetUserIdAsync(CancellationToken cancellationToken = default)
     {
