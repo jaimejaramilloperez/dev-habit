@@ -3,7 +3,6 @@ using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using DevHabit.Api.Common.Auth;
-using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Configurations.Scalar;
 using DevHabit.Api.Configurations.Swagger;
@@ -17,8 +16,6 @@ using DevHabit.Api.Services.GitHub;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -57,19 +54,6 @@ internal static class DependencyInjectionExtensions
             options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         })
         .AddXmlSerializerFormatters();
-
-        builder.Services.Configure<MvcOptions>(options =>
-        {
-            NewtonsoftJsonOutputFormatter formatter = options.OutputFormatters
-                .OfType<NewtonsoftJsonOutputFormatter>()
-                .First();
-
-            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.JsonV1);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.JsonV2);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJson);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJsonV1);
-            formatter.SupportedMediaTypes.Add(CustomMediaTypeNames.Application.HateoasJsonV2);
-        });
 
         builder.Services.AddApiVersioning(options =>
         {
@@ -174,8 +158,6 @@ internal static class DependencyInjectionExtensions
 
         builder.Services.AddScoped<UserContext>();
 
-        // builder.Services.AddTransient<DelayHandler>();
-
         builder.Services.AddScoped<GitHubService>();
 
         builder.Services.AddScoped<RefitGitHubService>();
@@ -206,30 +188,6 @@ internal static class DependencyInjectionExtensions
         {
             client.BaseAddress = new(builder.Configuration.GetValue<string>("GitHub:BaseUrl")!);
         });
-        // .AddHttpMessageHandler<DelayHandler>();
-        // .InternalRemoveAllResilienceHandlers()
-        // .AddResilienceHandler("custom", pipeline =>
-        // {
-        //     pipeline.AddTimeout(TimeSpan.FromSeconds(5));
-
-        //     pipeline.AddRetry(new()
-        //     {
-        //         MaxRetryAttempts = 3,
-        //         BackoffType = DelayBackoffType.Exponential,
-        //         UseJitter = true,
-        //         Delay = TimeSpan.FromMilliseconds(500),
-        //     });
-
-        //     pipeline.AddCircuitBreaker(new()
-        //     {
-        //         SamplingDuration = TimeSpan.FromSeconds(10),
-        //         FailureRatio = 0.9,
-        //         MinimumThroughput = 5,
-        //         BreakDuration = TimeSpan.FromSeconds(5),
-        //     });
-
-        //     pipeline.AddTimeout(TimeSpan.FromSeconds(1));
-        // });
 
         builder.Services.Configure<EncryptionOptions>(builder.Configuration.GetSection("Encryption"));
 
@@ -382,4 +340,3 @@ internal static class DependencyInjectionExtensions
         return builder;
     }
 }
-
