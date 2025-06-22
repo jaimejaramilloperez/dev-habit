@@ -68,8 +68,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
