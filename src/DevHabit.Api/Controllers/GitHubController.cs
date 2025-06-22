@@ -31,7 +31,7 @@ public sealed class GitHubController(
     [HttpGet("profile")]
     [EndpointSummary("Get GitHub user profile")]
     [EndpointDescription("Retrieves the authenticated user's GitHub profile information if a valid access token exists.")]
-    [Produces(CustomMediaTypeNames.Application.HateoasJson)]
+    [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
     [ProducesResponseType<GitHubUserProfileDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserProfile(

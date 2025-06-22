@@ -60,7 +60,7 @@ public sealed class UsersController(
     [HttpGet("me")]
     [EndpointSummary("Get current user's profile")]
     [EndpointDescription("Retrieves the profile information for the currently authenticated user.")]
-    [Produces(CustomMediaTypeNames.Application.HateoasJson)]
+    [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
     [ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCurrentUser(
         AcceptHeaderDto acceptHeaderDto,
