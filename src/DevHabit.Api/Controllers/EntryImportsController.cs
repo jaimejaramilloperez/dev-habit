@@ -21,16 +21,15 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/entries/imports")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class EntryImportsController(
     ApplicationDbContext dbContext,
-    UserContext userContext,
     LinkService linkService,
     ISchedulerFactory schedulerFactory) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
     private readonly ISchedulerFactory _schedulerFactory = schedulerFactory;
 
@@ -44,12 +43,7 @@ public sealed class EntryImportsController(
         IValidator<EntryImportJobsParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(entryImportsParameters, cancellationToken);
 
@@ -80,12 +74,7 @@ public sealed class EntryImportsController(
         EntryImportJobParameters entryImportJobParameters,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? fields = entryImportJobParameters.Fields;
 
@@ -110,12 +99,7 @@ public sealed class EntryImportsController(
         IValidator<CreateEntryImportJobDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(createImportJob, cancellationToken);
 

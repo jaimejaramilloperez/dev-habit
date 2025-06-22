@@ -20,16 +20,15 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/tags")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [ResponseCache(Duration = 120, VaryByHeader = "Accept")]
 [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class TagsController(
     ApplicationDbContext dbContext,
-    UserContext userContext,
     LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
@@ -42,12 +41,7 @@ public sealed class TagsController(
         IValidator<TagsParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(tagsParameters, cancellationToken);
 
@@ -84,12 +78,7 @@ public sealed class TagsController(
         TagParameters tagParameters,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? fields = tagParameters.Fields;
 
@@ -115,12 +104,7 @@ public sealed class TagsController(
         IValidator<CreateTagDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(createTagDto, cancellationToken);
 
@@ -168,12 +152,7 @@ public sealed class TagsController(
         IValidator<UpdateTagDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(updateTagDto, cancellationToken);
 
@@ -219,12 +198,7 @@ public sealed class TagsController(
         string id,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Tag? tag = await _dbContext.Tags
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);

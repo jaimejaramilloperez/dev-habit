@@ -22,16 +22,15 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/habits")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [ApiVersion(1.0)]
 [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class HabitsController(
     ApplicationDbContext dbContext,
-    UserContext userContext,
     LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
@@ -44,12 +43,7 @@ public sealed class HabitsController(
         IValidator<HabitsParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(habitParameters, cancellationToken);
 
@@ -82,7 +76,11 @@ public sealed class HabitsController(
     [MapToApiVersion(1.0)]
     [EndpointSummary("Get a habit by ID")]
     [EndpointDescription("Retrieves a specific habit by its unique identifier with optional field selection.")]
-    [Produces(CustomMediaTypeNames.Application.JsonV1, CustomMediaTypeNames.Application.HateoasJsonV1)]
+    [Produces(
+        MediaTypeNames.Application.Json,
+        CustomMediaTypeNames.Application.JsonV1,
+        CustomMediaTypeNames.Application.HateoasJson,
+        CustomMediaTypeNames.Application.HateoasJsonV1)]
     [ProducesResponseType<HabitWithTagsDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHabit(
@@ -90,12 +88,7 @@ public sealed class HabitsController(
         HabitParameters habitParameters,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? fields = habitParameters.Fields;
 
@@ -112,7 +105,11 @@ public sealed class HabitsController(
     [ApiVersion(2.0)]
     [EndpointSummary("Get a habit by ID")]
     [EndpointDescription("Retrieves a specific habit by its unique identifier with optional field selection.")]
-    [Produces(CustomMediaTypeNames.Application.JsonV2, CustomMediaTypeNames.Application.HateoasJsonV2)]
+    [Produces(
+        MediaTypeNames.Application.Json,
+        CustomMediaTypeNames.Application.JsonV2,
+        CustomMediaTypeNames.Application.HateoasJson,
+        CustomMediaTypeNames.Application.HateoasJsonV2)]
     [ProducesResponseType<HabitWithTagsDtoV2>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHabitV2(
@@ -120,12 +117,7 @@ public sealed class HabitsController(
         HabitParameters habitParameters,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? fields = habitParameters.Fields;
 
@@ -150,12 +142,7 @@ public sealed class HabitsController(
         IValidator<CreateHabitDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(createHabitDto, cancellationToken);
 
@@ -189,12 +176,7 @@ public sealed class HabitsController(
         IValidator<UpdateHabitDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(updateHabitDto, cancellationToken);
 
@@ -225,12 +207,7 @@ public sealed class HabitsController(
         JsonPatchDocument<HabitDto> patchDocument,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Habit? habit = await _dbContext.Habits
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
@@ -273,12 +250,7 @@ public sealed class HabitsController(
         string id,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Habit? habit = await _dbContext.Habits
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);

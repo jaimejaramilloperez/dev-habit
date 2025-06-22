@@ -21,16 +21,15 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/entries")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [EnableRateLimiting("default")]
 [Produces(MediaTypeNames.Application.Json, CustomMediaTypeNames.Application.HateoasJson)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class EntriesController(
     ApplicationDbContext dbContext,
-    UserContext userContext,
     LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
 
     [HttpGet]
@@ -43,12 +42,7 @@ public sealed class EntriesController(
         IValidator<EntriesParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(entriesParameters, cancellationToken);
 
@@ -84,12 +78,7 @@ public sealed class EntriesController(
         IValidator<EntriesCursorParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(entriesParameters, cancellationToken);
 
@@ -164,12 +153,7 @@ public sealed class EntriesController(
         EntryParameters entryParameters,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? fields = entryParameters.Fields;
 
@@ -195,12 +179,7 @@ public sealed class EntriesController(
         IValidator<CreateEntryDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(createEntryDto, cancellationToken);
 
@@ -243,12 +222,7 @@ public sealed class EntriesController(
         IValidator<CreateEntryBatchDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(createEntryBatchDto, cancellationToken);
 
@@ -303,12 +277,7 @@ public sealed class EntriesController(
         IValidator<UpdateEntryDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(updateEntryDto, cancellationToken);
 
@@ -334,12 +303,7 @@ public sealed class EntriesController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ArchiveEntry(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Entry? entry = await _dbContext.Entries
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
@@ -364,12 +328,7 @@ public sealed class EntriesController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UnArchiveEntry(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Entry? entry = await _dbContext.Entries
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
@@ -394,12 +353,7 @@ public sealed class EntriesController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEntry(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Entry? entry = await _dbContext.Entries
             .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, cancellationToken);
@@ -422,12 +376,7 @@ public sealed class EntriesController(
     [ProducesResponseType<EntryStatsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStats(CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         var entries = await _dbContext.Entries.Where(x => x.UserId == userId)
             .OrderBy(x => x.Date)

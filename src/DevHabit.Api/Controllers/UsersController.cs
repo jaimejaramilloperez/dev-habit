@@ -6,6 +6,7 @@ using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Users;
 using DevHabit.Api.Entities;
+using DevHabit.Api.Extensions;
 using DevHabit.Api.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -17,16 +18,15 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/users")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [Produces(MediaTypeNames.Application.Json)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(StatusCodes.Status404NotFound)]
 public sealed class UsersController(
     ApplicationDbContext dbContext,
-    UserContext userContext,
     LinkService linkService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
 
     [HttpGet("{id}")]
@@ -37,12 +37,7 @@ public sealed class UsersController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         if (id != userId)
         {
@@ -66,12 +61,7 @@ public sealed class UsersController(
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         UserDto? user = await _dbContext.Users.AsNoTracking()
             .Where(x => x.Id == userId)
@@ -103,12 +93,7 @@ public sealed class UsersController(
         IValidator<UpdateProfileDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(updateProfileDto, cancellationToken);
 

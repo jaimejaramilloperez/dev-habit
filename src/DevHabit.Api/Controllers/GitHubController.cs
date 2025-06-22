@@ -4,6 +4,7 @@ using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.GitHub;
+using DevHabit.Api.Extensions;
 using DevHabit.Api.Services;
 using DevHabit.Api.Services.GitHub;
 using FluentValidation;
@@ -15,17 +16,16 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("api/github")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [Produces(MediaTypeNames.Application.Json)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class GitHubController(
     RefitGitHubService gitHubService,
     GitHubAccessTokenService gitHubAccessTokenService,
-    UserContext userContext,
     LinkService linkService) : ControllerBase
 {
     private readonly RefitGitHubService _gitHubService = gitHubService;
     private readonly GitHubAccessTokenService _gitHubAccessTokenService = gitHubAccessTokenService;
-    private readonly UserContext _userContext = userContext;
     private readonly LinkService _linkService = linkService;
 
     [HttpGet("profile")]
@@ -38,12 +38,7 @@ public sealed class GitHubController(
         AcceptHeaderDto acceptHeaderDto,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         string? accessToken = await _gitHubAccessTokenService.GetAsync(userId, cancellationToken);
 
@@ -84,12 +79,7 @@ public sealed class GitHubController(
         IValidator<UserEventsParameters> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(eventsParameters, cancellationToken);
 
@@ -130,12 +120,7 @@ public sealed class GitHubController(
         IValidator<StoreGithubAccessTokenDto> validator,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await validator.ValidateAndThrowAsync(storeGithubAccessTokenDto, cancellationToken);
 
@@ -151,12 +136,7 @@ public sealed class GitHubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RevokeAccessToken(CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         await _gitHubAccessTokenService.RevokeAsync(userId, cancellationToken);
 

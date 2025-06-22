@@ -3,7 +3,7 @@ using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.HabitTags;
 using DevHabit.Api.Entities;
-using DevHabit.Api.Services;
+using DevHabit.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +13,17 @@ namespace DevHabit.Api.Controllers;
 [ApiController]
 [Route("/api/habits/{habitId}/tags")]
 [Authorize(Roles = Roles.Member)]
+[RequireUserId]
 [Produces(MediaTypeNames.Application.Json)]
 [ProducesResponseType(StatusCodes.Status204NoContent)]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(StatusCodes.Status404NotFound)]
-public sealed class HabitTagsController(
-    ApplicationDbContext dbContext,
-    UserContext userContext) : ControllerBase
+public sealed class HabitTagsController(ApplicationDbContext dbContext) : ControllerBase
 {
     public static readonly string Name = nameof(HabitTagsController)
         .Replace("Controller", string.Empty, StringComparison.Ordinal);
 
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly UserContext _userContext = userContext;
 
     [HttpPut]
     [EndpointSummary("Update habit tags")]
@@ -37,12 +35,7 @@ public sealed class HabitTagsController(
         UpsertHabitTagsDto upsertHabitTagsDto,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         Habit? habit = await _dbContext.Habits
             .Include(x => x.HabitTags)
@@ -96,12 +89,7 @@ public sealed class HabitTagsController(
         string tagId,
         CancellationToken cancellationToken)
     {
-        string? userId = await _userContext.GetUserIdAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return Unauthorized();
-        }
+        string userId = HttpContext.GetUserId();
 
         HabitTag? habitTag = await _dbContext.HabitTags
             .Where(x =>
