@@ -79,7 +79,7 @@ jobs:
           dotnet tool install -g dotnet-ef
           dotnet tool restore
 
-      - name: Create migration bundle
+      - name: Create migration bundles
         run: |
           dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationDbContext -o app-bundle.exe
           dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationIdentityDbContext -o identity-bundle.exe
