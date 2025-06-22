@@ -51,7 +51,7 @@ services:
 
   devhabit.aspire-dashboard:
     container_name: devhabit.aspire-dashboard
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.2
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
     ports:
       - 18888:18888
       - 18889:18889
