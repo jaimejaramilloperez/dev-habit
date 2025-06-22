@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <UserSecretsId>50a5b436-2896-4363-9bde-cca9f6e7227c</UserSecretsId>
+  </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="DevHabit.UnitTests" />
     <InternalsVisibleTo Include="DevHabit.IntegrationTests" />
