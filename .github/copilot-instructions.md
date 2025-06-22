@@ -1,13 +1,14 @@
 ## General
 
 - Make only high confidence suggestions when reviewing code changes.
-- Always use the latest version C#, currently C# 13 features.
 - Never change global.json unless explicitly asked to.
+- Use conventional commits.
 
 ## C# Guidelines
 
 ### Formatting
 
+- Use the latest C# 13 features.
 - Apply code-formatting style defined in `.editorconfig`.
 - Prefer file-scoped namespace declarations and single-line using directives.
 - Insert a newline before the opening curly brace of any code block (e.g., after `if`, `for`, `while`, `foreach`, `using`, `try`, etc.).

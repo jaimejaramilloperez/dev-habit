@@ -1,0 +1,85 @@
+version: 2
+updates:
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: America/Bogota
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "dotnet-sdk"
+    assignees:
+      - "jaimejaramilloperez"
+    reviewers:
+      - "jaimejaramilloperez"
+
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: America/Bogota
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "nuget"
+    assignees:
+      - "jaimejaramilloperez"
+    reviewers:
+      - "jaimejaramilloperez"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: America/Bogota
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    assignees:
+      - "jaimejaramilloperez"
+    reviewers:
+      - "jaimejaramilloperez"
+
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: America/Bogota
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    assignees:
+      - "jaimejaramilloperez"
+    reviewers:
+      - "jaimejaramilloperez"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: America/Bogota
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    assignees:
+      - "jaimejaramilloperez"
+    reviewers:
+      - "jaimejaramilloperez"
