@@ -1,4 +1,4 @@
-name: Publish 🚀
+name: Deploy app to Azure Web App 🚀
 
 on:
   workflow_dispatch:
@@ -106,7 +106,7 @@ jobs:
           name: webapp
           path: package
 
-      - name: Deploy
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
