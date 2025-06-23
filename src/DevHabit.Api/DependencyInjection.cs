@@ -52,8 +52,7 @@ internal static class DependencyInjectionExtensions
         .AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-        })
-        .AddXmlSerializerFormatters();
+        });
 
         builder.Services.AddApiVersioning(options =>
         {
