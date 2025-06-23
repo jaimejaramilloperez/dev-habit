@@ -46,12 +46,14 @@ services:
       - 5341:5341
     environment:
       ACCEPT_EULA: "Y"
+      SEQ_PASSWORD: ${SEQ_PASSWORD}
     volumes:
       - seq-data:/data
 
   devhabit.aspire-dashboard:
     container_name: devhabit.aspire-dashboard
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
+    restart: unless-stopped
     ports:
       - 18888:18888
       - 18889:18889

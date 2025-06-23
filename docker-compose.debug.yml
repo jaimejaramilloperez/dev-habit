@@ -19,6 +19,9 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Path: ${CERTIFICATE_PATH}
       ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
       ConnectionStrings__Database: "Server=${POSTGRES_SERVER};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
+      Encryption__Key: ${ENCRYPTION_KEY}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_ENDPOINT}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_PROTOCOL}
     depends_on:
       devhabit.postgres:
         condition: service_healthy
@@ -71,12 +74,14 @@ services:
       - 5341:5341
     environment:
       ACCEPT_EULA: "Y"
+      SEQ_PASSWORD: ${SEQ_PASSWORD}
     volumes:
       - seq-data:/data
 
   devhabit.aspire-dashboard:
     container_name: devhabit.aspire-dashboard
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
+    restart: unless-stopped
     ports:
       - 18888:18888
       - 18889:18889
