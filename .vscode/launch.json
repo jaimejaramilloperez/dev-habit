@@ -2,26 +2,28 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": ".NET Core Launch (web)",
-      "type": "coreclr",
+      "name": "Containers: .NET Launch",
+      "type": "docker",
       "request": "launch",
-      "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/DevHabit.Api/bin/Debug/net9.0/DevHabit.Api.dll",
-      "args": [],
-      "cwd": "${workspaceFolder}/src/DevHabit.Api",
-      "stopAtEntry": false,
+      "preLaunchTask": "docker-run: debug",
+      "postDebugTask": "docker-remove-image",
       "serverReadyAction": {
-        "action": "openExternally",
-        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+        "action": "startDebugging",
+        "name": "No Launch Browser",
+        "killOnServerStop": true
       },
-      "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+      "netCore": {
+        "appProject": "${workspaceFolder}/src/DevHabit.Api/DevHabit.Api.csproj"
       }
     },
     {
-      "name": ".NET Core Attach",
-      "type": "coreclr",
-      "request": "attach"
+      "name": "Containers .NET Attach (Preview)",
+      "type": "docker",
+      "request": "attach",
+      "platform": "netCore",
+      "sourceFileMap": {
+        "/src": "${workspaceFolder}"
+      }
     }
   ]
 }

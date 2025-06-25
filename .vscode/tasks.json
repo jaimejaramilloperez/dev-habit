@@ -1,0 +1,104 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/DevHabit.slnx",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "docker-remove-image",
+      "type": "shell",
+      "command": "docker container rm -f devhabit.api && docker image rm -f devhabit.api:dev && docker compose down"
+    },
+    {
+      "label": "docker-compose: up",
+      "type": "shell",
+      "command": "docker-compose up -d"
+    },
+    {
+      "type": "docker-build",
+      "label": "docker-build: debug",
+      "dependsOn": [
+        "build"
+      ],
+      "dockerBuild": {
+        "tag": "devhabit.api:dev",
+        "target": "debug",
+        "dockerfile": "${workspaceFolder}/src/DevHabit.Api/Dockerfile",
+        "context": "${workspaceFolder}",
+        "pull": true
+      },
+      "netCore": {
+        "appProject": "${workspaceFolder}/src/DevHabit.Api/DevHabit.Api.csproj"
+      }
+    },
+    {
+      "type": "docker-build",
+      "label": "docker-build: release",
+      "dependsOn": [
+        "build"
+      ],
+      "dockerBuild": {
+        "tag": "devhabit.api:latest",
+        "dockerfile": "${workspaceFolder}/src/DevHabit.Api/Dockerfile",
+        "context": "${workspaceFolder}",
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "pull": true
+      },
+      "netCore": {
+        "appProject": "${workspaceFolder}/src/DevHabit.Api/DevHabit.Api.csproj"
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: debug",
+      "dependsOn": [
+        "docker-compose: up",
+        "docker-build: debug"
+      ],
+      "dockerRun": {
+        "containerName": "devhabit.api",
+        "network": "pragmaticrestapicourse_default",
+        "envFiles": [
+          ".env.docker-debug-image"
+        ],
+        "ports": [
+          {
+            "hostPort": 5000,
+            "containerPort": 5000
+          },
+          {
+            "hostPort": 5001,
+            "containerPort": 5001
+          }
+        ]
+      },
+      "netCore": {
+        "appProject": "${workspaceFolder}/src/DevHabit.Api/DevHabit.Api.csproj",
+        "enableDebugging": true
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: release",
+      "dependsOn": [
+        "docker-build: release"
+      ],
+      "dockerRun": {},
+      "netCore": {
+        "appProject": "${workspaceFolder}/src/DevHabit.Api/DevHabit.Api.csproj"
+      }
+    }
+  ]
+}
