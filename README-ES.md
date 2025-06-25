@@ -387,9 +387,9 @@ Para compilar y ejecutar la API en modo producción utilizando una imagen Docker
 ```dotenv
 DOTNET_USE_POLLING_FILE_WATCHER="1"
 ASPNETCORE_ENVIRONMENT="Production"
-ASPNETCORE_HTTP_PORTS="5000"
+ASPNETCORE_HTTP_PORTS=5000
 
-ConnectionStrings__Database="Server=devhabit.postgres;Port=5432;Database=devhabit;Username=devhabit;Password=123456;"
+ConnectionStrings__Database=Server=devhabit.postgres;Port=5432;Database=devhabit;Username=devhabit;Password=123456;
 
 Jwt__Key="your-secret-key-here-that-should-also-be-fairly-long"
 Jwt__Issuer="dev-habit.api"
@@ -403,7 +403,7 @@ Jobs__ScanIntervalInMinutes=50
 GitHub__BaseUrl="https://api.github.com"
 
 # Required
-APPLICATIONINSIGHTS_CONNECTION_STRING="<your-azure-application-insights-connection-string>"
+APPLICATIONINSIGHTS_CONNECTION_STRING=<your-azure-application-insights-connection-string>
 ```
 
 2. Compile la imagen:

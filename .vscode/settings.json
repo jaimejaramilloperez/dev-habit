@@ -5,7 +5,7 @@
       "devHabitApiHostAddress": "https://localhost:5001"
     },
     "dev": {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJkZXYtaGFiaXQuYXBwIiwiaXNzIjoiZGV2LWhhYml0LmFwaSIsImV4cCI6MTc1MDg4NTcxNiwic3ViIjoiNGExNmY4MTEtMTZmYi00MmEwLWFlZjUtMjUxYzFjMjIxZTE3IiwiZW1haWwiOiJ0ZXN0QG1haWwuY29tIiwicm9sZSI6Ik1lbWJlciIsImlhdCI6MTc1MDg4MzkxNiwibmJmIjoxNzUwODgzOTE2fQ.IDWTQ-yB8fAKxt6Q8tcUWC5MlKzIqQDEENGRBRCZ6bQ",
+      "token": "",
       "githubToken": ""
     }
   },
