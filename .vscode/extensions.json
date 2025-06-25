@@ -1,0 +1,15 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
+  "recommendations": [
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "ms-dotnettools.vscodeintellicode-csharp",
+    "ms-azuretools.vscode-containers",
+    "docker.docker",
+    "ms-ossdata.vscode-pgsql",
+    "EditorConfig.EditorConfig",
+    "humao.rest-client",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
