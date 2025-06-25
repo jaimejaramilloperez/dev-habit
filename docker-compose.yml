@@ -63,5 +63,4 @@ services:
 volumes:
   postgres-data:
   pgadmin-data:
-    external: true
   seq-data:

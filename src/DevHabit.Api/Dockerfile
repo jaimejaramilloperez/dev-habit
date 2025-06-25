@@ -50,4 +50,18 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
   exit 1
 COPY ["src/DevHabit.Api/aspnetapp.pfx", "/https/aspnetapp.pfx"]
 RUN chmod 644 /https/aspnetapp.pfx
+USER app
 ENTRYPOINT ["dotnet", "DevHabit.Api.dll"]
+
+FROM base AS debug
+ENV ASPNETCORE_HTTP_PORTS=5000
+ENV ASPNETCORE_HTTPS_PORTS=5001
+EXPOSE $ASPNETCORE_HTTP_PORTS
+EXPOSE $ASPNETCORE_HTTPS_PORTS
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget --no-verbose --tries=1 --no-check-certificate --spider https://localhost:$ASPNETCORE_HTTPS_PORTS/health || \
+  wget --no-verbose --tries=1 --spider http://localhost:$ASPNETCORE_HTTP_PORTS/health || \
+  exit 1
+COPY ["src/DevHabit.Api/aspnetapp.pfx", "/https/aspnetapp.pfx"]
+RUN chmod 644 /https/aspnetapp.pfx
+USER app

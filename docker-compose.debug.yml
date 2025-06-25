@@ -9,8 +9,8 @@ services:
       args:
         - BUILD_CONFIGURATION=${DOCKER_ASPNETCORE_BUILD_CONFIGURATION}
     ports:
-      - 5000:${HTTP_PORT}
-      - 5001:${HTTPS_PORT}
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: 1
       ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
@@ -20,8 +20,8 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
       ConnectionStrings__Database: "Server=${POSTGRES_SERVER};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
       Encryption__Key: ${ENCRYPTION_KEY}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_ENDPOINT}
-      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_PROTOCOL}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}
     depends_on:
       devhabit.postgres:
         condition: service_healthy
@@ -91,5 +91,4 @@ services:
 volumes:
   postgres-data:
   pgadmin-data:
-    external: true
   seq-data:
