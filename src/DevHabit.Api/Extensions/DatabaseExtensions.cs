@@ -16,7 +16,7 @@ public static class DatabaseExtensions
     public static async Task SeedInitialDataAsync(this WebApplication app)
     {
         await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
-        RoleManager<IdentityRole> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        using RoleManager<IdentityRole> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
         try
         {
@@ -43,7 +43,7 @@ public static class DatabaseExtensions
         where TDbContext : DbContext
     {
         await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
-        using TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
+        await using TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
         try
         {
