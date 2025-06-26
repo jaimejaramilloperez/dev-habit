@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   AZURE_WEBAPP_NAME: "devhabit-api"
   DOTNET_VERSION: "9.x"
@@ -81,14 +85,14 @@ jobs:
 
       - name: Create migration bundles
         run: |
-          dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationDbContext -o app-bundle.exe
-          dotnet ef migrations bundle -p src/DevHabit.Api -c ApplicationIdentityDbContext -o identity-bundle.exe
+          dotnet ef migrations bundle --project src/DevHabit.Api --context ApplicationDbContext --output app-bundle
+          dotnet ef migrations bundle --project src/DevHabit.Api --context ApplicationIdentityDbContext --output identity-bundle
 
       - name: Apply app migrations
-        run: ./app-bundle.exe --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
+        run: ./app-bundle --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
 
       - name: Apply identity migrations
-        run: ./identity-bundle.exe --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
+        run: ./identity-bundle --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
 
   deploy:
     name: Deploy to Azure
