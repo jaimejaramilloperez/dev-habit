@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq.Dynamic.Core;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Pagination;
@@ -9,6 +10,8 @@ namespace DevHabit.Api.Extensions;
 
 public static class QueryableExtensions
 {
+    private static readonly ActivitySource ActivitySource = new("DevHabit.Tracing");
+
     public static IQueryable<T> SortByQueryString<T>(
         this IQueryable<T> query,
         string? sortExpression,
@@ -124,21 +127,26 @@ public static class QueryableExtensions
         string? fields,
         CancellationToken cancellationToken = default)
     {
-        long totalCount = await query.LongCountAsync(cancellationToken);
-
-        List<T> items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        return new()
+        using (var activity = ActivitySource.StartActivity($"Get Pagination.Result.{typeof(T).Name}"))
         {
-            Data = DataShaper.ShapeCollectionData(items, fields),
-            OriginalData = items,
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = totalCount,
-        };
+            activity?.SetTag("pagination.page", page);
+
+            long totalCount = await query.LongCountAsync(cancellationToken);
+
+            List<T> items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return new()
+            {
+                Data = DataShaper.ShapeCollectionData(items, fields),
+                OriginalData = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+            };
+        }
     }
 
     private static IQueryable<T> ApplyDefaultOrder<T>(IQueryable<T> query, string? defaultOrderField)
