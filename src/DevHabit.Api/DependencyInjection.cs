@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using DevHabit.Api.Common.Auth;
+using DevHabit.Api.Common.Telemetry;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Configurations.Scalar;
 using DevHabit.Api.Configurations.Swagger;
@@ -111,16 +112,21 @@ internal static class DependencyInjectionExtensions
 
     public static WebApplicationBuilder AddObservability(this WebApplicationBuilder builder)
     {
+        builder.Services.AddMetrics();
+        builder.Services.AddSingleton<DevHabitMetrics>();
+
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
             .WithTracing(tracing => tracing
+                .AddSource("DevHabit.Tracing")
                 .AddHttpClientInstrumentation()
                 .AddAspNetCoreInstrumentation()
                 .AddNpgsql())
             .WithMetrics(metrics => metrics
+                .AddMeter(DevHabitMetrics.MeterName)
+                .AddRuntimeInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddAspNetCoreInstrumentation()
-                .AddRuntimeInstrumentation());
+                .AddAspNetCoreInstrumentation());
 
         builder.Logging.AddOpenTelemetry(options =>
         {

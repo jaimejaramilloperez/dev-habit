@@ -4,6 +4,7 @@ using DevHabit.Api.Common.Auth;
 using DevHabit.Api.Common.DataShaping;
 using DevHabit.Api.Common.Hateoas;
 using DevHabit.Api.Common.Pagination;
+using DevHabit.Api.Common.Telemetry;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Common;
 using DevHabit.Api.Dtos.Habits;
@@ -41,6 +42,7 @@ public sealed class HabitsController(
     public async Task<IActionResult> GetHabits(
         HabitsParameters habitParameters,
         IValidator<HabitsParameters> validator,
+        DevHabitMetrics devHabitMetrics,
         CancellationToken cancellationToken)
     {
         string userId = HttpContext.GetUserId();
@@ -68,6 +70,8 @@ public sealed class HabitsController(
                 CollectionLinksFactory = x => CreateLinksForHabits(habitParameters, x.HasPreviousPage, x.HasNextPage),
                 AcceptHeader = habitParameters.Accept,
             }, cancellationToken);
+
+        devHabitMetrics.IncreaseHabitsRequestCount([new("UserId", userId)]);
 
         return Ok(paginationResult);
     }

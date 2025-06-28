@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using DevHabit.Api.Common.Auth;
+using DevHabit.Api.Common.Telemetry;
 using DevHabit.Api.Configurations;
 using DevHabit.Api.Database;
 using DevHabit.Api.Dtos.Auth;
@@ -43,6 +44,7 @@ public sealed class AuthController(
     public async Task<IActionResult> Register(
         RegisterUserDto registerUserDto,
         IValidator<RegisterUserDto> validator,
+        DevHabitMetrics devHabitMetrics,
         CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(registerUserDto, cancellationToken);
@@ -141,6 +143,8 @@ public sealed class AuthController(
         await _identityDbContext.SaveChangesAsync(cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
+
+        devHabitMetrics.IncreaseUserRegistrationsCount();
 
         return Ok(accessTokens);
     }
