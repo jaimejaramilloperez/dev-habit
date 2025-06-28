@@ -6,10 +6,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   AZURE_WEBAPP_NAME: "devhabit-api"
   DOTNET_VERSION: "9.x"
