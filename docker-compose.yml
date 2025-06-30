@@ -20,7 +20,7 @@ services:
 
   devhabit.pgadmin:
     container_name: devhabit.pgadmin
-    image: dpage/pgadmin4:9.4.0
+    image: dpage/pgadmin4:9.5.0
     restart: unless-stopped
     ports:
       - 8080:80
