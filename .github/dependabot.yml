@@ -11,6 +11,9 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    commit-message:
+       include: scope
+       prefix: chore
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
