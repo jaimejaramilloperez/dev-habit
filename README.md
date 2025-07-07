@@ -7,7 +7,7 @@
 # DevHabit API
 
 > [!TIP]
-> 📘 This project is also available in [Spanish](./README-ES.md).
+> 📘 This project documentation is also available in [Spanish](./README-ES.md).
 
 ## Table of Contents
 
