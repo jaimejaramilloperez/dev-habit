@@ -30,6 +30,9 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: America/Bogota
+    commit-message:
+       include: scope
+       prefix: chore
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
