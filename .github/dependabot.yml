@@ -14,7 +14,7 @@ updates:
     commit-message:
        include: scope
        prefix: chore
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "dotnet-sdk"
@@ -33,7 +33,7 @@ updates:
     commit-message:
        include: scope
        prefix: chore
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "nuget"
@@ -49,7 +49,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: America/Bogota
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "docker"
@@ -65,7 +65,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: America/Bogota
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "docker"
@@ -84,7 +84,7 @@ updates:
     commit-message:
       include: scope
       prefix: ci
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "github-actions"
