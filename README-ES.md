@@ -292,7 +292,7 @@ SEQ_PASSWORD="12345678"
 docker compose up -d
 ```
 
-5. REjecute la API:
+5. Ejecute la API:
 
 ```bash
 dotnet run --project src/DevHabit.Api
