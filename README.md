@@ -91,7 +91,7 @@ This project was built following [Milan Jovanović](https://github.com/m-jovanov
 #### 🔐 Security
 - JWT-based authentication and authorization
 - CORS policy configuration
-- secure storage of GitHub api keys via encryption
+- Secure storage of GitHub api keys via encryption
 
 #### 📈 Observability & Resilience
 - OpenTelemetry-based distributed tracing
